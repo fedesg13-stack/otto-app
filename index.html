@@ -787,7 +787,7 @@ ${cDet}`;
   try{
     const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:ctx,messages:[{role:'user',content:msg}]})});
     const data=await res.json();
-    const reply=data.content?.[0]?.text||'No pude procesar eso.';
+    const reply=data.content?.[0]?.text||(data.error?'Error: '+JSON.stringify(data.error):'Sin respuesta');
     document.getElementById(tid)?.remove();addBub(reply,'otto');
   }catch(e){document.getElementById(tid)?.remove();addBub('Tuve un problema conectándome. Intentá de nuevo.','otto');}
 }
