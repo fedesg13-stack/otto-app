@@ -46,8 +46,94 @@ body{background:var(--bg);color:var(--on-bg);font-family:'Nunito',sans-serif;min
 .loading-text{font-size:13px;color:var(--on-surface-var);font-weight:600;}
 
 /* APP */
-#app{display:none;min-height:100vh;padding-bottom:80px;}
+#app{display:none;min-height:100vh;padding-bottom:32px;}
 #app.visible{display:block;}
+
+/* ── MENÚ HAMBURGUESA ── */
+.btn-menu{
+  background:var(--surface-var);border:none;border-radius:var(--rm);
+  width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:var(--on-surface-var);transition:all .2s;
+}
+.btn-menu:hover{background:var(--primary-container);color:var(--primary);}
+
+.menu-overlay{
+  display:none;position:fixed;inset:0;z-index:300;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(2px);
+}
+.menu-overlay.visible{display:block;}
+
+.menu-panel{
+  position:fixed;top:0;right:-280px;width:280px;height:100vh;
+  background:var(--surface);z-index:301;
+  display:flex;flex-direction:column;
+  box-shadow:-4px 0 24px rgba(0,0,0,.12);
+  transition:right .3s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+}
+.menu-panel.open{right:0;}
+
+.menu-panel-top{
+  background:linear-gradient(135deg,var(--primary),#0d47a1);
+  padding:48px 20px 20px;
+}
+.menu-user{display:flex;align-items:center;gap:12px;}
+.menu-user .user-av{border:2px solid rgba(255,255,255,.4);flex-shrink:0;}
+.menu-user #menuName{color:#fff;}
+.menu-user #menuNegocio{color:rgba(255,255,255,.7);}
+
+.menu-items{flex:1;padding:12px 0;}
+.menu-item{
+  width:100%;display:flex;align-items:center;gap:14px;
+  padding:13px 20px;background:transparent;border:none;
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;
+  color:var(--on-bg);cursor:pointer;text-align:left;
+  transition:background .15s;border-radius:0;
+}
+.menu-item:hover{background:var(--surface-var);}
+.menu-item.on{background:var(--primary-container);color:var(--primary);}
+.menu-item-icon{
+  width:40px;height:40px;border-radius:var(--rm);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.menu-item-label{font-size:14px;font-weight:700;}
+
+.menu-logout{
+  margin:12px 16px 24px;display:flex;align-items:center;gap:8px;
+  background:var(--error-container);color:var(--error);border:none;
+  border-radius:var(--rfull);padding:12px 16px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;width:calc(100% - 32px);
+}
+.menu-logout:hover{background:var(--error);color:#fff;}
+
+/* ── FAB AGREGAR ── */
+.sec-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.sec-title-row .sec-title{margin-bottom:0;}
+.fab-add{
+  display:flex;align-items:center;gap:6px;
+  background:var(--primary);color:#fff;border:none;
+  border-radius:var(--rfull);padding:9px 16px;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;
+  cursor:pointer;box-shadow:var(--elev2);transition:all .2s;
+  white-space:nowrap;
+}
+.fab-add:hover{box-shadow:var(--elev3);transform:translateY(-1px);}
+.fab-add .material-icons-round{font-size:18px;}
+
+/* Animación suave al expandir forms */
+.form-collapsible{animation:fadeUp .2s ease;}
+
+/* ── CHAT RÁPIDO HOME ── */
+.btn-quick-chat{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:linear-gradient(135deg,var(--primary),#0d47a1);color:#fff;
+  border:none;border-radius:var(--rxl);padding:14px 20px;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;
+  cursor:pointer;box-shadow:var(--elev2);transition:all .2s;
+}
+.btn-quick-chat:hover{box-shadow:var(--elev3);transform:translateY(-1px);}
+.btn-quick-chat .material-icons-round{font-size:20px;}
 
 /* TOP BAR */
 header{background:var(--surface);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50;box-shadow:0 1px 0 var(--outline-var);}
@@ -626,56 +712,77 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 <!-- APP -->
 <div id="app">
   <header>
-    <svg width="72" height="26" viewBox="0 0 560 180">
-      <path d="M8,90 A72,72 0 0,1 152,90" fill="none" stroke="#1a73e8" stroke-width="34" stroke-linecap="butt"/>
-      <path d="M8,90 A72,72 0 0,0 152,90" fill="none" stroke="#1a73e8" stroke-width="11" stroke-linecap="butt"/>
-      <circle cx="80" cy="90" r="13" fill="#1a73e8" opacity="0.3"/>
-      <rect x="174" y="22" width="104" height="26" rx="13" fill="#1a73e8"/>
-      <rect x="213" y="22" width="26" height="140" rx="13" fill="#1a73e8"/>
-      <rect x="288" y="22" width="104" height="26" rx="13" fill="#1a73e8"/>
-      <rect x="327" y="22" width="26" height="140" rx="13" fill="#1a73e8"/>
-      <path d="M408,90 A72,72 0 0,1 552,90" fill="none" stroke="#1a73e8" stroke-width="34" stroke-linecap="butt"/>
-      <path d="M408,90 A72,72 0 0,0 552,90" fill="none" stroke="#1a73e8" stroke-width="11" stroke-linecap="butt"/>
-      <circle cx="480" cy="90" r="13" fill="#1a73e8" opacity="0.3"/>
-    </svg>
+    <button onclick="menuNav('home')" style="background:transparent;border:none;cursor:pointer;padding:4px;border-radius:var(--rs);transition:background .2s;" title="Inicio">
+      <svg width="72" height="26" viewBox="0 0 560 180">
+        <path d="M8,90 A72,72 0 0,1 152,90" fill="none" stroke="#1a73e8" stroke-width="34" stroke-linecap="butt"/>
+        <path d="M8,90 A72,72 0 0,0 152,90" fill="none" stroke="#1a73e8" stroke-width="11" stroke-linecap="butt"/>
+        <circle cx="80" cy="90" r="13" fill="#1a73e8" opacity="0.3"/>
+        <rect x="174" y="22" width="104" height="26" rx="13" fill="#1a73e8"/>
+        <rect x="213" y="22" width="26" height="140" rx="13" fill="#1a73e8"/>
+        <rect x="288" y="22" width="104" height="26" rx="13" fill="#1a73e8"/>
+        <rect x="327" y="22" width="26" height="140" rx="13" fill="#1a73e8"/>
+        <path d="M408,90 A72,72 0 0,1 552,90" fill="none" stroke="#1a73e8" stroke-width="34" stroke-linecap="butt"/>
+        <path d="M408,90 A72,72 0 0,0 552,90" fill="none" stroke="#1a73e8" stroke-width="11" stroke-linecap="butt"/>
+        <circle cx="480" cy="90" r="13" fill="#1a73e8" opacity="0.3"/>
+      </svg>
+    </button>
     <div style="display:flex;align-items:center;gap:8px;">
       <div class="user-chip">
         <div class="user-av" id="uAv">?</div>
         <div class="user-name" id="uName">—</div>
       </div>
-      <button class="btn-logout" onclick="logoutOtto()" title="Cerrar sesión">
-        <span class="material-icons-round" style="font-size:18px">logout</span>
+      <button class="btn-menu rpl" onclick="toggleMenu()" id="btnMenu" aria-label="Menú">
+        <span class="material-icons-round" id="menuIcon">menu</span>
       </button>
     </div>
   </header>
 
-  <div class="otto-banner">
-    <div class="otto-av">
-      <svg width="22" height="22" viewBox="0 0 560 180">
-        <path d="M8,90 A72,72 0 0,1 152,90" fill="none" stroke="white" stroke-width="34" stroke-linecap="butt"/>
-        <path d="M8,90 A72,72 0 0,0 152,90" fill="none" stroke="white" stroke-width="11" stroke-linecap="butt"/>
-        <rect x="174" y="22" width="104" height="26" rx="13" fill="white"/>
-        <rect x="213" y="22" width="26" height="140" rx="13" fill="white"/>
-        <rect x="288" y="22" width="104" height="26" rx="13" fill="white"/>
-        <rect x="327" y="22" width="26" height="140" rx="13" fill="white"/>
-        <path d="M408,90 A72,72 0 0,1 552,90" fill="none" stroke="white" stroke-width="34" stroke-linecap="butt"/>
-        <path d="M408,90 A72,72 0 0,0 552,90" fill="none" stroke="white" stroke-width="11" stroke-linecap="butt"/>
-      </svg>
+  <!-- MENÚ LATERAL DESPLEGABLE -->
+  <div class="menu-overlay" id="menuOverlay" onclick="closeMenu()"></div>
+  <div class="menu-panel" id="menuPanel">
+    <div class="menu-panel-top">
+      <div class="menu-user">
+        <div class="user-av" id="menuAv" style="width:40px;height:40px;font-size:16px;">?</div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--on-bg)" id="menuName">—</div>
+          <div style="font-size:12px;color:var(--on-surface-var);font-weight:500" id="menuNegocio">Mi negocio</div>
+        </div>
+      </div>
     </div>
-    <div>
-      <div class="otto-label"><span class="otto-dot"></span>OTTO dice</div>
-      <div class="otto-text" id="ottoBanner">Bienvenido. Cargá tus primeros datos.</div>
+    <div class="menu-items">
+      <button class="menu-item on" id="mi-home" onclick="menuNav('home')">
+        <span class="menu-item-icon" style="background:var(--primary-container)"><span class="material-icons-round" style="color:var(--primary)">home</span></span>
+        <span class="menu-item-label">Inicio</span>
+      </button>
+      <button class="menu-item" id="mi-fin" onclick="menuNav('fin')">
+        <span class="menu-item-icon" style="background:var(--secondary-container)"><span class="material-icons-round" style="color:var(--secondary)">payments</span></span>
+        <span class="menu-item-label">Finanzas</span>
+      </button>
+      <button class="menu-item" id="mi-ped" onclick="menuNav('ped')">
+        <span class="menu-item-icon" style="background:var(--tertiary-container)"><span class="material-icons-round" style="color:var(--tertiary)">receipt_long</span></span>
+        <span class="menu-item-label">Pedidos</span>
+      </button>
+      <button class="menu-item" id="mi-age" onclick="menuNav('age')">
+        <span class="menu-item-icon" style="background:#fff3e0"><span class="material-icons-round" style="color:#e65100">calendar_month</span></span>
+        <span class="menu-item-label">Agenda</span>
+      </button>
+      <button class="menu-item" id="mi-task" onclick="menuNav('task')">
+        <span class="menu-item-icon" style="background:var(--success-container)"><span class="material-icons-round" style="color:var(--success)">check_circle</span></span>
+        <span class="menu-item-label">Tareas</span>
+      </button>
+      <button class="menu-item" id="mi-mn" onclick="menuNav('mn')">
+        <span class="menu-item-icon" style="background:#f3e5f5"><span class="material-icons-round" style="color:#7b1fa2">storefront</span></span>
+        <span class="menu-item-label">Mi negocio</span>
+      </button>
+      <button class="menu-item" id="mi-chat" onclick="menuNav('chat')">
+        <span class="menu-item-icon" style="background:var(--primary-container)"><span class="material-icons-round" style="color:var(--primary)">smart_toy</span></span>
+        <span class="menu-item-label">Hablar con OTTO</span>
+      </button>
     </div>
-  </div>
-
-  <div class="nav" style="overflow-x:auto;scrollbar-width:none;">
-    <button class="nav-btn on rpl" onclick="goTab('home',this)"><div class="pill"><span class="material-icons-round">home</span></div>Inicio</button>
-    <button class="nav-btn rpl" onclick="goTab('fin',this)"><div class="pill"><span class="material-icons-round">payments</span></div>Finanzas</button>
-    <button class="nav-btn rpl" onclick="goTab('ped',this)"><div class="pill"><span class="material-icons-round">receipt_long</span></div>Pedidos</button>
-    <button class="nav-btn rpl" onclick="goTab('age',this)"><div class="pill"><span class="material-icons-round">calendar_month</span></div>Agenda</button>
-    <button class="nav-btn rpl" onclick="goTab('task',this)"><div class="pill"><span class="material-icons-round">check_circle</span></div>Tareas</button>
-    <button class="nav-btn rpl" onclick="goTab('mn',this)"><div class="pill"><span class="material-icons-round">storefront</span></div>Negocio</button>
-    <button class="nav-btn rpl" onclick="goTab('chat',this)"><div class="pill"><span class="material-icons-round">smart_toy</span></div>OTTO</button>
+    <button class="menu-logout" onclick="logoutOtto()">
+      <span class="material-icons-round" style="font-size:18px">logout</span>
+      Cerrar sesión
+    </button>
   </div>
 
   <!-- MODAL -->
@@ -696,6 +803,28 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       <div class="otto-slider" id="ottoSlider"></div>
     </div>
     <div class="slider-dots" id="sliderDots"></div>
+
+    <!-- Botón chat rápido -->
+    <div style="padding:12px 16px 0;">
+      <button class="btn-quick-chat rpl" onclick="toggleQuickChat()">
+        <span class="material-icons-round">smart_toy</span>
+        Consultarle a OTTO
+      </button>
+    </div>
+
+    <!-- Chat rápido colapsable -->
+    <div id="quickChatWrap" style="display:none;margin:10px 16px 0;">
+      <div class="m3-card" style="margin-bottom:0;">
+        <div class="chat-msgs" id="quickChatMsgs" style="max-height:220px;">
+          <div class="msg"><div class="msg-av">O</div><div class="msg-bub otto">¡Hola! ¿En qué te ayudo? 👋</div></div>
+        </div>
+        <div class="chat-row">
+          <input class="chat-inp" id="quickChatInp" placeholder="Preguntale a OTTO…" onkeydown="if(event.key==='Enter')sendQuickMsg()">
+          <button class="chat-send rpl" onclick="sendQuickMsg()"><span class="material-icons-round">send</span></button>
+        </div>
+      </div>
+    </div>
+
     <div style="height:14px"></div>
     <div class="week-wrap">
       <div class="week-header">Esta semana</div>
@@ -721,7 +850,12 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 
   <!-- FINANZAS -->
   <div class="panel" id="p-fin">
-    <div class="sec-title">Finanzas</div>
+    <div class="sec-title-row">
+      <div class="sec-title">Finanzas</div>
+      <button class="fab-add rpl" onclick="toggleForm('formFin')" id="fabFin">
+        <span class="material-icons-round">add</span> Agregar
+      </button>
+    </div>
     <div class="bal-row">
       <div class="bal-card ing rpl" onclick="openModal('ingreso')">
         <div class="bal-lbl">Ingresos <span class="material-icons-round" style="font-size:10px;vertical-align:middle;opacity:.5">open_in_new</span></div>
@@ -736,7 +870,7 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
         <div class="bal-num" id="bNet">$0</div>
       </div>
     </div>
-    <div class="m3-card">
+    <div class="m3-card form-collapsible" id="formFin" style="display:none;">
       <div class="m3-card-title">Nuevo movimiento</div>
       <div class="type-seg">
         <button class="seg-btn ing-on" id="sIng" onclick="setTipo('ingreso')"><span class="material-icons-round" style="font-size:16px">trending_up</span>Ingreso</button>
@@ -763,7 +897,12 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 
   <!-- PEDIDOS -->
   <div class="panel" id="p-ped">
-    <div class="sec-title">Pedidos</div>
+    <div class="sec-title-row">
+      <div class="sec-title">Pedidos</div>
+      <button class="fab-add rpl" onclick="toggleForm('formPed')">
+        <span class="material-icons-round">add</span> Nuevo pedido
+      </button>
+    </div>
     <div class="produce-week" id="produceWeek" style="display:none">
       <div class="produce-week-lbl">Total a producir esta semana</div>
       <div class="produce-grid" id="proWeekGrid"></div>
@@ -797,8 +936,8 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       </button>
       <div id="historialContainer" style="display:none"></div>
     </div>
-    <div class="m3-card">
-      <div class="m3-card-title">+ Agregar pedido</div>
+    <div class="m3-card form-collapsible" id="formPed" style="display:none;">
+      <div class="m3-card-title">Nuevo pedido</div>
       <div class="inp-row">
         <div class="m3-field"><input class="m3-inp" id="pCli" placeholder=" "><label class="m3-lbl">Cliente</label></div>
         <div class="m3-field"><input class="m3-inp" id="pFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha entrega</label></div>
@@ -836,7 +975,12 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 
   <!-- AGENDA -->
   <div class="panel" id="p-age">
-    <div class="sec-title">Agenda</div>
+    <div class="sec-title-row">
+      <div class="sec-title">Agenda</div>
+      <button class="fab-add rpl" onclick="toggleForm('formAge')">
+        <span class="material-icons-round">add</span> Nuevo evento
+      </button>
+    </div>
     <div class="week-cal-wrap">
       <div class="week-cal-header">
         <div class="week-cal-title" id="ageWeekTitle">Esta semana</div>
@@ -860,8 +1004,8 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       <div class="tickets-date-header"><span id="ageSelectedDateLbl">Todos los eventos</span></div>
       <div id="evContainer"><div class="empty"><span>📅</span>Sin eventos aún.</div></div>
     </div>
-    <div class="m3-card">
-      <div class="m3-card-title">+ Agendar evento</div>
+    <div class="m3-card form-collapsible" id="formAge" style="display:none;">
+      <div class="m3-card-title">Nuevo evento</div>
       <div class="m3-field"><input class="m3-inp" id="evTit" placeholder=" "><label class="m3-lbl">Título del evento</label></div>
       <div class="inp-row">
         <div class="m3-field"><input class="m3-inp" id="evFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
@@ -876,7 +1020,12 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 
   <!-- TAREAS -->
   <div class="panel" id="p-task">
-    <div class="sec-title">Tareas</div>
+    <div class="sec-title-row">
+      <div class="sec-title">Tareas</div>
+      <button class="fab-add rpl" onclick="toggleForm('formTask')">
+        <span class="material-icons-round">add</span> Nueva tarea
+      </button>
+    </div>
     <div class="cal-wrap" id="calTask">
       <div class="cal-header">
         <div class="cal-title" id="calTaskTitle"></div>
@@ -887,7 +1036,7 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       </div>
       <div class="cal-grid" id="calTaskGrid"></div>
     </div>
-    <div class="m3-card">
+    <div class="m3-card form-collapsible" id="formTask" style="display:none;">
       <div class="m3-card-title">Nueva tarea</div>
       <div class="m3-field"><input class="m3-inp" id="taskTit" placeholder=" "><label class="m3-lbl">Título de la tarea</label></div>
       <div class="inp-row">
@@ -1078,6 +1227,9 @@ onAuthStateChanged(auth, async (user) => {
 
     document.getElementById('uAv').textContent = S.nombre[0].toUpperCase();
     document.getElementById('uName').textContent = S.nombre.split(' ')[0];
+    // Menú lateral
+    document.getElementById('menuAv').textContent = S.nombre[0].toUpperCase();
+    document.getElementById('menuName').textContent = S.nombre;
 
     const hoy = new Date().toISOString().split('T')[0];
     document.getElementById('mFecha').value = hoy;
@@ -1097,6 +1249,7 @@ onAuthStateChanged(auth, async (user) => {
         if (perfData.negocio) {
           S.negocio = perfData.negocio;
           document.getElementById('uName').textContent = perfData.negocio.split(' ')[0];
+          document.getElementById('menuNegocio').textContent = perfData.negocio;
         }
         renderPerfil();
       } else {
@@ -1262,7 +1415,7 @@ function renderC(){
 }
 function renderChips(){
   const w=document.getElementById('fChips');
-  const goO=`goTab('chat',document.querySelectorAll('.nav-btn')[6])`;
+  const goO=`menuNav('chat')`;
   if(!S.contactos.length){w.innerHTML=`<span class="m3-chip add" onclick="${goO}"><span class="material-icons-round" style="font-size:14px">add</span>Contacto</span>`;return;}
   w.innerHTML=S.contactos.map(c=>`<span class="m3-chip${S.selC===c.id?' sel':''}" onclick="selC('${c.id}')">${CI[c.tipo]} ${c.nombre}</span>`).join('')+`<span class="m3-chip add" onclick="${goO}"><span class="material-icons-round" style="font-size:14px">add</span></span>`;
 }
@@ -1558,17 +1711,18 @@ window.goSlide=goSlide;
 function renderWeek(){
   const hoy=new Date();hoy.setHours(0,0,0,0);
   const lunes=new Date(hoy);const dow=hoy.getDay()===0?6:hoy.getDay()-1;lunes.setDate(hoy.getDate()-dow);
-  const dias=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  let html=dias.map(d=>`<div style="text-align:center;font-size:9px;font-weight:700;color:var(--on-surface-var);text-transform:uppercase;">${d}</div>`).join('');
+  const dias=['L','M','X','J','V','S','D'];
+  const diasFull=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  let html='';
   for(let i=0;i<7;i++){
     const fecha=new Date(lunes);fecha.setDate(lunes.getDate()+i);
     const esHoy=fecha.getTime()===hoy.getTime();const fechaStr=fecha.toISOString().split('T')[0];
     const peds=S.pedidos.filter(p=>p.fecha===fechaStr&&!p.archivado);const evs=S.eventos.filter(e=>e.fecha===fechaStr);const tasks=S.tareas.filter(t=>t.fecha===fechaStr&&!t.done);
-    const chips=[...peds.slice(0,1).map(p=>`<div class="week-chip ped">${p.cli.substring(0,6).toUpperCase()}</div>`),...evs.slice(0,1).map(e=>`<div class="week-chip ${e.prio==='urgente'?'ev-urg':'ev'}">${e.tit.substring(0,6).toUpperCase()}</div>`),...tasks.slice(0,1).map(t=>`<div class="week-chip task">${t.tit.substring(0,6).toUpperCase()}</div>`)].slice(0,2).join('');
+    const chips=[...peds.slice(0,1).map(p=>`<div class="week-chip ped">${p.cli.substring(0,5).toUpperCase()}</div>`),...evs.slice(0,1).map(e=>`<div class="week-chip ${e.prio==='urgente'?'ev-urg':'ev'}">${e.tit.substring(0,5).toUpperCase()}</div>`),...tasks.slice(0,1).map(t=>`<div class="week-chip task">${t.tit.substring(0,5).toUpperCase()}</div>`)].slice(0,2).join('');
     const total=peds.length+evs.length+tasks.length;const mas=total>2?`<div style="font-size:7px;color:var(--on-surface-var);font-weight:700;">+${total-2}</div>`:'';
     html+=`<div class="week-day${esHoy?' today':''}">
-      <div class="week-day-name">${dias[i]}</div>
-      <div class="week-day-num" style="${esHoy?'background:var(--primary);color:#fff;border-radius:50%;':''}">${fecha.getDate()}</div>
+      <div class="week-day-name">${diasFull[i]}</div>
+      <div class="week-day-num"${esHoy?' style="background:var(--primary);color:#fff;"':''}>${fecha.getDate()}</div>
       ${chips}${mas}
     </div>`;
   }
@@ -1740,7 +1894,9 @@ window.delCatalogo=delCatalogo;
 
 function renderCatalogo(){
   const el=document.getElementById('catalogoChips');if(!el)return;
-  if(!S.catalogo.length){el.innerHTML='<span style="font-size:13px;color:var(--on-surface-var);font-weight:500">Sin productos aún.</span>';}
+  // El catálogo ahora usa Mi Negocio → Productos como fuente principal
+  // Pero mantenemos el catálogo propio también fusionado
+  if(!S.catalogo.length){el.innerHTML='<span style="font-size:13px;color:var(--on-surface-var);font-weight:500">Sin productos aún. Agregá desde Mi negocio → Productos.</span>';}
   else{el.innerHTML=S.catalogo.map(p=>`<span class="cat-prod-chip">${p.nombre}<button class="cat-prod-chip-del" onclick="delCatalogo('${p.id}')">×</button></span>`).join('');}
   renderCatalogoSelector();
 }
@@ -1748,12 +1904,33 @@ function renderCatalogo(){
 function toggleCatalogoSelector(){const sel=document.getElementById('catalogoSelector');const btn=document.getElementById('btnCatSel');const visible=sel.style.display!=='none';sel.style.display=visible?'none':'block';btn.style.background=visible?'transparent':'var(--tertiary-container)';if(!visible)renderCatalogoSelector();}
 window.toggleCatalogoSelector=toggleCatalogoSelector;
 
+function getCatalogoUnificado(){
+  // Fusiona Mi Negocio → Productos con el catálogo propio
+  const nombresSet=new Set();const resultado=[];
+  // Primero los productos de Mi Negocio
+  (S.miNegocio.productos||[]).forEach(p=>{
+    if(p.nombre&&!nombresSet.has(p.nombre.toLowerCase())){
+      nombresSet.add(p.nombre.toLowerCase());
+      resultado.push({nombre:p.nombre,fuente:'negocio'});
+    }
+  });
+  // Después los del catálogo propio (si no están duplicados)
+  (S.catalogo||[]).forEach(p=>{
+    if(p.nombre&&!nombresSet.has(p.nombre.toLowerCase())){
+      nombresSet.add(p.nombre.toLowerCase());
+      resultado.push({nombre:p.nombre,fuente:'catalogo',id:p.id});
+    }
+  });
+  return resultado;
+}
+
 function renderCatalogoSelector(){
   const el=document.getElementById('catalogoSelChips');if(!el)return;
-  if(!S.catalogo.length){el.innerHTML='<span style="font-size:12px;color:var(--on-surface-var)">Sin productos en el catálogo aún.</span>';return;}
-  el.innerHTML=S.catalogo.map(p=>{const qty=catalogoSeleccionado[p.nombre]||0;return `<div style="display:flex;align-items:center;gap:8px;background:var(--surface-var);border-radius:var(--rm);padding:8px 12px;margin-bottom:6px;"><span style="flex:1;font-size:13px;font-weight:700">${p.nombre}</span><div class="qty-selector"><button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button><span class="qty-num" id="qty_${p.nombre.replace(/\s/g,'_')}">${qty}</span><button class="qty-btn" onclick="changeCatQty('${p.nombre}',1)">+</button></div></div>`;}).join('');
+  const productos=getCatalogoUnificado();
+  if(!productos.length){el.innerHTML='<span style="font-size:12px;color:var(--on-surface-var)">Sin productos. Agregá en Mi negocio → Productos 🛍️</span>';return;}
+  el.innerHTML=productos.map(p=>{const qty=catalogoSeleccionado[p.nombre]||0;return `<div style="display:flex;align-items:center;gap:8px;background:var(--surface-var);border-radius:var(--rm);padding:8px 12px;margin-bottom:6px;"><span style="flex:1;font-size:13px;font-weight:700">${p.nombre}${p.fuente==='negocio'?'':' <span style="font-size:10px;opacity:.5">★</span>'}</span><div class="qty-selector"><button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button><span class="qty-num" id="qty_${p.nombre.replace(/[\s']/g,'_')}">${qty}</span><button class="qty-btn" onclick="changeCatQty('${p.nombre}',1)">+</button></div></div>`;}).join('');
 }
-function changeCatQty(nombre,delta){const current=catalogoSeleccionado[nombre]||0;const nuevo=Math.max(0,current+delta);if(nuevo===0)delete catalogoSeleccionado[nombre];else catalogoSeleccionado[nombre]=nuevo;const id='qty_'+nombre.replace(/\s/g,'_');const el=document.getElementById(id);if(el)el.textContent=nuevo;}
+function changeCatQty(nombre,delta){const current=catalogoSeleccionado[nombre]||0;const nuevo=Math.max(0,current+delta);if(nuevo===0)delete catalogoSeleccionado[nombre];else catalogoSeleccionado[nombre]=nuevo;const id='qty_'+nombre.replace(/[\s']/g,'_');const el=document.getElementById(id);if(el)el.textContent=nuevo;}
 window.changeCatQty=changeCatQty;
 
 function addFromCatalogo(){
@@ -1798,7 +1975,7 @@ async function finishOnboarding(){
   try{await addDoc(col('perfil'),{...S.perfil,creadoEn:new Date().toISOString()});}catch(e){}
   document.getElementById('onboarding').classList.remove('visible');renderPerfil();
   const tabMap={finanzas:'fin',pedidos:'ped',agenda:'age',todo:'home'};
-  const navBtns=document.querySelectorAll('.nav-btn');goTab(tabMap[obObjetivo||'todo'],navBtns[0]);
+  menuNav(tabMap[obObjetivo||'todo']);
   showToast(`¡Bienvenido a OTTO, ${S.nombre.split(' ')[0]}! 🎉`);
 }
 window.skipOnboarding=skipOnboarding;window.selectRubro=selectRubro;window.selectEquipo=selectEquipo;window.selectObjetivo=selectObjetivo;window.obNext=obNext;window.finishOnboarding=finishOnboarding;
@@ -1868,6 +2045,75 @@ async function delMnItem(tab,id){
 window.delMnItem=delMnItem;
 
 window.goTab=goTab;window.setTipo=setTipo;window.calNav=calNav;
+
+/* ── MENÚ HAMBURGUESA ── */
+function toggleMenu(){
+  const panel=document.getElementById('menuPanel');
+  const overlay=document.getElementById('menuOverlay');
+  const isOpen=panel.classList.contains('open');
+  if(isOpen){closeMenu();}else{panel.classList.add('open');overlay.classList.add('visible');document.getElementById('menuIcon').textContent='close';}
+}
+function closeMenu(){
+  document.getElementById('menuPanel').classList.remove('open');
+  document.getElementById('menuOverlay').classList.remove('visible');
+  document.getElementById('menuIcon').textContent='menu';
+}
+function menuNav(id){
+  // Cambiar panel visible
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.getElementById('p-'+id).classList.add('on');
+  // Marcar item activo en menú
+  document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('on'));
+  const mi=document.getElementById('mi-'+id);if(mi)mi.classList.add('on');
+  closeMenu();
+}
+window.toggleMenu=toggleMenu;window.closeMenu=closeMenu;window.menuNav=menuNav;
+
+/* ── FORMULARIOS COLAPSABLES ── */
+function toggleForm(formId){
+  const el=document.getElementById(formId);
+  if(!el)return;
+  const isVisible=el.style.display!=='none';
+  el.style.display=isVisible?'none':'block';
+  if(!isVisible){setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'nearest'}),50);}
+}
+window.toggleForm=toggleForm;
+
+/* ── CHAT RÁPIDO HOME ── */
+let quickChatOpen=false;
+function toggleQuickChat(){
+  quickChatOpen=!quickChatOpen;
+  const wrap=document.getElementById('quickChatWrap');
+  wrap.style.display=quickChatOpen?'block':'none';
+  if(quickChatOpen){setTimeout(()=>document.getElementById('quickChatInp').focus(),100);}
+}
+window.toggleQuickChat=toggleQuickChat;
+
+async function sendQuickMsg(){
+  const inp=document.getElementById('quickChatInp');
+  const msg=inp.value.trim();if(!msg)return;
+  inp.value='';
+  addQuickBub(msg,'me');
+  const tid='qt'+Date.now();
+  const box=document.getElementById('quickChatMsgs');
+  box.innerHTML+=`<div class="msg" id="${tid}"><div class="msg-av">O</div><div class="msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  box.scrollTop=99999;
+  const ing=S.movs.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
+  const gas=S.movs.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
+  const ctx=`Sos OTTO, el socio de ${S.nombre} de "${S.negocio}". Muy conciso, máximo 2 oraciones. Español rioplatense. Sin markdown.
+Ingresos:$${ing} Gastos:$${gas} Balance:$${ing-gas}. Pedidos activos:${S.pedidos.filter(p=>!p.archivado).length}. Eventos:${S.eventos.length}. Tareas pendientes:${S.tareas.filter(t=>!t.done).length}.`;
+  try{
+    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,system:ctx,messages:[{role:'user',content:msg}]})});
+    const data=await res.json();const reply=data.content?.[0]?.text||'Sin respuesta';
+    document.getElementById(tid)?.remove();addQuickBub(reply,'otto');
+  }catch(e){document.getElementById(tid)?.remove();addQuickBub('No pude conectarme. Intentá de nuevo.','otto');}
+}
+function addQuickBub(text,who){
+  const box=document.getElementById('quickChatMsgs');
+  box.innerHTML+=`<div class="msg ${who==='me'?'me':''}"><div class="msg-av">${who==='otto'?'O':S.nombre[0]?.toUpperCase()||'U'}</div><div class="msg-bub ${who}">${text}</div></div>`;
+  box.scrollTop=99999;
+}
+window.sendQuickMsg=sendQuickMsg;
 </script>
 </body>
 </html>
