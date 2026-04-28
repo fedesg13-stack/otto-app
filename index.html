@@ -46,8 +46,34 @@ body{background:var(--bg);color:var(--on-bg);font-family:'Nunito',sans-serif;min
 .loading-text{font-size:13px;color:var(--on-surface-var);font-weight:600;}
 
 /* APP */
-#app{display:none;min-height:100vh;padding-bottom:32px;}
+#app{display:none;min-height:100vh;padding-bottom:80px;}
 #app.visible{display:block;}
+
+/* ── BARRA INFERIOR FIJA ── */
+.bottom-bar{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:430px;
+  background:var(--surface);border-top:1px solid var(--outline-var);
+  display:flex;z-index:50;padding:8px 8px 12px;gap:6px;
+}
+.bottom-btn{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:transparent;border:none;cursor:pointer;
+  font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;
+  color:var(--on-surface-var);letter-spacing:.3px;transition:color .2s;
+  padding:6px 4px;border-radius:var(--rm);
+}
+.bottom-btn:hover{background:var(--surface-var);}
+.bottom-btn .bb-icon{
+  width:44px;height:28px;border-radius:var(--rfull);
+  display:flex;align-items:center;justify-content:center;
+  background:var(--primary);transition:background .2s;
+}
+.bottom-btn .bb-icon .material-icons-round{font-size:18px;color:#fff;}
+.bottom-btn:nth-child(1) .bb-icon{background:var(--secondary);}
+.bottom-btn:nth-child(2) .bb-icon{background:var(--tertiary);}
+.bottom-btn:nth-child(3) .bb-icon{background:#e65100;}
+.bottom-btn:nth-child(4) .bb-icon{background:var(--success);}
 
 /* ── MENÚ HAMBURGUESA ── */
 .btn-menu{
@@ -106,6 +132,34 @@ body{background:var(--bg);color:var(--on-bg);font-family:'Nunito',sans-serif;min
   cursor:pointer;transition:all .2s;width:calc(100% - 32px);
 }
 .menu-logout:hover{background:var(--error);color:#fff;}
+
+/* ── BOTTOM SHEETS DE FORMULARIOS ── */
+.form-sheet-overlay{
+  display:none;position:fixed;inset:0;z-index:350;
+  background:rgba(0,0,0,.45);backdrop-filter:blur(2px);
+}
+.form-sheet-overlay.visible{display:block;}
+.form-sheet{
+  display:none;position:fixed;bottom:0;left:50%;
+  transform:translateX(-50%);width:100%;max-width:430px;
+  background:var(--surface);border-radius:28px 28px 0 0;
+  z-index:351;max-height:88vh;overflow-y:auto;
+  box-shadow:0 -4px 32px rgba(0,0,0,.15);
+}
+.form-sheet.open{display:block;}
+.form-sheet-handle{display:flex;justify-content:center;padding:12px 0 0;}
+.form-sheet-bar{width:36px;height:4px;border-radius:2px;background:var(--outline);}
+.form-sheet-header{
+  padding:12px 20px 14px;display:flex;align-items:center;
+  justify-content:space-between;border-bottom:1px solid var(--outline-var);
+  position:sticky;top:0;background:var(--surface);z-index:1;
+}
+.form-sheet-title{font-size:17px;font-weight:800;color:var(--on-bg);}
+.form-sheet-close{
+  background:var(--surface-var);border:none;border-radius:50%;
+  width:34px;height:34px;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.form-sheet-body{padding:16px 20px 32px;}
 
 /* ── FAB AGREGAR ── */
 .sec-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
@@ -350,7 +404,7 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 .week-header{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--on-surface-var);margin-bottom:10px;}
 .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
 .week-day{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px;}
-.week-day-name{font-size:9px;font-weight:700;color:var(--on-surface-var);text-transform:uppercase;}
+.week-day-name{font-size:9px;font-weight:700;color:var(--on-surface-var);text-transform:uppercase;margin-bottom:1px;}
 .week-day-num{font-size:12px;font-weight:800;color:var(--on-bg);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
 .week-day.today .week-day-num{background:var(--primary);color:#fff;}
 .week-chip{width:100%;padding:1px 3px;border-radius:3px;font-size:7px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.6;max-width:42px;}
@@ -785,6 +839,26 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
     </button>
   </div>
 
+  <!-- BARRA INFERIOR FIJA -->
+  <div class="bottom-bar">
+    <button class="bottom-btn rpl" onclick="openSheet('fin')">
+      <div class="bb-icon"><span class="material-icons-round">add</span></div>
+      <span>Finanza</span>
+    </button>
+    <button class="bottom-btn rpl" onclick="openSheet('ped')">
+      <div class="bb-icon"><span class="material-icons-round">add</span></div>
+      <span>Pedido</span>
+    </button>
+    <button class="bottom-btn rpl" onclick="openSheet('age')">
+      <div class="bb-icon"><span class="material-icons-round">add</span></div>
+      <span>Evento</span>
+    </button>
+    <button class="bottom-btn rpl" onclick="openSheet('task')">
+      <div class="bb-icon"><span class="material-icons-round">add</span></div>
+      <span>Tarea</span>
+    </button>
+  </div>
+
   <!-- MODAL -->
   <div class="overlay" id="overlay" onclick="closeModal()"></div>
   <div class="sheet" id="sheet">
@@ -799,13 +873,14 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 
   <!-- HOME -->
   <div class="panel on" id="p-home">
+    <!-- Slider OTTO (arriba) -->
     <div class="otto-slider-wrap" id="ottoSliderWrap">
       <div class="otto-slider" id="ottoSlider"></div>
     </div>
     <div class="slider-dots" id="sliderDots"></div>
 
-    <!-- Botón chat rápido -->
-    <div style="padding:12px 16px 0;">
+    <!-- Botón chat rápido (debajo del slider) -->
+    <div style="padding:10px 16px 0;">
       <button class="btn-quick-chat rpl" onclick="toggleQuickChat()">
         <span class="material-icons-round">smart_toy</span>
         Consultarle a OTTO
@@ -825,7 +900,7 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       </div>
     </div>
 
-    <div style="height:14px"></div>
+    <div style="height:12px"></div>
     <div class="week-wrap">
       <div class="week-header">Esta semana</div>
       <div class="week-grid" id="weekGrid"></div>
@@ -850,12 +925,7 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 
   <!-- FINANZAS -->
   <div class="panel" id="p-fin">
-    <div class="sec-title-row">
-      <div class="sec-title">Finanzas</div>
-      <button class="fab-add rpl" onclick="toggleForm('formFin')" id="fabFin">
-        <span class="material-icons-round">add</span> Agregar
-      </button>
-    </div>
+    <div class="sec-title">Finanzas</div>
     <div class="bal-row">
       <div class="bal-card ing rpl" onclick="openModal('ingreso')">
         <div class="bal-lbl">Ingresos <span class="material-icons-round" style="font-size:10px;vertical-align:middle;opacity:.5">open_in_new</span></div>
@@ -870,39 +940,12 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
         <div class="bal-num" id="bNet">$0</div>
       </div>
     </div>
-    <div class="m3-card form-collapsible" id="formFin" style="display:none;">
-      <div class="m3-card-title">Nuevo movimiento</div>
-      <div class="type-seg">
-        <button class="seg-btn ing-on" id="sIng" onclick="setTipo('ingreso')"><span class="material-icons-round" style="font-size:16px">trending_up</span>Ingreso</button>
-        <button class="seg-btn" id="sGas" onclick="setTipo('gasto')"><span class="material-icons-round" style="font-size:16px">trending_down</span>Gasto</button>
-      </div>
-      <div class="inp-row">
-        <div class="m3-field"><input class="m3-inp" id="mMonto" type="number" placeholder=" " min="0"><label class="m3-lbl">Monto $</label></div>
-        <div class="m3-field"><input class="m3-inp" id="mFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-      </div>
-      <select class="m3-select" id="mCat">
-        <option value="">Categoría…</option>
-        <option>Ventas mostrador</option><option>Ventas cafeterías</option>
-        <option>Eventos</option><option>Proveedores</option>
-        <option>Sueldos</option><option>Servicios</option>
-        <option>Alquiler</option><option>Otros</option>
-      </select>
-      <div class="sub-lbl">Asociar contacto</div>
-      <div class="chips-row" id="fChips"></div>
-      <div class="m3-field"><input class="m3-inp" id="mDesc" placeholder=" "><label class="m3-lbl">Nota (opcional)</label></div>
-      <button class="m3-btn rpl" onclick="addMov()"><span class="material-icons-round">add</span>Agregar movimiento</button>
-    </div>
     <div id="movContainer"><div class="empty"><span>💸</span>Sin movimientos aún.</div></div>
   </div>
 
   <!-- PEDIDOS -->
   <div class="panel" id="p-ped">
-    <div class="sec-title-row">
-      <div class="sec-title">Pedidos</div>
-      <button class="fab-add rpl" onclick="toggleForm('formPed')">
-        <span class="material-icons-round">add</span> Nuevo pedido
-      </button>
-    </div>
+    <div class="sec-title">Pedidos</div>
     <div class="produce-week" id="produceWeek" style="display:none">
       <div class="produce-week-lbl">Total a producir esta semana</div>
       <div class="produce-grid" id="proWeekGrid"></div>
@@ -936,51 +979,11 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       </button>
       <div id="historialContainer" style="display:none"></div>
     </div>
-    <div class="m3-card form-collapsible" id="formPed" style="display:none;">
-      <div class="m3-card-title">Nuevo pedido</div>
-      <div class="inp-row">
-        <div class="m3-field"><input class="m3-inp" id="pCli" placeholder=" "><label class="m3-lbl">Cliente</label></div>
-        <div class="m3-field"><input class="m3-inp" id="pFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha entrega</label></div>
-      </div>
-      <div class="inp-row">
-        <div class="m3-field"><input class="m3-inp" id="pHora" type="time" placeholder=" "><label class="m3-lbl">Hora entrega</label></div>
-        <div class="m3-field" style="visibility:hidden"></div>
-      </div>
-      <div id="catalogoSelector" style="margin-bottom:12px;display:none">
-        <div class="sub-lbl">Seleccioná del catálogo</div>
-        <div id="catalogoSelChips" class="catalogo-chips"></div>
-        <div class="catalogo-selected-list" id="catalogoSelList"></div>
-        <button class="m3-btn rpl" onclick="addFromCatalogo()" style="margin-top:0">
-          <span class="material-icons-round">add</span>Agregar seleccionados
-        </button>
-      </div>
-      <div id="prodBox">
-        <div class="prod-row">
-          <div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" placeholder=" "><label class="m3-lbl">Producto</label></div>
-          <div class="m3-field" style="flex:.8;margin-bottom:0"><input class="m3-inp" placeholder=" " type="number" min="1"><label class="m3-lbl">Cant.</label></div>
-          <button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        <button class="add-prod-btn" onclick="addProd()" style="flex:1;min-width:140px">
-          <span class="material-icons-round" style="font-size:18px">add</span>Producto manual
-        </button>
-        <button class="add-prod-btn" onclick="toggleCatalogoSelector()" style="flex:1;min-width:140px;border-color:var(--tertiary);color:var(--tertiary)" id="btnCatSel">
-          <span class="material-icons-round" style="font-size:18px">menu_book</span>Del catálogo
-        </button>
-      </div>
-      <button class="m3-btn rpl" onclick="savePed()"><span class="material-icons-round">save</span>Guardar pedido</button>
-    </div>
   </div>
 
   <!-- AGENDA -->
   <div class="panel" id="p-age">
-    <div class="sec-title-row">
-      <div class="sec-title">Agenda</div>
-      <button class="fab-add rpl" onclick="toggleForm('formAge')">
-        <span class="material-icons-round">add</span> Nuevo evento
-      </button>
-    </div>
+    <div class="sec-title">Agenda</div>
     <div class="week-cal-wrap">
       <div class="week-cal-header">
         <div class="week-cal-title" id="ageWeekTitle">Esta semana</div>
@@ -1004,28 +1007,11 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       <div class="tickets-date-header"><span id="ageSelectedDateLbl">Todos los eventos</span></div>
       <div id="evContainer"><div class="empty"><span>📅</span>Sin eventos aún.</div></div>
     </div>
-    <div class="m3-card form-collapsible" id="formAge" style="display:none;">
-      <div class="m3-card-title">Nuevo evento</div>
-      <div class="m3-field"><input class="m3-inp" id="evTit" placeholder=" "><label class="m3-lbl">Título del evento</label></div>
-      <div class="inp-row">
-        <div class="m3-field"><input class="m3-inp" id="evFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-        <div class="m3-field"><input class="m3-inp" id="evHora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
-      </div>
-      <div class="m3-field"><input class="m3-inp" id="evCliente" placeholder=" "><label class="m3-lbl">Cliente (opcional)</label></div>
-      <select class="m3-select" id="evPrio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
-      <textarea class="m3-textarea" id="evDesc" rows="3" placeholder="Detalle del evento…"></textarea>
-      <button class="m3-btn sec rpl" onclick="saveEv()"><span class="material-icons-round">event</span>Agendar</button>
-    </div>
   </div>
 
   <!-- TAREAS -->
   <div class="panel" id="p-task">
-    <div class="sec-title-row">
-      <div class="sec-title">Tareas</div>
-      <button class="fab-add rpl" onclick="toggleForm('formTask')">
-        <span class="material-icons-round">add</span> Nueva tarea
-      </button>
-    </div>
+    <div class="sec-title">Tareas</div>
     <div class="cal-wrap" id="calTask">
       <div class="cal-header">
         <div class="cal-title" id="calTaskTitle"></div>
@@ -1035,19 +1021,6 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
         </div>
       </div>
       <div class="cal-grid" id="calTaskGrid"></div>
-    </div>
-    <div class="m3-card form-collapsible" id="formTask" style="display:none;">
-      <div class="m3-card-title">Nueva tarea</div>
-      <div class="m3-field"><input class="m3-inp" id="taskTit" placeholder=" "><label class="m3-lbl">Título de la tarea</label></div>
-      <div class="inp-row">
-        <div class="m3-field"><input class="m3-inp" id="taskFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha límite</label></div>
-        <select class="m3-select" id="taskPrio" style="margin-bottom:0">
-          <option value="normal">Normal</option>
-          <option value="urgente">🔴 Urgente</option>
-        </select>
-      </div>
-      <div class="m3-field"><input class="m3-inp" id="taskDesc" placeholder=" "><label class="m3-lbl">Descripción (opcional)</label></div>
-      <button class="m3-btn rpl" onclick="saveTask()"><span class="material-icons-round">add</span>Agregar tarea</button>
     </div>
     <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--on-surface-var);margin-bottom:10px;">Pendientes</div>
     <div id="taskPendList"><div class="empty"><span>✅</span>Sin tareas pendientes.</div></div>
@@ -1105,6 +1078,122 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
         <button class="m3-btn rpl" style="width:auto;margin-top:0;padding:12px 16px" onclick="addC()">+ Add</button>
       </div>
     </div>
+  </div>
+</div>
+
+<!-- FORM SHEET OVERLAY -->
+<div class="form-sheet-overlay" id="formSheetOverlay" onclick="closeSheet()"></div>
+
+<!-- SHEET: NUEVA FINANZA -->
+<div class="form-sheet" id="sheet-fin">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title">💰 Nuevo movimiento</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--on-surface-var)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <div class="type-seg">
+      <button class="seg-btn ing-on" id="sIng" onclick="setTipo('ingreso')"><span class="material-icons-round" style="font-size:16px">trending_up</span>Ingreso</button>
+      <button class="seg-btn" id="sGas" onclick="setTipo('gasto')"><span class="material-icons-round" style="font-size:16px">trending_down</span>Gasto</button>
+    </div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="mMonto" type="number" placeholder=" " min="0"><label class="m3-lbl">Monto $</label></div>
+      <div class="m3-field"><input class="m3-inp" id="mFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+    </div>
+    <select class="m3-select" id="mCat">
+      <option value="">Categoría…</option>
+      <option>Ventas mostrador</option><option>Ventas cafeterías</option>
+      <option>Eventos</option><option>Proveedores</option>
+      <option>Sueldos</option><option>Servicios</option>
+      <option>Alquiler</option><option>Otros</option>
+    </select>
+    <div class="sub-lbl">Asociar contacto</div>
+    <div class="chips-row" id="fChips"></div>
+    <div class="m3-field"><input class="m3-inp" id="mDesc" placeholder=" "><label class="m3-lbl">Nota (opcional)</label></div>
+    <button class="m3-btn rpl" onclick="addMov()"><span class="material-icons-round">add</span>Agregar movimiento</button>
+  </div>
+</div>
+
+<!-- SHEET: NUEVO PEDIDO -->
+<div class="form-sheet" id="sheet-ped">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title">📋 Nuevo pedido</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--on-surface-var)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="pCli" placeholder=" "><label class="m3-lbl">Cliente</label></div>
+      <div class="m3-field"><input class="m3-inp" id="pFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha entrega</label></div>
+    </div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="pHora" type="time" placeholder=" "><label class="m3-lbl">Hora entrega</label></div>
+      <div class="m3-field" style="visibility:hidden"></div>
+    </div>
+    <!-- Selector catálogo por categoría -->
+    <div class="sub-lbl" style="margin-bottom:8px;">Agregar productos</div>
+    <div id="catSelector">
+      <div id="catCategoryList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+      <div id="catProductList" style="display:none;margin-bottom:10px;"></div>
+    </div>
+    <div id="prodBox">
+      <div class="prod-row">
+        <div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" placeholder=" "><label class="m3-lbl">Producto</label></div>
+        <div class="m3-field" style="flex:.8;margin-bottom:0"><input class="m3-inp" placeholder=" " type="number" min="1"><label class="m3-lbl">Cant.</label></div>
+        <button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button>
+      </div>
+    </div>
+    <button class="add-prod-btn" onclick="addProd()" style="margin-bottom:12px;">
+      <span class="material-icons-round" style="font-size:18px">add</span>Agregar producto manual
+    </button>
+    <button class="m3-btn rpl" onclick="savePed()"><span class="material-icons-round">save</span>Guardar pedido</button>
+  </div>
+</div>
+
+<!-- SHEET: NUEVO EVENTO -->
+<div class="form-sheet" id="sheet-age">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title">📅 Nuevo evento</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--on-surface-var)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <div class="m3-field"><input class="m3-inp" id="evTit" placeholder=" "><label class="m3-lbl">Título del evento</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="evFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+      <div class="m3-field"><input class="m3-inp" id="evHora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
+    </div>
+    <!-- Selector cliente por categoría -->
+    <div class="sub-lbl" style="margin-bottom:8px;">Cliente (opcional)</div>
+    <div id="clienteSelectorAge" style="margin-bottom:12px;">
+      <div id="clienteCatListAge" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
+      <div id="clienteNomListAge" style="display:none;margin-bottom:8px;"></div>
+      <div class="m3-field"><input class="m3-inp" id="evCliente" placeholder=" "><label class="m3-lbl">O escribí el nombre</label></div>
+    </div>
+    <select class="m3-select" id="evPrio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
+    <textarea class="m3-textarea" id="evDesc" rows="3" placeholder="Detalle del evento…"></textarea>
+    <button class="m3-btn sec rpl" onclick="saveEv()"><span class="material-icons-round">event</span>Agendar</button>
+  </div>
+</div>
+
+<!-- SHEET: NUEVA TAREA -->
+<div class="form-sheet" id="sheet-task">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title">✅ Nueva tarea</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--on-surface-var)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <div class="m3-field"><input class="m3-inp" id="taskTit" placeholder=" "><label class="m3-lbl">Título de la tarea</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="taskFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha límite</label></div>
+      <select class="m3-select" id="taskPrio" style="margin-bottom:0">
+        <option value="normal">Normal</option>
+        <option value="urgente">🔴 Urgente</option>
+      </select>
+    </div>
+    <div class="m3-field"><input class="m3-inp" id="taskDesc" placeholder=" "><label class="m3-lbl">Descripción (opcional)</label></div>
+    <button class="m3-btn rpl" onclick="saveTask()"><span class="material-icons-round">add</span>Agregar tarea</button>
   </div>
 </div>
 
@@ -1316,6 +1405,7 @@ async function addMov(){
     document.getElementById('mDesc').value='';
     document.getElementById('mCat').value='';
     S.selC=null;renderChips();renderMovs();updateBanner();
+    closeSheet();
     showToast('✅ Movimiento guardado');
   }catch(e){showToast('❌ Error al guardar. Revisá tu conexión.');}
 }
@@ -1445,7 +1535,7 @@ async function savePed(){
     ped._id=ref.id;S.pedidos.unshift(ped);
     document.getElementById('pCli').value='';
     document.getElementById('prodBox').innerHTML=`<div class="prod-row"><div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" placeholder=" "><label class="m3-lbl">Producto</label></div><div class="m3-field" style="flex:.8;margin-bottom:0"><input class="m3-inp" placeholder=" " type="number" min="1"><label class="m3-lbl">Cant.</label></div><button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button></div>`;
-    renderPeds();updateBanner();renderCals();renderPedWeek();renderHome();showToast('✅ Pedido guardado');
+    renderPeds();updateBanner();renderCals();renderPedWeek();renderHome();closeSheet();showToast('✅ Pedido guardado');
   }catch(e){showToast('❌ Error al guardar.');}
 }
 
@@ -1528,7 +1618,7 @@ async function saveEv(){
     ev._id=ref.id;S.eventos.push(ev);S.eventos.sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
     document.getElementById('evTit').value='';document.getElementById('evHora').value='';
     document.getElementById('evCliente').value='';document.getElementById('evDesc').value='';
-    renderEvs();updateBanner();renderCals();renderAgeWeek();renderHome();showToast('✅ Evento guardado');
+    renderEvs();updateBanner();renderCals();renderAgeWeek();renderHome();closeSheet();showToast('✅ Evento guardado');
   }catch(e){showToast('❌ Error al guardar.');}
 }
 function renderEvs(){
@@ -1711,18 +1801,25 @@ window.goSlide=goSlide;
 function renderWeek(){
   const hoy=new Date();hoy.setHours(0,0,0,0);
   const lunes=new Date(hoy);const dow=hoy.getDay()===0?6:hoy.getDay()-1;lunes.setDate(hoy.getDate()-dow);
-  const dias=['L','M','X','J','V','S','D'];
   const diasFull=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   let html='';
   for(let i=0;i<7;i++){
     const fecha=new Date(lunes);fecha.setDate(lunes.getDate()+i);
-    const esHoy=fecha.getTime()===hoy.getTime();const fechaStr=fecha.toISOString().split('T')[0];
-    const peds=S.pedidos.filter(p=>p.fecha===fechaStr&&!p.archivado);const evs=S.eventos.filter(e=>e.fecha===fechaStr);const tasks=S.tareas.filter(t=>t.fecha===fechaStr&&!t.done);
-    const chips=[...peds.slice(0,1).map(p=>`<div class="week-chip ped">${p.cli.substring(0,5).toUpperCase()}</div>`),...evs.slice(0,1).map(e=>`<div class="week-chip ${e.prio==='urgente'?'ev-urg':'ev'}">${e.tit.substring(0,5).toUpperCase()}</div>`),...tasks.slice(0,1).map(t=>`<div class="week-chip task">${t.tit.substring(0,5).toUpperCase()}</div>`)].slice(0,2).join('');
-    const total=peds.length+evs.length+tasks.length;const mas=total>2?`<div style="font-size:7px;color:var(--on-surface-var);font-weight:700;">+${total-2}</div>`:'';
+    const esHoy=fecha.getTime()===hoy.getTime();
+    const fechaStr=fecha.toISOString().split('T')[0];
+    const peds=S.pedidos.filter(p=>p.fecha===fechaStr&&!p.archivado);
+    const evs=S.eventos.filter(e=>e.fecha===fechaStr);
+    const tasks=S.tareas.filter(t=>t.fecha===fechaStr&&!t.done);
+    const chips=[
+      ...peds.slice(0,1).map(p=>`<div class="week-chip ped">${p.cli.substring(0,5).toUpperCase()}</div>`),
+      ...evs.slice(0,1).map(e=>`<div class="week-chip ${e.prio==='urgente'?'ev-urg':'ev'}">${e.tit.substring(0,5).toUpperCase()}</div>`),
+      ...tasks.slice(0,1).map(t=>`<div class="week-chip task">${t.tit.substring(0,5).toUpperCase()}</div>`)
+    ].slice(0,2).join('');
+    const total=peds.length+evs.length+tasks.length;
+    const mas=total>2?`<div style="font-size:7px;color:var(--on-surface-var);font-weight:700;">+${total-2}</div>`:'';
     html+=`<div class="week-day${esHoy?' today':''}">
       <div class="week-day-name">${diasFull[i]}</div>
-      <div class="week-day-num"${esHoy?' style="background:var(--primary);color:#fff;"':''}>${fecha.getDate()}</div>
+      <div class="week-day-num">${fecha.getDate()}</div>
       ${chips}${mas}
     </div>`;
   }
@@ -1753,7 +1850,7 @@ async function saveTask(){
   const tit=document.getElementById('taskTit').value.trim();const fecha=document.getElementById('taskFecha').value;const desc=document.getElementById('taskDesc').value.trim();const prio=document.getElementById('taskPrio').value;
   if(!tit){alert('Ingresá el título de la tarea.');return;}
   const task={tit,fecha,desc,prio,done:false,creadoEn:new Date().toISOString()};showSaving();
-  try{const ref=await addDoc(col('tareas'),task);task._id=ref.id;S.tareas.unshift(task);document.getElementById('taskTit').value='';document.getElementById('taskDesc').value='';renderTasks();renderCal('task');renderWeek();renderSlider();showToast('✅ Tarea guardada');}catch(e){showToast('❌ Error al guardar.');}
+  try{const ref=await addDoc(col('tareas'),task);task._id=ref.id;S.tareas.unshift(task);document.getElementById('taskTit').value='';document.getElementById('taskDesc').value='';renderTasks();renderCal('task');renderWeek();renderSlider();closeSheet();showToast('✅ Tarea guardada');}catch(e){showToast('❌ Error al guardar.');}
 }
 window.saveTask=saveTask;
 
@@ -1936,8 +2033,14 @@ window.changeCatQty=changeCatQty;
 function addFromCatalogo(){
   const items=Object.entries(catalogoSeleccionado);if(!items.length){alert('Seleccioná al menos un producto con cantidad.');return;}
   const box=document.getElementById('prodBox');
+  // Limpiar fila vacía inicial si existe
+  const primeraFila=box.querySelector('.prod-row');
+  if(primeraFila){const ins=primeraFila.querySelectorAll('input');if(!ins[0].value.trim()&&!ins[1].value)primeraFila.remove();}
   items.forEach(([nombre,qty])=>{const row=document.createElement('div');row.className='prod-row';row.innerHTML=`<div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" value="${nombre}" placeholder=" "><label class="m3-lbl">Producto</label></div><div class="m3-field" style="flex:.8;margin-bottom:0"><input class="m3-inp" value="${qty}" type="number" min="1" placeholder=" "><label class="m3-lbl">Cant.</label></div><button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button>`;box.appendChild(row);});
-  catalogoSeleccionado={};renderCatalogoSelector();document.getElementById('catalogoSelector').style.display='none';document.getElementById('btnCatSel').style.background='transparent';showToast('✅ Productos agregados');
+  catalogoSeleccionado={};
+  // Resetear selector de categorías
+  if(catSelectedCategory){renderCatSelectorSheet();}
+  showToast('✅ '+items.length+' producto(s) agregado(s)');
 }
 window.addFromCatalogo=addFromCatalogo;
 
@@ -2045,6 +2148,142 @@ async function delMnItem(tab,id){
 window.delMnItem=delMnItem;
 
 window.goTab=goTab;window.setTipo=setTipo;window.calNav=calNav;
+
+/* ── BOTTOM SHEETS DE FORMULARIOS ── */
+function openSheet(tipo){
+  const hoy=new Date().toISOString().split('T')[0];
+  // Setear fecha de hoy en los campos relevantes
+  if(tipo==='fin'){const mf=document.getElementById('mFecha');if(mf)mf.value=hoy;}
+  if(tipo==='ped'){const pf=document.getElementById('pFecha');if(pf)pf.value=hoy;renderCatSelectorSheet();}
+  if(tipo==='age'){const ef=document.getElementById('evFecha');if(ef)ef.value=hoy;renderClienteSelectorSheet();}
+  if(tipo==='task'){const tf=document.getElementById('taskFecha');if(tf)tf.value=hoy;}
+  document.getElementById('formSheetOverlay').classList.add('visible');
+  document.querySelectorAll('.form-sheet').forEach(s=>s.classList.remove('open'));
+  document.getElementById('sheet-'+tipo).classList.add('open');
+}
+function closeSheet(){
+  document.getElementById('formSheetOverlay').classList.remove('visible');
+  document.querySelectorAll('.form-sheet').forEach(s=>s.classList.remove('open'));
+}
+window.openSheet=openSheet;window.closeSheet=closeSheet;
+
+/* ── CATÁLOGO POR CATEGORÍA ── */
+let catSelectedCategory=null;
+
+function getCategorias(){
+  // Obtiene categorías únicas de Mi Negocio → Productos
+  const cats=new Set();
+  (S.miNegocio.productos||[]).forEach(p=>{if(p.categoria&&p.categoria.trim())cats.add(p.categoria.trim());});
+  (S.catalogo||[]).forEach(p=>{if(p.categoria&&p.categoria.trim())cats.add(p.categoria.trim());});
+  if(!cats.size)cats.add('General');
+  return [...cats];
+}
+
+function getProductosPorCategoria(cat){
+  const todos=[];
+  const nombresSet=new Set();
+  (S.miNegocio.productos||[]).forEach(p=>{
+    if(p.nombre&&!nombresSet.has(p.nombre.toLowerCase())){
+      const pCat=p.categoria||'General';
+      if(pCat===cat||(!p.categoria&&cat==='General')){
+        nombresSet.add(p.nombre.toLowerCase());
+        todos.push({nombre:p.nombre,precio:p.precio});
+      }
+    }
+  });
+  (S.catalogo||[]).forEach(p=>{
+    if(p.nombre&&!nombresSet.has(p.nombre.toLowerCase())){
+      const pCat=p.categoria||'General';
+      if(pCat===cat||(!p.categoria&&cat==='General')){
+        nombresSet.add(p.nombre.toLowerCase());
+        todos.push({nombre:p.nombre});
+      }
+    }
+  });
+  return todos;
+}
+
+function renderCatSelectorSheet(){
+  const catList=document.getElementById('catCategoryList');
+  const prodList=document.getElementById('catProductList');
+  if(!catList)return;
+  catSelectedCategory=null;
+  prodList.style.display='none';
+  const cats=getCategorias();
+  if(!cats.length){catList.innerHTML='<span style="font-size:12px;color:var(--on-surface-var)">Sin productos. Agregá en Mi negocio → Productos 🛍️</span>';return;}
+  catList.innerHTML=cats.map(c=>`
+    <button class="m3-chip" onclick="selectCatCategory('${c}')" id="catcat_${c.replace(/\s/g,'_')}">${c}</button>
+  `).join('');
+  // Si solo hay una categoría, seleccionarla automáticamente
+  if(cats.length===1)selectCatCategory(cats[0]);
+}
+
+function selectCatCategory(cat){
+  catSelectedCategory=cat;
+  document.querySelectorAll('#catCategoryList .m3-chip').forEach(b=>b.classList.remove('sel'));
+  const btn=document.getElementById('catcat_'+cat.replace(/\s/g,'_'));
+  if(btn)btn.classList.add('sel');
+  const productos=getProductosPorCategoria(cat);
+  const prodList=document.getElementById('catProductList');
+  if(!productos.length){prodList.innerHTML='<div style="font-size:12px;color:var(--on-surface-var);padding:6px 0">Sin productos en esta categoría</div>';prodList.style.display='block';return;}
+  prodList.style.display='block';
+  prodList.innerHTML='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--on-surface-var);margin-bottom:8px;">'+cat+'</div>'+productos.map(p=>{
+    const qty=catalogoSeleccionado[p.nombre]||0;
+    return `<div style="display:flex;align-items:center;gap:8px;background:var(--surface-var);border-radius:var(--rm);padding:8px 12px;margin-bottom:6px;">
+      <span style="flex:1;font-size:13px;font-weight:700">${p.nombre}${p.precio?` <span style="font-size:11px;color:var(--on-surface-var);font-weight:500">$${Number(p.precio).toLocaleString()}</span>`:''}</span>
+      <div class="qty-selector">
+        <button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button>
+        <span class="qty-num" id="qty_${p.nombre.replace(/[\s']/g,'_')}">${qty}</span>
+        <button class="qty-btn" onclick="changeCatQty('${p.nombre}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('')+'<button class="m3-btn rpl" onclick="addFromCatalogo()" style="margin-top:6px;"><span class="material-icons-round">add</span>Agregar al pedido</button>';
+}
+window.selectCatCategory=selectCatCategory;
+
+/* ── CLIENTES POR CATEGORÍA ── */
+function getClienteCategorias(){
+  const cats=new Set();
+  (S.miNegocio.clientes||[]).forEach(c=>{if(c.categoria&&c.categoria.trim())cats.add(c.categoria.trim());});
+  return [...cats];
+}
+
+function getClientesPorCategoria(cat){
+  return (S.miNegocio.clientes||[]).filter(c=>(c.categoria||'Sin categoría')===cat);
+}
+
+function renderClienteSelectorSheet(){
+  const catList=document.getElementById('clienteCatListAge');
+  if(!catList)return;
+  const cats=getClienteCategorias();
+  if(!cats.length){catList.innerHTML='';return;}
+  catList.innerHTML=cats.map(c=>`
+    <button class="m3-chip" onclick="selectClienteCat('${c}')" id="clcat_${c.replace(/\s/g,'_')}">${c}</button>
+  `).join('');
+}
+
+function selectClienteCat(cat){
+  document.querySelectorAll('#clienteCatListAge .m3-chip').forEach(b=>b.classList.remove('sel'));
+  const btn=document.getElementById('clcat_'+cat.replace(/\s/g,'_'));
+  if(btn)btn.classList.add('sel');
+  const clientes=getClientesPorCategoria(cat);
+  const nomList=document.getElementById('clienteNomListAge');
+  if(!nomList)return;
+  if(!clientes.length){nomList.innerHTML='';nomList.style.display='none';return;}
+  nomList.style.display='flex';
+  nomList.style.flexWrap='wrap';
+  nomList.style.gap='6px';
+  nomList.innerHTML=clientes.map(c=>`
+    <button class="m3-chip" onclick="selectClienteNom('${c.nombre}')">${c.nombre}</button>
+  `).join('');
+}
+function selectClienteNom(nombre){
+  const inp=document.getElementById('evCliente');if(inp)inp.value=nombre;
+  document.querySelectorAll('#clienteNomListAge .m3-chip').forEach(b=>b.classList.remove('sel'));
+  // buscar el botón del nombre
+  document.querySelectorAll('#clienteNomListAge .m3-chip').forEach(b=>{if(b.textContent===nombre)b.classList.add('sel');});
+}
+window.selectClienteCat=selectClienteCat;window.selectClienteNom=selectClienteNom;
 
 /* ── MENÚ HAMBURGUESA ── */
 function toggleMenu(){
