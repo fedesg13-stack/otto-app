@@ -232,6 +232,23 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 /* SUB LABEL */
 .sub-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--on-surface-var);margin:14px 0 8px;}
 
+
+/* ── CALENDARIO ── */
+.cal-wrap{background:var(--surface);border-radius:var(--rxl);padding:16px;margin-bottom:14px;box-shadow:var(--elev1);border:1px solid var(--outline-var);}
+.cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.cal-title{font-size:15px;font-weight:800;color:var(--on-bg);}
+.cal-nav{display:flex;gap:4px;}
+.cal-nav-btn{background:var(--surface-var);border:none;border-radius:var(--rs);width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s;}
+.cal-nav-btn:hover{background:var(--primary-container);}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;}
+.cal-day-name{text-align:center;font-size:10px;font-weight:700;color:var(--on-surface-var);text-transform:uppercase;letter-spacing:.5px;padding:4px 0 6px;}
+.cal-day{text-align:center;padding:6px 2px;border-radius:var(--rs);cursor:default;position:relative;min-height:42px;display:flex;flex-direction:column;align-items:center;gap:2px;}
+.cal-day.other-month .cal-day-num{color:var(--outline);}
+.cal-day.today .cal-day-num{background:var(--primary);color:#fff;border-radius:50%;width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.cal-day-num{font-size:12px;font-weight:600;color:var(--on-bg);width:24px;height:24px;display:flex;align-items:center;justify-content:center;}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;max-width:32px;}
+.cal-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0;}
+
 /* EMPTY */
 .empty{text-align:center;padding:40px 20px;color:var(--on-surface-var);font-size:13px;font-weight:500;}
 .empty span{display:block;font-size:42px;margin-bottom:10px;}
@@ -395,6 +412,19 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
   <!-- PEDIDOS -->
   <div class="panel" id="p-ped">
     <div class="sec-title">Pedidos</div>
+
+    <!-- CALENDARIO PEDIDOS -->
+    <div class="cal-wrap" id="calPed">
+      <div class="cal-header">
+        <div class="cal-title" id="calPedTitle"></div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calNav('ped',-1)"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
+          <button class="cal-nav-btn" onclick="calNav('ped',1)"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calPedGrid"></div>
+    </div>
+
     <div id="proBox" style="display:none" class="produce-card">
       <div class="produce-lbl">Total a producir</div>
       <div class="produce-grid" id="proGrid"></div>
@@ -421,6 +451,19 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
   <!-- AGENDA -->
   <div class="panel" id="p-age">
     <div class="sec-title">Agenda</div>
+
+    <!-- CALENDARIO AGENDA -->
+    <div class="cal-wrap" id="calAge">
+      <div class="cal-header">
+        <div class="cal-title" id="calAgeTitle"></div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calNav('age',-1)"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
+          <button class="cal-nav-btn" onclick="calNav('age',1)"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
+        </div>
+      </div>
+      <div class="cal-grid" id="calAgeGrid"></div>
+    </div>
+
     <div class="m3-card">
       <div class="m3-card-title">Nuevo evento</div>
       <div class="m3-field"><input class="m3-inp" id="evTit" placeholder=" "><label class="m3-lbl">Título del evento</label></div>
@@ -520,7 +563,7 @@ async function entrar(){
   document.getElementById('mFecha').value=hoy;
   document.getElementById('pFecha').value=hoy;
   document.getElementById('evFecha').value=hoy;
-  updateBanner();
+  updateBanner();renderCals();
 }
 window.entrar=entrar;
 
@@ -546,7 +589,7 @@ async function loadAllData(){
     // Contactos
     const cSnap=await getDocs(col('contactos'));
     S.contactos=cSnap.docs.map(d=>({...d.data(),id:d.id}));
-    renderMovs();renderPeds();renderEvs();renderC();renderChips();
+    renderMovs();renderPeds();renderEvs();renderC();renderChips();renderCals();
   }catch(e){
     showToast('⚠️ Error al cargar datos. Revisá tu conexión.');
   }
@@ -701,7 +744,7 @@ async function savePed(){
     ped._id=ref.id;S.pedidos.unshift(ped);
     document.getElementById('pCli').value='';
     document.getElementById('prodBox').innerHTML=`<div class="prod-row"><div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" placeholder=" "><label class="m3-lbl">Producto</label></div><div class="m3-field" style="flex:.8;margin-bottom:0"><input class="m3-inp" placeholder=" " type="number" min="1"><label class="m3-lbl">Cant.</label></div><button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button></div>`;
-    renderPeds();updateBanner();showToast('✅ Pedido guardado');
+    renderPeds();updateBanner();renderCals();showToast('✅ Pedido guardado');
   }catch(e){showToast('❌ Error al guardar.');}
 }
 function renderPeds(){
@@ -725,7 +768,7 @@ async function saveEv(){
     ev._id=ref.id;S.eventos.push(ev);S.eventos.sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
     document.getElementById('evTit').value='';document.getElementById('evHora').value='';
     document.getElementById('evCliente').value='';document.getElementById('evDesc').value='';
-    renderEvs();updateBanner();showToast('✅ Evento guardado');
+    renderEvs();updateBanner();renderCals();showToast('✅ Evento guardado');
   }catch(e){showToast('❌ Error al guardar.');}
 }
 function renderEvs(){
@@ -773,7 +816,9 @@ async function sendMsg(){
   const movDet=S.movs.length?S.movs.slice(0,10).map(m=>`  • ${m.tipo.toUpperCase()} $${m.monto} | FECHA: ${m.fecha} | CAT: ${m.cat}${m.contacto?' | CONTACTO: '+m.contacto.nombre:''}`).join('\n'):'  (sin movimientos)';
   const cDet=S.contactos.length?S.contactos.map(c=>`  • ${c.nombre} (${c.tipo})`).join('\n'):'  (sin contactos)';
   const ctx=`Sos OTTO, el socio silencioso de ${S.nombre}, dueño/a de "${S.negocio}".
-Sos conciso, directo, cálido y práctico. Hablás en español rioplatense. Sin asteriscos ni markdown. Máximo 3 oraciones. 
+Sos conciso, directo, cálido y práctico. Hablás en español rioplatense. Sin asteriscos ni markdown. Máximo 3 oraciones.
+FECHA DE HOY: ${new Date().toLocaleDateString('es-AR', {weekday:'long', year:'numeric', month:'long', day:'numeric'})}.
+Usá esta fecha para calcular correctamente cuántos días faltan para cada evento. Nunca te equivoques con las fechas.
 CRÍTICO: Usá ÚNICAMENTE los datos de abajo. No inventes. No confundas contactos financieros con clientes de pedidos.
 
 === FINANZAS === Ingresos:$${ing} Gastos:$${gas} Balance:$${ing-gas}
@@ -797,8 +842,104 @@ function addBub(text,who){
   box.scrollTop=99999;
 }
 window.sendMsg=sendMsg;
+
+/* ── CALENDARIO ── */
+const CAL_STATE = { ped: new Date(), age: new Date() };
+
+function calNav(which, dir) {
+  const d = CAL_STATE[which];
+  CAL_STATE[which] = new Date(d.getFullYear(), d.getMonth() + dir, 1);
+  renderCal(which);
+}
+
+function renderCal(which) {
+  const d = CAL_STATE[which];
+  const year = d.getFullYear();
+  const month = d.getMonth();
+  const hoy = new Date();
+  hoy.setHours(0,0,0,0);
+
+  // Título
+  const titulo = new Date(year, month, 1).toLocaleDateString('es-AR', { month: 'long', year: 'numeric' });
+  document.getElementById(which === 'ped' ? 'calPedTitle' : 'calAgeTitle').textContent =
+    titulo.charAt(0).toUpperCase() + titulo.slice(1);
+
+  // Obtener items del mes
+  const itemsDelMes = {};
+
+  if (which === 'ped') {
+    S.pedidos.forEach(p => {
+      const fd = new Date(p.fecha + 'T00:00:00');
+      if (fd.getFullYear() === year && fd.getMonth() === month) {
+        const k = fd.getDate();
+        if (!itemsDelMes[k]) itemsDelMes[k] = [];
+        itemsDelMes[k].push({ color: 'var(--tertiary)', label: p.cli });
+      }
+    });
+  } else {
+    S.eventos.forEach(e => {
+      const fd = new Date(e.fecha + 'T00:00:00');
+      if (fd.getFullYear() === year && fd.getMonth() === month) {
+        const k = fd.getDate();
+        if (!itemsDelMes[k]) itemsDelMes[k] = [];
+        const color = e.prio === 'urgente' ? 'var(--error)' : 'var(--tertiary)';
+        itemsDelMes[k].push({ color, label: e.tit });
+      }
+    });
+  }
+
+  // Construir grilla
+  const gridId = which === 'ped' ? 'calPedGrid' : 'calAgeGrid';
+  const grid = document.getElementById(gridId);
+
+  const dias = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  let html = dias.map(d => `<div class="cal-day-name">${d}</div>`).join('');
+
+  // Primer día del mes
+  const primerDia = new Date(year, month, 1).getDay();
+  // Último día del mes
+  const ultimoDia = new Date(year, month + 1, 0).getDate();
+
+  // Días del mes anterior
+  const diasMesAnterior = new Date(year, month, 0).getDate();
+  for (let i = primerDia - 1; i >= 0; i--) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${diasMesAnterior - i}</div></div>`;
+  }
+
+  // Días del mes actual
+  for (let dia = 1; dia <= ultimoDia; dia++) {
+    const estaFecha = new Date(year, month, dia);
+    const esHoy = estaFecha.getTime() === hoy.getTime();
+    const items = itemsDelMes[dia] || [];
+
+    const dots = items.slice(0, 3).map(item =>
+      `<div class="cal-dot" style="background:${item.color}" title="${item.label}"></div>`
+    ).join('');
+
+    html += `<div class="cal-day${esHoy ? ' today' : ''}">
+      <div class="cal-day-num">${dia}</div>
+      ${dots ? `<div class="cal-dots">${dots}</div>` : ''}
+    </div>`;
+  }
+
+  // Días del mes siguiente para completar
+  const totalCeldas = primerDia + ultimoDia;
+  const celdasRestantes = totalCeldas % 7 === 0 ? 0 : 7 - (totalCeldas % 7);
+  for (let i = 1; i <= celdasRestantes; i++) {
+    html += `<div class="cal-day other-month"><div class="cal-day-num">${i}</div></div>`;
+  }
+
+  grid.innerHTML = html;
+}
+
+function renderCals() {
+  renderCal('ped');
+  renderCal('age');
+}
+
 window.goTab=goTab;
 window.setTipo=setTipo;
+window.calNav=calNav;
 </script>
 </body>
 </html>
