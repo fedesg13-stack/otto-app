@@ -1044,6 +1044,7 @@ async function saveEv(){
 function renderEvs(){
   renderAgeWeek();
   const lbl = document.getElementById('ageSelectedDateLbl');
+  if (!lbl) return;
   let evs = ageSelectedDate
     ? S.eventos.filter(e=>e.fecha===ageSelectedDate)
     : S.eventos;
@@ -1668,6 +1669,7 @@ let ageSelectedDate = null;
 let ageCalExpanded = false;
 
 function renderPedWeek() {
+  if (!document.getElementById('pedWeekRow')) return;
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   const lunes = new Date(hoy);
   const dow = hoy.getDay() === 0 ? 6 : hoy.getDay() - 1;
@@ -1736,6 +1738,7 @@ window.toggleCalPed = toggleCalPed;
 
 /* ── AGENDA: semana clickeable ── */
 function renderAgeWeek() {
+  if (!document.getElementById('ageWeekRow')) return;
   const hoy = new Date(); hoy.setHours(0,0,0,0);
   const lunes = new Date(hoy);
   const dow = hoy.getDay()===0?6:hoy.getDay()-1;
