@@ -33,7 +33,7 @@ body{background:var(--bg);color:var(--on-bg);font-family:'Nunito',sans-serif;min
 .rpl:active::after{transform:scale(4);opacity:1;transition:0s;}
 
 /* SPLASH */
-#splash{position:fixed;inset:0;z-index:300;background:linear-gradient(160deg,#1a73e8 0%,#0d47a1 55%,#1565c0 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px;transition:opacity .5s;}
+#splash{display:none !important;}
 #splash.hidden{opacity:0;pointer-events:none;}
 .splash-tagline{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:4px;text-transform:uppercase;margin-bottom:52px;font-weight:500;}
 .splash-card{background:rgba(255,255,255,.1);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,.2);border-radius:var(--rxl);padding:24px;width:100%;max-width:320px;display:flex;flex-direction:column;gap:12px;}
@@ -386,6 +386,256 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 .ev-day-header{font-size:13px;font-weight:800;color:var(--on-bg);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
 .ev-day-badge{background:var(--tertiary);color:#fff;border-radius:var(--rfull);padding:3px 10px;font-size:11px;font-weight:700;}
 
+
+/* ── LOGIN ── */
+#loginScreen{
+  position:fixed;inset:0;z-index:250;
+  background:linear-gradient(160deg,#1a73e8 0%,#0d47a1 55%,#1565c0 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px;
+}
+#loginScreen.visible{display:flex;}
+.login-card{
+  background:rgba(255,255,255,.1);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:28px 24px;width:100%;max-width:320px;
+  display:flex;flex-direction:column;align-items:center;gap:16px;
+}
+.login-title{font-size:15px;font-weight:700;color:rgba(255,255,255,.8);text-align:center;}
+.btn-google{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  width:100%;background:#fff;color:#3c4043;
+  border:none;border-radius:var(--rfull);padding:14px 20px;
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;transition:all .2s;box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+.btn-google:hover{box-shadow:0 6px 20px rgba(0,0,0,.3);transform:translateY(-1px);}
+.btn-google img{width:20px;height:20px;}
+.login-sub{font-size:11px;color:rgba(255,255,255,.4);text-align:center;letter-spacing:.5px;}
+
+/* HEADER con logout */
+.btn-logout{
+  background:transparent;border:none;cursor:pointer;
+  color:var(--on-surface-var);display:flex;align-items:center;
+  gap:4px;font-family:'Nunito',sans-serif;font-size:12px;font-weight:600;
+  padding:4px 8px;border-radius:var(--rfull);transition:all .2s;
+}
+.btn-logout:hover{background:var(--error-container);color:var(--error);}
+
+
+/* ── ARCHIVAR PEDIDOS ── */
+.ticket-btn-done{
+  background:var(--success-container);border:none;border-radius:var(--rfull);
+  padding:4px 10px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;
+  color:var(--success);cursor:pointer;flex:1;transition:all .2s;
+}
+.ticket-btn-done:hover{background:var(--success);color:#fff;}
+.ticket.archivado{opacity:.5;border-style:dashed;}
+.ticket.archivado::before{background:var(--outline);}
+
+.historial-toggle{
+  background:transparent;border:1.5px solid var(--outline);
+  border-radius:var(--rfull);padding:8px 16px;
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;
+  color:var(--on-surface-var);cursor:pointer;
+  display:flex;align-items:center;gap:6px;
+  margin-bottom:14px;transition:all .2s;width:100%;justify-content:center;
+}
+.historial-toggle:hover{border-color:var(--primary);color:var(--primary);}
+
+/* ── CATÁLOGO ── */
+.catalogo-wrap{background:var(--surface);border-radius:var(--rxl);padding:18px;margin-bottom:12px;box-shadow:var(--elev1);border:1px solid var(--outline-var);}
+.catalogo-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--on-surface-var);margin-bottom:14px;}
+.catalogo-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;}
+.cat-prod-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:8px 14px;border-radius:var(--rs);
+  background:var(--tertiary-container);color:var(--on-tertiary-container);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;transition:all .2s;border:1.5px solid transparent;
+}
+.cat-prod-chip:hover{border-color:var(--tertiary);transform:translateY(-1px);}
+.cat-prod-chip.sel{background:var(--tertiary);color:#fff;box-shadow:var(--elev1);}
+.cat-prod-chip-del{
+  background:transparent;border:none;cursor:pointer;
+  font-size:14px;color:inherit;opacity:.6;padding:0 0 0 4px;
+  transition:opacity .2s;
+}
+.cat-prod-chip-del:hover{opacity:1;}
+.add-prod-catalogo{display:flex;gap:8px;margin-top:8px;}
+.inp-catalogo{
+  flex:1;background:var(--surface-var);border:none;
+  border-bottom:2px solid var(--outline);
+  border-radius:var(--rs) var(--rs) 0 0;
+  color:var(--on-bg);padding:12px 14px;
+  font-family:'Nunito',sans-serif;font-size:14px;font-weight:500;outline:none;
+}
+.inp-catalogo:focus{border-bottom-color:var(--tertiary);}
+.inp-catalogo::placeholder{color:var(--on-surface-var);}
+.btn-catalogo-add{
+  background:var(--tertiary);color:#fff;border:none;
+  padding:12px 16px;border-radius:var(--rfull);
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;
+  cursor:pointer;white-space:nowrap;transition:all .2s;
+}
+.btn-catalogo-add:hover{filter:brightness(1.05);}
+
+/* Selector de cantidad rápida en pedidos */
+.qty-selector{display:flex;align-items:center;gap:6px;margin-top:8px;}
+.qty-btn{
+  width:28px;height:28px;border-radius:50%;border:1.5px solid var(--outline);
+  background:transparent;font-size:16px;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--on-bg);transition:all .2s;
+}
+.qty-btn:hover{background:var(--primary-container);border-color:var(--primary);}
+.qty-num{font-size:15px;font-weight:800;color:var(--on-bg);min-width:24px;text-align:center;}
+.catalogo-selected-list{display:flex;flex-direction:column;gap:6px;margin:10px 0;}
+.catalogo-sel-item{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--tertiary-container);border-radius:var(--rm);
+  padding:8px 12px;
+}
+.catalogo-sel-name{font-size:13px;font-weight:700;color:var(--on-tertiary-container);}
+
+
+/* ── ONBOARDING ── */
+#onboarding{
+  position:fixed;inset:0;z-index:280;
+  background:linear-gradient(160deg,#1a73e8 0%,#0d47a1 55%,#1565c0 100%);
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px;
+}
+#onboarding.visible{display:flex;}
+.ob-card{
+  background:rgba(255,255,255,.1);backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.2);border-radius:var(--rxl);
+  padding:28px 24px;width:100%;max-width:340px;
+}
+.ob-step{display:none;flex-direction:column;gap:16px;}
+.ob-step.on{display:flex;}
+.ob-progress{display:flex;gap:6px;justify-content:center;margin-bottom:8px;}
+.ob-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .3s;}
+.ob-dot.on{background:#fff;width:24px;border-radius:4px;}
+.ob-title{font-size:20px;font-weight:800;color:#fff;text-align:center;line-height:1.3;}
+.ob-sub{font-size:13px;color:rgba(255,255,255,.7);text-align:center;font-weight:500;line-height:1.5;}
+.ob-options{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.ob-option{
+  background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.2);
+  border-radius:var(--rm);padding:12px 10px;text-align:center;
+  cursor:pointer;transition:all .2s;
+  font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;color:#fff;
+}
+.ob-option:hover{background:rgba(255,255,255,.2);}
+.ob-option.sel{background:#fff;color:var(--primary);border-color:#fff;}
+.ob-option-icon{font-size:24px;display:block;margin-bottom:4px;}
+.ob-inp{
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.25);
+  color:#fff;padding:14px 16px;border-radius:var(--rm);
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:500;outline:none;
+  width:100%;
+}
+.ob-inp::placeholder{color:rgba(255,255,255,.4);}
+.ob-btn{
+  background:#fff;color:var(--primary);border:none;
+  padding:14px;border-radius:var(--rfull);
+  font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;
+  cursor:pointer;transition:all .2s;
+  box-shadow:0 4px 16px rgba(0,0,0,.2);
+}
+.ob-btn:hover{transform:translateY(-1px);}
+.ob-skip{
+  background:transparent;border:none;color:rgba(255,255,255,.4);
+  font-family:'Nunito',sans-serif;font-size:12px;cursor:pointer;
+  text-decoration:underline;text-align:center;
+}
+
+/* ── MI NEGOCIO ── */
+.mn-section{margin-bottom:20px;}
+.mn-section-title{
+  font-size:13px;font-weight:800;text-transform:uppercase;
+  letter-spacing:1.5px;color:var(--on-surface-var);
+  margin-bottom:10px;display:flex;align-items:center;
+  justify-content:space-between;
+}
+.mn-add-btn{
+  background:var(--primary-container);color:var(--primary);
+  border:none;border-radius:var(--rfull);padding:5px 12px;
+  font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;
+  cursor:pointer;display:flex;align-items:center;gap:4px;
+  transition:all .2s;
+}
+.mn-add-btn:hover{background:var(--primary);color:#fff;}
+
+.mn-list{display:flex;flex-direction:column;gap:8px;}
+.mn-item{
+  background:var(--surface);border-radius:var(--rl);
+  padding:14px 16px;box-shadow:var(--elev1);
+  border:1px solid var(--outline-var);
+  display:flex;align-items:center;gap:12px;
+  animation:fadeUp .25s ease;
+}
+.mn-item-icon{
+  width:40px;height:40px;border-radius:var(--rm);
+  display:flex;align-items:center;justify-content:center;
+  font-size:20px;flex-shrink:0;
+}
+.mn-item-info{flex:1;}
+.mn-item-name{font-size:14px;font-weight:700;color:var(--on-bg);}
+.mn-item-sub{font-size:12px;color:var(--on-surface-var);font-weight:500;margin-top:2px;}
+.mn-item-tag{
+  font-size:10px;font-weight:700;padding:2px 8px;
+  border-radius:var(--rfull);text-transform:uppercase;letter-spacing:.5px;
+}
+.mn-item-actions{display:flex;gap:6px;flex-shrink:0;}
+.mn-btn-edit{
+  background:var(--primary-container);border:none;border-radius:var(--rfull);
+  padding:5px 10px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;
+  color:var(--primary);cursor:pointer;transition:all .2s;
+}
+.mn-btn-edit:hover{background:var(--primary);color:#fff;}
+.mn-btn-del{
+  background:var(--error-container);border:none;border-radius:var(--rfull);
+  padding:5px 10px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;
+  color:var(--error);cursor:pointer;transition:all .2s;
+}
+.mn-btn-del:hover{background:var(--error);color:#fff;}
+
+/* Tab selector dentro de Mi negocio */
+.mn-tabs{
+  display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;
+  margin-bottom:16px;scrollbar-width:none;
+}
+.mn-tabs::-webkit-scrollbar{display:none;}
+.mn-tab{
+  flex-shrink:0;padding:8px 16px;border-radius:var(--rfull);
+  border:1.5px solid var(--outline);background:transparent;
+  font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;
+  color:var(--on-surface-var);cursor:pointer;transition:all .2s;
+  white-space:nowrap;
+}
+.mn-tab.on{background:var(--primary);color:#fff;border-color:var(--primary);}
+.mn-tab:hover:not(.on){background:var(--primary-container);border-color:var(--primary);color:var(--primary);}
+
+/* Perfil del negocio */
+.perfil-card{
+  background:linear-gradient(135deg,var(--primary-container),#e8f0fe);
+  border-radius:var(--rxl);padding:20px;margin-bottom:16px;
+  border:1px solid var(--primary-container);
+}
+.perfil-rubro{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--primary);color:#fff;
+  border-radius:var(--rfull);padding:4px 12px;
+  font-size:11px;font-weight:700;letter-spacing:.5px;
+  text-transform:uppercase;margin-bottom:8px;
+}
+.perfil-nombre{font-size:20px;font-weight:800;color:var(--on-bg);margin-bottom:4px;}
+.perfil-desc{font-size:13px;color:var(--on-surface-var);font-weight:500;}
+
+/* Campo de formulario genérico con label flotante */
+.mn-form{display:flex;flex-direction:column;gap:0;}
+
 /* EMPTY */
 .empty{text-align:center;padding:40px 20px;color:var(--on-surface-var);font-size:13px;font-weight:500;}
 .empty span{display:block;font-size:42px;margin-bottom:10px;}
@@ -425,8 +675,90 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
   </div>
 </div>
 
+<!-- LOGIN SCREEN -->
+<div id="loginScreen">
+  <div style="margin-bottom:8px;">
+    <svg width="160" height="56" viewBox="0 0 560 180">
+      <path d="M8,90 A72,72 0 0,1 152,90" fill="none" stroke="white" stroke-width="34" stroke-linecap="butt"/>
+      <path d="M8,90 A72,72 0 0,0 152,90" fill="none" stroke="white" stroke-width="11" stroke-linecap="butt"/>
+      <circle cx="80" cy="90" r="13" fill="rgba(255,255,255,0.3)"/>
+      <rect x="174" y="22" width="104" height="26" rx="13" fill="white"/>
+      <rect x="213" y="22" width="26" height="140" rx="13" fill="white"/>
+      <rect x="288" y="22" width="104" height="26" rx="13" fill="white"/>
+      <rect x="327" y="22" width="26" height="140" rx="13" fill="white"/>
+      <path d="M408,90 A72,72 0 0,1 552,90" fill="none" stroke="white" stroke-width="34" stroke-linecap="butt"/>
+      <path d="M408,90 A72,72 0 0,0 552,90" fill="none" stroke="white" stroke-width="11" stroke-linecap="butt"/>
+      <circle cx="480" cy="90" r="13" fill="rgba(255,255,255,0.3)"/>
+    </svg>
+  </div>
+  <div class="login-card">
+    <div class="login-title">Entrá a tu cuenta para continuar</div>
+    <button class="btn-google rpl" onclick="loginGoogle()">
+      <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
+      Continuar con Google
+    </button>
+    <div class="login-sub">Tus datos están seguros y son solo tuyos</div>
+  </div>
+</div>
+
+<!-- ONBOARDING -->
+<div id="onboarding">
+  <div class="ob-card">
+    <div class="ob-progress">
+      <div class="ob-dot on" id="obDot0"></div>
+      <div class="ob-dot" id="obDot1"></div>
+      <div class="ob-dot" id="obDot2"></div>
+    </div>
+
+    <!-- Step 1: Rubro -->
+    <div class="ob-step on" id="obStep0">
+      <div style="text-align:center;font-size:40px;margin-bottom:4px;">👋</div>
+      <div class="ob-title">¡Hola! Soy OTTO,<br>tu socio a toda hora</div>
+      <div class="ob-sub">Contame a qué te dedicás para personalizar tu experiencia</div>
+      <div class="ob-options" id="obRubroOpts">
+        <div class="ob-option" onclick="selectRubro('panaderia','🥐')"><span class="ob-option-icon">🥐</span>Panadería</div>
+        <div class="ob-option" onclick="selectRubro('gastronomia','🍽️')"><span class="ob-option-icon">🍽️</span>Gastronomía</div>
+        <div class="ob-option" onclick="selectRubro('fotografia','📸')"><span class="ob-option-icon">📸</span>Fotografía</div>
+        <div class="ob-option" onclick="selectRubro('construccion','🔨')"><span class="ob-option-icon">🔨</span>Construcción</div>
+        <div class="ob-option" onclick="selectRubro('comercio','🛍️')"><span class="ob-option-icon">🛍️</span>Comercio</div>
+        <div class="ob-option" onclick="selectRubro('otro','💼')"><span class="ob-option-icon">💼</span>Otro</div>
+      </div>
+      <input class="ob-inp" id="obRubroCustom" placeholder="O escribí tu rubro…" style="display:none">
+      <button class="ob-btn" onclick="obNext(1)">Continuar →</button>
+      <button class="ob-skip" onclick="skipOnboarding()">Saltar por ahora</button>
+    </div>
+
+    <!-- Step 2: Equipo -->
+    <div class="ob-step" id="obStep1">
+      <div style="text-align:center;font-size:40px;margin-bottom:4px;">👥</div>
+      <div class="ob-title">¿Trabajás solo o<br>con un equipo?</div>
+      <div class="ob-sub">Esto ayuda a OTTO a darte mejores consejos</div>
+      <div class="ob-options">
+        <div class="ob-option" onclick="selectEquipo('solo')" id="obEquipoSolo"><span class="ob-option-icon">🙋</span>Solo/a</div>
+        <div class="ob-option" onclick="selectEquipo('equipo')" id="obEquipoTeam"><span class="ob-option-icon">👨‍👩‍👧</span>Con equipo</div>
+      </div>
+      <button class="ob-btn" onclick="obNext(2)">Continuar →</button>
+      <button class="ob-skip" onclick="obNext(2)" style="color:rgba(255,255,255,.4);background:transparent;border:none;font-family:Nunito,sans-serif;font-size:12px;cursor:pointer;text-decoration:underline;text-align:center;">Saltar</button>
+    </div>
+
+    <!-- Step 3: Primer objetivo -->
+    <div class="ob-step" id="obStep2">
+      <div style="text-align:center;font-size:40px;margin-bottom:4px;">🚀</div>
+      <div class="ob-title">¿Qué querés gestionar<br>primero?</div>
+      <div class="ob-sub">Podés usar todo desde el día uno, pero empezar por algo ayuda</div>
+      <div class="ob-options">
+        <div class="ob-option" onclick="selectObjetivo('finanzas')" id="obObj0"><span class="ob-option-icon">💰</span>Finanzas</div>
+        <div class="ob-option" onclick="selectObjetivo('pedidos')" id="obObj1"><span class="ob-option-icon">📋</span>Pedidos</div>
+        <div class="ob-option" onclick="selectObjetivo('agenda')" id="obObj2"><span class="ob-option-icon">📅</span>Agenda</div>
+        <div class="ob-option" onclick="selectObjetivo('todo')" id="obObj3"><span class="ob-option-icon">⚡</span>Todo junto</div>
+      </div>
+      <button class="ob-btn" onclick="finishOnboarding()">¡Empezar con OTTO!</button>
+    </div>
+  </div>
+</div>
+
 <!-- LOADING -->
-<div id="loadingScreen" class="hidden">
+<div id="loadingScreen">
   <svg width="80" height="30" viewBox="0 0 560 180">
     <path d="M8,90 A72,72 0 0,1 152,90" fill="none" stroke="#1a73e8" stroke-width="34" stroke-linecap="butt"/>
     <path d="M8,90 A72,72 0 0,0 152,90" fill="none" stroke="#1a73e8" stroke-width="11" stroke-linecap="butt"/>
@@ -458,9 +790,14 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       <path d="M408,90 A72,72 0 0,0 552,90" fill="none" stroke="#1a73e8" stroke-width="11" stroke-linecap="butt"/>
       <circle cx="480" cy="90" r="13" fill="#1a73e8" opacity="0.3"/>
     </svg>
-    <div class="user-chip">
-      <div class="user-av" id="uAv">?</div>
-      <div class="user-name" id="uName">—</div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="user-chip">
+        <div class="user-av" id="uAv">?</div>
+        <div class="user-name" id="uName">—</div>
+      </div>
+      <button class="btn-logout" onclick="logoutOtto()" title="Cerrar sesión">
+        <span class="material-icons-round" style="font-size:18px">logout</span>
+      </button>
     </div>
   </header>
 
@@ -483,12 +820,13 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
     </div>
   </div>
 
-  <div class="nav">
+  <div class="nav" style="overflow-x:auto;scrollbar-width:none;">
     <button class="nav-btn on rpl" onclick="goTab('home',this)"><div class="pill"><span class="material-icons-round">home</span></div>Inicio</button>
     <button class="nav-btn rpl" onclick="goTab('fin',this)"><div class="pill"><span class="material-icons-round">payments</span></div>Finanzas</button>
     <button class="nav-btn rpl" onclick="goTab('ped',this)"><div class="pill"><span class="material-icons-round">receipt_long</span></div>Pedidos</button>
     <button class="nav-btn rpl" onclick="goTab('age',this)"><div class="pill"><span class="material-icons-round">calendar_month</span></div>Agenda</button>
     <button class="nav-btn rpl" onclick="goTab('task',this)"><div class="pill"><span class="material-icons-round">check_circle</span></div>Tareas</button>
+    <button class="nav-btn rpl" onclick="goTab('mn',this)"><div class="pill"><span class="material-icons-round">storefront</span></div>Negocio</button>
     <button class="nav-btn rpl" onclick="goTab('chat',this)"><div class="pill"><span class="material-icons-round">smart_toy</span></div>OTTO</button>
   </div>
 
@@ -627,6 +965,10 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
         <span id="pedSelectedDateLbl">Todos los pedidos</span>
       </div>
       <div id="pedContainer"><div class="empty"><span>📋</span>Sin pedidos aún.</div></div>
+      <button class="historial-toggle" onclick="toggleHistorial()" id="historialBtn" style="display:none">
+        <span>📦</span> Ver historial de entregados
+      </button>
+      <div id="historialContainer" style="display:none"></div>
     </div>
 
     <!-- 4. Agregar pedido — siempre abajo -->
@@ -640,6 +982,16 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
         <div class="m3-field"><input class="m3-inp" id="pHora" type="time" placeholder=" "><label class="m3-lbl">Hora entrega</label></div>
         <div class="m3-field" style="visibility:hidden"></div>
       </div>
+      <!-- Selector rápido del catálogo -->
+      <div id="catalogoSelector" style="margin-bottom:12px;display:none">
+        <div class="sub-lbl">Seleccioná del catálogo</div>
+        <div id="catalogoSelChips" class="catalogo-chips"></div>
+        <div class="catalogo-selected-list" id="catalogoSelList"></div>
+        <button class="m3-btn rpl" onclick="addFromCatalogo()" style="margin-top:0">
+          <span class="material-icons-round">add</span>Agregar seleccionados
+        </button>
+      </div>
+
       <div id="prodBox">
         <div class="prod-row">
           <div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" placeholder=" "><label class="m3-lbl">Producto</label></div>
@@ -647,7 +999,14 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
           <button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button>
         </div>
       </div>
-      <button class="add-prod-btn" onclick="addProd()"><span class="material-icons-round" style="font-size:18px">add</span>Agregar producto</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="add-prod-btn" onclick="addProd()" style="flex:1;min-width:140px">
+          <span class="material-icons-round" style="font-size:18px">add</span>Producto manual
+        </button>
+        <button class="add-prod-btn" onclick="toggleCatalogoSelector()" style="flex:1;min-width:140px;border-color:var(--tertiary);color:var(--tertiary)" id="btnCatSel">
+          <span class="material-icons-round" style="font-size:18px">menu_book</span>Del catálogo
+        </button>
+      </div>
       <button class="m3-btn rpl" onclick="savePed()"><span class="material-icons-round">save</span>Guardar pedido</button>
     </div>
   </div>
@@ -740,6 +1099,33 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
     <div id="taskDoneList"><div class="empty" style="padding:16px 0"><span style="font-size:24px">🎉</span>Nada completado aún.</div></div>
   </div>
 
+
+  <!-- MI NEGOCIO -->
+  <div class="panel" id="p-mn">
+    <div class="sec-title">Mi negocio</div>
+
+    <!-- Perfil -->
+    <div class="perfil-card" id="perfilCard">
+      <div class="perfil-rubro" id="perfilRubro">💼 Mi negocio</div>
+      <div class="perfil-nombre" id="perfilNombre">—</div>
+      <div class="perfil-desc" id="perfilDesc">Completá tu perfil para que OTTO te conozca mejor</div>
+      <button class="mn-btn-edit" style="margin-top:10px" onclick="editPerfil()">✏️ Editar perfil</button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="mn-tabs">
+      <button class="mn-tab on" onclick="switchMnTab('productos',this)">🛍️ Productos</button>
+      <button class="mn-tab" onclick="switchMnTab('clientes',this)">👤 Clientes</button>
+      <button class="mn-tab" onclick="switchMnTab('proveedores',this)">🏭 Proveedores</button>
+      <button class="mn-tab" onclick="switchMnTab('equipo',this)">👥 Equipo</button>
+      <button class="mn-tab" onclick="switchMnTab('servicios',this)">⚡ Servicios</button>
+      <button class="mn-tab" onclick="switchMnTab('impositiva',this)">📊 Impositiva</button>
+    </div>
+
+    <!-- Contenido dinámico -->
+    <div id="mnContent"></div>
+  </div>
+
   <!-- OTTO + CONTACTOS -->
   <div class="panel" id="p-chat">
     <div class="sec-title">Hablá con OTTO</div>
@@ -791,7 +1177,8 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 <!-- FIREBASE SDK -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
-import { getFirestore, collection, doc, addDoc, getDocs, deleteDoc, onSnapshot, query, orderBy, setDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getFirestore, collection, doc, addDoc, getDocs, deleteDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBocids5Yt8eSExznVPkkFwE_4Kq3aDGnE",
@@ -804,11 +1191,13 @@ const firebaseConfig = {
 
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
+const auth = getAuth(fbApp);
+const provider = new GoogleAuthProvider();
 
 // ── ESTADO ──
 const CC={proveedor:'#e8710a',empleado:'#1a73e8',servicio:'#00897b',cliente:'#7b1fa2',otro:'#5d4037'};
 const CI={proveedor:'🏭',empleado:'👤',servicio:'⚡',cliente:'🛒',otro:'📌'};
-let S={nombre:'',negocio:'',tipo:'ingreso',movs:[],pedidos:[],eventos:[],contactos:[],tareas:[],nota:'',selC:null,uid:null};
+let S={nombre:'',negocio:'',tipo:'ingreso',movs:[],pedidos:[],eventos:[],contactos:[],tareas:[],catalogo:[],nota:'',perfil:null,miNegocio:{productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},selC:null,uid:null};
 
 // ── HELPERS ──
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
@@ -1803,6 +2192,511 @@ function toggleCalAge() {
   if (ageCalExpanded) renderCal('age');
 }
 window.toggleCalAge = toggleCalAge;
+
+
+/* ── CATÁLOGO DE PRODUCTOS ── */
+let historialVisible = false;
+let catalogoSeleccionado = {}; // {nombre: qty}
+
+async function addCatalogo() {
+  const nombre = document.getElementById('catalogoNombre').value.trim();
+  if (!nombre) { alert('Ingresá el nombre del producto.'); return; }
+  if (S.catalogo.find(p => p.nombre.toLowerCase() === nombre.toLowerCase())) {
+    alert('Ese producto ya existe en el catálogo.'); return;
+  }
+  showSaving();
+  try {
+    const ref = await addDoc(col('catalogo'), { nombre, creadoEn: new Date().toISOString() });
+    S.catalogo.push({ nombre, id: ref.id });
+    document.getElementById('catalogoNombre').value = '';
+    renderCatalogo();
+    showToast('✅ Producto agregado al catálogo');
+  } catch(e) { showToast('❌ Error al guardar.'); }
+}
+window.addCatalogo = addCatalogo;
+
+async function delCatalogo(id) {
+  try {
+    await deleteDoc(doc(db, `usuarios/${S.uid}/catalogo`, id));
+    S.catalogo = S.catalogo.filter(p => p.id !== id);
+    renderCatalogo();
+    showToast('🗑️ Producto eliminado');
+  } catch(e) { showToast('❌ Error.'); }
+}
+window.delCatalogo = delCatalogo;
+
+function renderCatalogo() {
+  const el = document.getElementById('catalogoChips');
+  if (!el) return;
+  if (!S.catalogo.length) {
+    el.innerHTML = '<span style="font-size:13px;color:var(--on-surface-var);font-weight:500">Sin productos aún.</span>';
+  } else {
+    el.innerHTML = S.catalogo.map(p => `
+      <span class="cat-prod-chip">
+        ${p.nombre}
+        <button class="cat-prod-chip-del" onclick="delCatalogo('${p.id}')">×</button>
+      </span>`).join('');
+  }
+  renderCatalogoSelector();
+}
+
+function toggleCatalogoSelector() {
+  const sel = document.getElementById('catalogoSelector');
+  const btn = document.getElementById('btnCatSel');
+  const visible = sel.style.display !== 'none';
+  sel.style.display = visible ? 'none' : 'block';
+  btn.style.background = visible ? 'transparent' : 'var(--tertiary-container)';
+  if (!visible) renderCatalogoSelector();
+}
+window.toggleCatalogoSelector = toggleCatalogoSelector;
+
+function renderCatalogoSelector() {
+  const el = document.getElementById('catalogoSelChips');
+  if (!el) return;
+  if (!S.catalogo.length) {
+    el.innerHTML = '<span style="font-size:12px;color:var(--on-surface-var)">Agregá productos en la pestaña OTTO → Mi catálogo</span>';
+    return;
+  }
+  el.innerHTML = S.catalogo.map(p => {
+    const qty = catalogoSeleccionado[p.nombre] || 0;
+    return `<div style="display:flex;align-items:center;gap:8px;background:var(--surface-var);border-radius:var(--rm);padding:8px 12px;margin-bottom:6px;">
+      <span style="flex:1;font-size:13px;font-weight:700">${p.nombre}</span>
+      <div class="qty-selector">
+        <button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button>
+        <span class="qty-num" id="qty_${p.nombre.replace(/\s/g,'_')}">${qty}</span>
+        <button class="qty-btn" onclick="changeCatQty('${p.nombre}',1)">+</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function changeCatQty(nombre, delta) {
+  const current = catalogoSeleccionado[nombre] || 0;
+  const nuevo = Math.max(0, current + delta);
+  if (nuevo === 0) delete catalogoSeleccionado[nombre];
+  else catalogoSeleccionado[nombre] = nuevo;
+  const id = 'qty_' + nombre.replace(/\s/g, '_');
+  const el = document.getElementById(id);
+  if (el) el.textContent = nuevo;
+}
+window.changeCatQty = changeCatQty;
+
+function addFromCatalogo() {
+  const items = Object.entries(catalogoSeleccionado);
+  if (!items.length) { alert('Seleccioná al menos un producto con cantidad.'); return; }
+  const box = document.getElementById('prodBox');
+  items.forEach(([nombre, qty]) => {
+    const row = document.createElement('div');
+    row.className = 'prod-row';
+    row.innerHTML = `
+      <div class="m3-field" style="flex:2;margin-bottom:0">
+        <input class="m3-inp" value="${nombre}" placeholder=" ">
+        <label class="m3-lbl">Producto</label>
+      </div>
+      <div class="m3-field" style="flex:.8;margin-bottom:0">
+        <input class="m3-inp" value="${qty}" type="number" min="1" placeholder=" ">
+        <label class="m3-lbl">Cant.</label>
+      </div>
+      <button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button>`;
+    box.appendChild(row);
+  });
+  // Limpiar selección
+  catalogoSeleccionado = {};
+  renderCatalogoSelector();
+  document.getElementById('catalogoSelector').style.display = 'none';
+  document.getElementById('btnCatSel').style.background = 'transparent';
+  showToast('✅ Productos agregados');
+}
+window.addFromCatalogo = addFromCatalogo;
+
+/* ── ARCHIVAR PEDIDOS ── */
+async function archivarPed(id) {
+  try {
+    await updateDoc(doc(db, `usuarios/${S.uid}/pedidos`, id), { archivado: true, archivadoEn: new Date().toISOString() });
+    const idx = S.pedidos.findIndex(p => p._id === id);
+    if (idx > -1) S.pedidos[idx].archivado = true;
+    renderPeds();
+    renderCals();
+    renderWeek ? renderWeek() : null;
+    renderPedWeek();
+    renderHome();
+    showToast('✅ Pedido marcado como entregado');
+  } catch(e) { showToast('❌ Error al archivar.'); }
+}
+window.archivarPed = archivarPed;
+
+function toggleHistorial() {
+  historialVisible = !historialVisible;
+  const el = document.getElementById('historialContainer');
+  const btn = document.getElementById('historialBtn');
+  if (historialVisible) {
+    const archivados = S.pedidos.filter(p => p.archivado);
+    el.style.display = 'block';
+    btn.innerHTML = '<span>📦</span> Ocultar historial';
+    if (!archivados.length) {
+      el.innerHTML = '<div class="empty" style="padding:16px"><span>📦</span>Sin pedidos entregados aún.</div>';
+    } else {
+      el.innerHTML = '<div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--on-surface-var);margin-bottom:10px;">Entregados</div>' +
+        '<div class="tickets-row">' +
+        archivados.map(p => `
+          <div class="ticket archivado">
+            <div class="ticket-client">👤 ${p.cli}</div>
+            ${p.hora ? `<div class="ticket-time">⏰ ${p.hora}</div>` : ''}
+            <div class="ticket-items">
+              ${p.items.map(i => `<div class="ticket-item"><span class="ticket-qty">${i.q}×</span><span>${i.p}</span></div>`).join('')}
+            </div>
+            <div style="font-size:11px;color:var(--on-surface-var);margin-top:6px;font-weight:500;">
+              📅 ${fmt(p.fecha)} · Entregado ✓
+            </div>
+          </div>`).join('') +
+        '</div>';
+    }
+  } else {
+    el.style.display = 'none';
+    btn.innerHTML = '<span>📦</span> Ver historial de entregados';
+  }
+}
+window.toggleHistorial = toggleHistorial;
+
+
+/* ══ ONBOARDING ══ */
+let obRubro = null;
+let obEquipo = null;
+let obObjetivo = null;
+
+function showOnboarding() {
+  document.getElementById('onboarding').classList.add('visible');
+}
+
+function skipOnboarding() {
+  document.getElementById('onboarding').classList.remove('visible');
+}
+
+function selectRubro(rubro, emoji) {
+  obRubro = { rubro, emoji };
+  document.querySelectorAll('#obRubroOpts .ob-option').forEach(el => el.classList.remove('sel'));
+  event.currentTarget.classList.add('sel');
+  document.getElementById('obRubroCustom').style.display = rubro === 'otro' ? 'block' : 'none';
+}
+
+function selectEquipo(tipo) {
+  obEquipo = tipo;
+  document.getElementById('obEquipoSolo').classList.toggle('sel', tipo==='solo');
+  document.getElementById('obEquipoTeam').classList.toggle('sel', tipo==='equipo');
+}
+
+function selectObjetivo(obj) {
+  obObjetivo = obj;
+  ['obObj0','obObj1','obObj2','obObj3'].forEach(id => {
+    document.getElementById(id).classList.remove('sel');
+  });
+  const map = {finanzas:'obObj0',pedidos:'obObj1',agenda:'obObj2',todo:'obObj3'};
+  document.getElementById(map[obj]).classList.add('sel');
+}
+
+function obNext(step) {
+  document.querySelectorAll('.ob-step').forEach(s => s.classList.remove('on'));
+  document.querySelectorAll('.ob-dot').forEach((d,i) => d.classList.toggle('on', i===step));
+  document.getElementById('obStep'+(step)).classList.add('on');
+}
+
+async function finishOnboarding() {
+  // Guardar perfil del onboarding
+  const customRubro = document.getElementById('obRubroCustom').value.trim();
+  const rubroFinal = customRubro || (obRubro ? obRubro.rubro : 'otro');
+  const emojiFinal = obRubro ? obRubro.emoji : '💼';
+
+  S.perfil = {
+    rubro: rubroFinal,
+    emoji: emojiFinal,
+    equipo: obEquipo || 'solo',
+    objetivo: obObjetivo || 'todo',
+    onboardingDone: true
+  };
+
+  try {
+    await addDoc(col('perfil'), { ...S.perfil, creadoEn: new Date().toISOString() });
+  } catch(e) {}
+
+  document.getElementById('onboarding').classList.remove('visible');
+  renderPerfil();
+
+  // Ir a la sección elegida
+  const tabMap = {
+    finanzas: 'fin', pedidos: 'ped', agenda: 'age', todo: 'home'
+  };
+  const navBtns = document.querySelectorAll('.nav-btn');
+  const tabId = tabMap[obObjetivo || 'todo'];
+  goTab(tabId, navBtns[0]);
+
+  showToast(`¡Bienvenido a OTTO, ${S.nombre.split(' ')[0]}! 🎉`);
+}
+window.skipOnboarding = skipOnboarding;
+window.selectRubro = selectRubro;
+window.selectEquipo = selectEquipo;
+window.selectObjetivo = selectObjetivo;
+window.obNext = obNext;
+window.finishOnboarding = finishOnboarding;
+
+function renderPerfil() {
+  const p = S.perfil;
+  if (!p) return;
+  const rubroLabels = {
+    panaderia:'Panadería',gastronomia:'Gastronomía',fotografia:'Fotografía',
+    construccion:'Construcción',comercio:'Comercio',otro:'Emprendimiento'
+  };
+  const label = rubroLabels[p.rubro] || p.rubro;
+  const el = document.getElementById('perfilRubro');
+  const nombre = document.getElementById('perfilNombre');
+  const desc = document.getElementById('perfilDesc');
+  if (el) el.textContent = (p.emoji||'💼') + ' ' + label;
+  if (nombre) nombre.textContent = S.negocio || '—';
+  if (desc) desc.textContent = p.equipo === 'solo' ? 'Emprendedor individual' : 'Negocio con equipo';
+}
+
+function editPerfil() {
+  openEdit('Editar perfil', `
+    <div class="m3-field"><input class="m3-inp" id="epNegocio" value="${S.negocio||''}" placeholder=" "><label class="m3-lbl">Nombre del negocio</label></div>
+    <select class="m3-select" id="epRubro">
+      <option value="panaderia" ${S.perfil?.rubro==='panaderia'?'selected':''}>🥐 Panadería</option>
+      <option value="gastronomia" ${S.perfil?.rubro==='gastronomia'?'selected':''}>🍽️ Gastronomía</option>
+      <option value="fotografia" ${S.perfil?.rubro==='fotografia'?'selected':''}>📸 Fotografía</option>
+      <option value="construccion" ${S.perfil?.rubro==='construccion'?'selected':''}>🔨 Construcción</option>
+      <option value="comercio" ${S.perfil?.rubro==='comercio'?'selected':''}>🛍️ Comercio</option>
+      <option value="otro" ${S.perfil?.rubro==='otro'?'selected':''}>💼 Otro</option>
+    </select>
+    <div class="m3-field"><input class="m3-inp" id="epDesc" value="${S.perfil?.descripcion||''}" placeholder=" "><label class="m3-lbl">Descripción del negocio</label></div>
+    <div class="m3-field"><input class="m3-inp" id="epCuit" value="${S.perfil?.cuit||''}" placeholder=" "><label class="m3-lbl">CUIT / ID fiscal (opcional)</label></div>
+    <button class="m3-btn rpl" onclick="savePerfil()"><span class="material-icons-round">save</span>Guardar perfil</button>
+  `);
+}
+window.editPerfil = editPerfil;
+
+async function savePerfil() {
+  const negocio = document.getElementById('epNegocio').value.trim();
+  const rubro = document.getElementById('epRubro').value;
+  const desc = document.getElementById('epDesc').value.trim();
+  const cuit = document.getElementById('epCuit').value.trim();
+  S.negocio = negocio || S.negocio;
+  if (!S.perfil) S.perfil = {};
+  S.perfil = { ...S.perfil, rubro, descripcion: desc, cuit };
+  try {
+    const snap = await getDocs(col('perfil'));
+    if (!snap.empty) {
+      await updateDoc(doc(db, `usuarios/${S.uid}/perfil`, snap.docs[0].id), { negocio, rubro, descripcion: desc, cuit });
+    } else {
+      await addDoc(col('perfil'), { negocio, rubro, descripcion: desc, cuit, creadoEn: new Date().toISOString() });
+    }
+    document.getElementById('uName').textContent = negocio.split(' ')[0] || S.nombre.split(' ')[0];
+  } catch(e) {}
+  renderPerfil();
+  closeEdit();
+  showToast('✅ Perfil actualizado');
+}
+window.savePerfil = savePerfil;
+
+/* ══ MI NEGOCIO — TABS ══ */
+let mnTabActual = 'productos';
+
+const MN_CONFIG = {
+  productos: {
+    icon: '🛍️', label: 'Producto / Servicio',
+    campos: [
+      { id: 'nombre', label: 'Nombre', type: 'text', required: true },
+      { id: 'precio', label: 'Precio de venta', type: 'number' },
+      { id: 'costo', label: 'Costo / precio de costo', type: 'number' },
+      { id: 'categoria', label: 'Categoría', type: 'text' },
+      { id: 'descripcion', label: 'Descripción', type: 'text' },
+    ],
+    color: 'var(--tertiary)', bg: 'var(--tertiary-container)'
+  },
+  clientes: {
+    icon: '👤', label: 'Cliente',
+    campos: [
+      { id: 'nombre', label: 'Nombre completo', type: 'text', required: true },
+      { id: 'telefono', label: 'Teléfono / WhatsApp', type: 'text' },
+      { id: 'email', label: 'Email', type: 'email' },
+      { id: 'direccion', label: 'Dirección de entrega', type: 'text' },
+      { id: 'notas', label: 'Notas', type: 'text' },
+    ],
+    color: 'var(--primary)', bg: 'var(--primary-container)'
+  },
+  proveedores: {
+    icon: '🏭', label: 'Proveedor',
+    campos: [
+      { id: 'nombre', label: 'Nombre / empresa', type: 'text', required: true },
+      { id: 'contacto', label: 'Contacto', type: 'text' },
+      { id: 'telefono', label: 'Teléfono', type: 'text' },
+      { id: 'queProvee', label: '¿Qué provee?', type: 'text' },
+      { id: 'condiciones', label: 'Condiciones de pago', type: 'text' },
+    ],
+    color: '#e8710a', bg: 'var(--tertiary-container)'
+  },
+  equipo: {
+    icon: '👥', label: 'Miembro del equipo',
+    campos: [
+      { id: 'nombre', label: 'Nombre completo', type: 'text', required: true },
+      { id: 'rol', label: 'Rol / puesto', type: 'text' },
+      { id: 'telefono', label: 'Teléfono', type: 'text' },
+      { id: 'horario', label: 'Horario', type: 'text' },
+      { id: 'sueldo', label: 'Sueldo / pago', type: 'number' },
+    ],
+    color: 'var(--secondary)', bg: 'var(--secondary-container)'
+  },
+  servicios: {
+    icon: '⚡', label: 'Servicio / suscripción',
+    campos: [
+      { id: 'nombre', label: 'Nombre del servicio', type: 'text', required: true },
+      { id: 'costo', label: 'Costo mensual', type: 'number' },
+      { id: 'vencimiento', label: 'Próximo vencimiento', type: 'date' },
+      { id: 'notas', label: 'Notas', type: 'text' },
+    ],
+    color: 'var(--primary)', bg: 'var(--primary-container)'
+  },
+  impositiva: {
+    icon: '📊', label: 'Obligación impositiva',
+    campos: [
+      { id: 'nombre', label: 'Nombre (ej: IVA, Ingresos Brutos)', type: 'text', required: true },
+      { id: 'vencimiento', label: 'Próximo vencimiento', type: 'date' },
+      { id: 'monto', label: 'Monto estimado', type: 'number' },
+      { id: 'periodicidad', label: 'Periodicidad (mensual, anual…)', type: 'text' },
+      { id: 'notas', label: 'Notas', type: 'text' },
+    ],
+    color: '#b3261e', bg: 'var(--error-container)'
+  }
+};
+
+function switchMnTab(tab, el) {
+  mnTabActual = tab;
+  document.querySelectorAll('.mn-tab').forEach(t => t.classList.remove('on'));
+  if (el) el.classList.add('on');
+  renderMnContent();
+}
+window.switchMnTab = switchMnTab;
+
+function renderMnContent() {
+  const cfg = MN_CONFIG[mnTabActual];
+  const items = S.miNegocio[mnTabActual] || [];
+  const el = document.getElementById('mnContent');
+  if (!el) return;
+
+  const lista = items.length
+    ? items.map(item => `
+      <div class="mn-item">
+        <div class="mn-item-icon" style="background:${cfg.bg}">${cfg.icon}</div>
+        <div class="mn-item-info">
+          <div class="mn-item-name">${item.nombre || '—'}</div>
+          <div class="mn-item-sub">${getMnSubtitle(mnTabActual, item)}</div>
+        </div>
+        <div class="mn-item-actions">
+          <button class="mn-btn-edit" onclick="editMnItem('${mnTabActual}','${item._id}')">✏️</button>
+          <button class="mn-btn-del" onclick="delMnItem('${mnTabActual}','${item._id}')">🗑️</button>
+        </div>
+      </div>`).join('')
+    : `<div class="empty"><span>${cfg.icon}</span>Sin ${mnTabActual} aún.<br><small style="font-size:11px;opacity:.6">Agregá tu primer ${cfg.label.toLowerCase()}</small></div>`;
+
+  el.innerHTML = `
+    <div class="mn-section">
+      <div class="mn-section-title">
+        ${cfg.icon} ${cfg.label}s
+        <button class="mn-add-btn" onclick="addMnItem('${mnTabActual}')">+ Agregar</button>
+      </div>
+      <div class="mn-list">${lista}</div>
+    </div>`;
+}
+
+function getMnSubtitle(tab, item) {
+  const parts = [];
+  if (tab==='productos') {
+    if (item.precio) parts.push('$'+Number(item.precio).toLocaleString());
+    if (item.categoria) parts.push(item.categoria);
+  } else if (tab==='clientes') {
+    if (item.telefono) parts.push('📱 '+item.telefono);
+    if (item.email) parts.push(item.email);
+  } else if (tab==='proveedores') {
+    if (item.queProvee) parts.push(item.queProvee);
+    if (item.telefono) parts.push('📱 '+item.telefono);
+  } else if (tab==='equipo') {
+    if (item.rol) parts.push(item.rol);
+    if (item.sueldo) parts.push('$'+Number(item.sueldo).toLocaleString());
+  } else if (tab==='servicios') {
+    if (item.costo) parts.push('$'+Number(item.costo).toLocaleString()+'/mes');
+    if (item.vencimiento) parts.push('Vence: '+fmt(item.vencimiento));
+  } else if (tab==='impositiva') {
+    if (item.vencimiento) parts.push('Vence: '+fmt(item.vencimiento));
+    if (item.monto) parts.push('$'+Number(item.monto).toLocaleString());
+  }
+  return parts.join(' · ') || item.notas || item.descripcion || '';
+}
+
+function addMnItem(tab) {
+  const cfg = MN_CONFIG[tab];
+  const campos = cfg.campos.map(c => `
+    <div class="m3-field">
+      <input class="m3-inp" id="mnf_${c.id}" type="${c.type||'text'}" placeholder=" " ${c.required?'required':''}>
+      <label class="m3-lbl">${c.label}${c.required?' *':''}</label>
+    </div>`).join('');
+  openEdit(`Nuevo ${cfg.label}`, `
+    ${campos}
+    <button class="m3-btn rpl" onclick="saveMnItem('${tab}',null)">
+      <span class="material-icons-round">save</span>Guardar
+    </button>`);
+}
+window.addMnItem = addMnItem;
+
+function editMnItem(tab, id) {
+  const cfg = MN_CONFIG[tab];
+  const item = (S.miNegocio[tab]||[]).find(x=>x._id===id);
+  if (!item) return;
+  const campos = cfg.campos.map(c => `
+    <div class="m3-field">
+      <input class="m3-inp" id="mnf_${c.id}" type="${c.type||'text'}" value="${item[c.id]||''}" placeholder=" ">
+      <label class="m3-lbl">${c.label}</label>
+    </div>`).join('');
+  openEdit(`Editar ${cfg.label}`, `
+    ${campos}
+    <button class="m3-btn rpl" onclick="saveMnItem('${tab}','${id}')">
+      <span class="material-icons-round">save</span>Guardar cambios
+    </button>`);
+}
+window.editMnItem = editMnItem;
+
+async function saveMnItem(tab, id) {
+  const cfg = MN_CONFIG[tab];
+  const data = {};
+  cfg.campos.forEach(c => {
+    const el = document.getElementById('mnf_'+c.id);
+    if (el) data[c.id] = el.value.trim();
+  });
+  if (!data.nombre) { alert('El nombre es obligatorio.'); return; }
+  showSaving();
+  try {
+    if (id) {
+      await updateDoc(doc(db, `usuarios/${S.uid}/mn_${tab}`, id), data);
+      const idx = S.miNegocio[tab].findIndex(x=>x._id===id);
+      if (idx>-1) S.miNegocio[tab][idx] = { ...S.miNegocio[tab][idx], ...data };
+    } else {
+      const ref = await addDoc(col('mn_'+tab), { ...data, creadoEn: new Date().toISOString() });
+      if (!S.miNegocio[tab]) S.miNegocio[tab]=[];
+      S.miNegocio[tab].push({ ...data, _id: ref.id });
+    }
+    renderMnContent();
+    closeEdit();
+    showToast('✅ Guardado correctamente');
+  } catch(e) { showToast('❌ Error al guardar.'); }
+}
+window.saveMnItem = saveMnItem;
+
+async function delMnItem(tab, id) {
+  if (!confirm('¿Eliminar este elemento?')) return;
+  try {
+    await deleteDoc(doc(db, `usuarios/${S.uid}/mn_${tab}`, id));
+    S.miNegocio[tab] = S.miNegocio[tab].filter(x=>x._id!==id);
+    renderMnContent();
+    showToast('🗑️ Eliminado');
+  } catch(e) { showToast('❌ Error.'); }
+}
+window.delMnItem = delMnItem;
 
 window.goTab=goTab;
 window.setTipo=setTipo;
