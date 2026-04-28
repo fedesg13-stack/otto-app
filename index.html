@@ -338,6 +338,54 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
 .edit-sheet-body{padding:20px;}
 .edit-close{background:var(--surface-var);border:none;border-radius:50%;width:36px;height:36px;cursor:pointer;display:flex;align-items:center;justify-content:center;}
 
+
+/* ── SEMANA COLLAPSIBLE ── */
+.week-cal-wrap{background:var(--surface);border-radius:var(--rxl);padding:14px;margin-bottom:14px;box-shadow:var(--elev1);border:1px solid var(--outline-var);}
+.week-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.week-cal-title{font-size:14px;font-weight:800;color:var(--on-bg);}
+.week-cal-actions{display:flex;align-items:center;gap:8px;}
+.btn-expand-cal{background:var(--surface-var);border:none;border-radius:var(--rfull);padding:5px 12px;font-family:'Nunito',sans-serif;font-size:11px;font-weight:700;color:var(--on-surface-var);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .2s;}
+.btn-expand-cal.on{background:var(--primary-container);color:var(--primary);}
+.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.week-col{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 2px;border-radius:var(--rs);transition:background .15s;}
+.week-col:hover{background:var(--primary-container);}
+.week-col.selected{background:var(--primary-container);}
+.week-col-name{font-size:9px;font-weight:700;color:var(--on-surface-var);text-transform:uppercase;}
+.week-col-num{font-size:13px;font-weight:800;color:var(--on-bg);width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.week-col.today .week-col-num{background:var(--primary);color:#fff;}
+.week-col.selected .week-col-num{background:var(--primary);color:#fff;}
+.w-chip{width:100%;padding:1px 3px;border-radius:3px;font-size:7px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.6;max-width:44px;}
+.w-chip.ped{background:#00897b;}
+.w-chip.ev{background:#e8710a;}
+.w-chip.ev-urg{background:#b3261e;}
+.month-cal-wrap{margin-top:10px;border-top:1px solid var(--outline-var);padding-top:10px;}
+
+/* ── PRODUCE SEMANA ── */
+.produce-week{background:var(--tertiary-container);border-radius:var(--rxl);padding:14px;margin-bottom:14px;}
+.produce-week-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--tertiary);margin-bottom:10px;}
+
+/* ── TICKETS ── */
+.tickets-section{margin-bottom:14px;}
+.tickets-date-header{font-size:13px;font-weight:800;color:var(--on-bg);margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.tickets-date-badge{background:var(--primary);color:#fff;border-radius:var(--rfull);padding:3px 10px;font-size:11px;font-weight:700;}
+.tickets-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ticket{background:var(--surface);border-radius:18px;padding:14px;box-shadow:var(--elev2);border:1px solid var(--outline-var);position:relative;overflow:hidden;animation:fadeUp .25s ease;}
+.ticket::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:var(--tertiary);}
+.ticket-client{font-size:13px;font-weight:800;color:var(--on-bg);margin-bottom:6px;display:flex;align-items:center;gap:5px;}
+.ticket-time{font-size:11px;color:var(--on-surface-var);font-weight:500;margin-bottom:8px;}
+.ticket-items{display:flex;flex-direction:column;gap:3px;margin-bottom:10px;}
+.ticket-item{font-size:12px;color:var(--on-surface-var);display:flex;gap:6px;font-weight:500;}
+.ticket-qty{color:var(--tertiary);font-weight:800;min-width:20px;}
+.ticket-actions{display:flex;gap:6px;}
+.ticket-btn-edit{background:var(--primary-container);border:none;border-radius:var(--rfull);padding:4px 10px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:var(--primary);cursor:pointer;flex:1;}
+.ticket-btn-del{background:var(--error-container);border:none;border-radius:var(--rfull);padding:4px 10px;font-family:'Nunito',sans-serif;font-size:10px;font-weight:700;color:var(--error);cursor:pointer;flex:1;}
+.tickets-empty{text-align:center;padding:24px;color:var(--on-surface-var);font-size:13px;font-weight:500;background:var(--surface);border-radius:var(--rl);border:1.5px dashed var(--outline);}
+
+/* ── EV CARDS mejoradas ── */
+.ev-day-group{margin-bottom:16px;}
+.ev-day-header{font-size:13px;font-weight:800;color:var(--on-bg);margin-bottom:8px;display:flex;align-items:center;gap:8px;}
+.ev-day-badge{background:var(--tertiary);color:#fff;border-radius:var(--rfull);padding:3px 10px;font-size:11px;font-weight:700;}
+
 /* EMPTY */
 .empty{text-align:center;padding:40px 20px;color:var(--on-surface-var);font-size:13px;font-weight:500;}
 .empty span{display:block;font-size:42px;margin-bottom:10px;}
@@ -587,20 +635,38 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
   <div class="panel" id="p-age">
     <div class="sec-title">Agenda</div>
 
-    <!-- CALENDARIO AGENDA -->
-    <div class="cal-wrap" id="calAge">
-      <div class="cal-header">
-        <div class="cal-title" id="calAgeTitle"></div>
-        <div class="cal-nav">
-          <button class="cal-nav-btn" onclick="calNav('age',-1)"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
-          <button class="cal-nav-btn" onclick="calNav('age',1)"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
+    <!-- 1. Calendario semana + expandible mes -->
+    <div class="week-cal-wrap">
+      <div class="week-cal-header">
+        <div class="week-cal-title" id="ageWeekTitle">Esta semana</div>
+        <div class="week-cal-actions">
+          <div class="cal-nav" id="ageMonthNav" style="display:none">
+            <button class="cal-nav-btn" onclick="calNav('age',-1)"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
+            <button class="cal-nav-btn" onclick="calNav('age',1)"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
+          </div>
+          <button class="btn-expand-cal" id="ageExpandBtn" onclick="toggleCalAge()">
+            <span class="material-icons-round" style="font-size:14px">calendar_month</span> Ver mes
+          </button>
         </div>
       </div>
-      <div class="cal-grid" id="calAgeGrid"></div>
+      <div class="week-row" id="ageWeekRow"></div>
+      <div class="month-cal-wrap" id="ageMonthWrap" style="display:none">
+        <div style="font-size:12px;font-weight:800;color:var(--on-surface-var);margin-bottom:8px;" id="calAgeTitle"></div>
+        <div class="cal-grid" id="calAgeGrid"></div>
+      </div>
     </div>
 
+    <!-- 2. Eventos del día seleccionado -->
+    <div id="ageEventsSection">
+      <div class="tickets-date-header">
+        <span id="ageSelectedDateLbl">Todos los eventos</span>
+      </div>
+      <div id="evContainer"><div class="empty"><span>📅</span>Sin eventos aún.</div></div>
+    </div>
+
+    <!-- 3. Agregar evento (abajo del todo) -->
     <div class="m3-card">
-      <div class="m3-card-title">Nuevo evento</div>
+      <div class="m3-card-title">+ Agendar evento</div>
       <div class="m3-field"><input class="m3-inp" id="evTit" placeholder=" "><label class="m3-lbl">Título del evento</label></div>
       <div class="inp-row">
         <div class="m3-field"><input class="m3-inp" id="evFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
@@ -608,10 +674,9 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       </div>
       <div class="m3-field"><input class="m3-inp" id="evCliente" placeholder=" "><label class="m3-lbl">Cliente (opcional)</label></div>
       <select class="m3-select" id="evPrio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
-      <textarea class="m3-textarea" id="evDesc" rows="4" placeholder="Detalle del evento…"></textarea>
+      <textarea class="m3-textarea" id="evDesc" rows="3" placeholder="Detalle del evento…"></textarea>
       <button class="m3-btn sec rpl" onclick="saveEv()"><span class="material-icons-round">event</span>Agendar</button>
     </div>
-    <div id="evContainer"><div class="empty"><span>📅</span>Sin eventos aún.</div></div>
   </div>
 
 
@@ -751,7 +816,7 @@ async function entrar(){
   document.getElementById('pFecha').value=hoy;
   document.getElementById('evFecha').value=hoy;
   document.getElementById('taskFecha').value=hoy;
-  updateBanner();renderCals();renderHome();
+  updateBanner();renderCals();renderPedWeek();renderAgeWeek();renderHome();
 }
 window.entrar=entrar;
 
@@ -782,7 +847,7 @@ async function loadAllData(){
     S.tareas=tSnap.docs.map(d=>({...d.data(),_id:d.id}));
     S.tareas.sort((a,b)=>new Date(a.fecha||'9999')-new Date(b.fecha||'9999'));
     // Nota
-    renderMovs();renderPeds();renderEvs();renderC();renderChips();renderCals();renderTasks();renderHome();
+    renderMovs();renderPeds();renderEvs();renderC();renderChips();renderCals();renderTasks();renderHome();renderPedWeek();renderAgeWeek();
   }catch(e){
     showToast('⚠️ Error al cargar datos. Revisá tu conexión.');
   }
@@ -977,9 +1042,25 @@ async function saveEv(){
   }catch(e){showToast('❌ Error al guardar.');}
 }
 function renderEvs(){
-  if(!S.eventos.length){document.getElementById('evContainer').innerHTML='<div class="empty"><span>📅</span>Sin eventos aún.</div>';return;}
+  renderAgeWeek();
+  const lbl = document.getElementById('ageSelectedDateLbl');
+  let evs = ageSelectedDate
+    ? S.eventos.filter(e=>e.fecha===ageSelectedDate)
+    : S.eventos;
+
+  if (ageSelectedDate) {
+    const d = new Date(ageSelectedDate+'T00:00:00');
+    const hoy2 = new Date(); hoy2.setHours(0,0,0,0);
+    const diff2 = Math.ceil((d-hoy2)/86400000);
+    const cuando2 = diff2===0?'Hoy':diff2===1?'Mañana':diff2===-1?'Ayer':fmt(ageSelectedDate);
+    lbl.innerHTML = `<span class="tickets-date-badge" style="background:var(--tertiary)">${cuando2} · ${fmt(ageSelectedDate)}</span>`;
+  } else {
+    lbl.innerHTML = 'Todos los eventos';
+  }
+
+  if(!evs.length){document.getElementById('evContainer').innerHTML=`<div class="tickets-empty">${ageSelectedDate?'Sin eventos para este día':'Sin eventos aún.'}</div>`;return;}
   const hoy=new Date();hoy.setHours(0,0,0,0);
-  document.getElementById('evContainer').innerHTML=S.eventos.map(e=>{
+  document.getElementById('evContainer').innerHTML=evs.map(e=>{
     const fe=new Date(e.fecha+'T00:00:00');const diff=Math.ceil((fe-hoy)/86400000);
     let badge='';if(diff>=0&&diff<=7){const cls=diff<=1?'hoy':'';badge=`<span class="badge ${cls}">${diff===0?'HOY':diff===1?'MAÑANA':'en '+diff+' días'}</span>`;}
     return `<div class="ev-card ${e.prio==='urgente'?'urg':''}">
@@ -1144,7 +1225,9 @@ function renderCal(which) {
 
     const masLabel = extras > 0 ? `<div class="cal-more">+${extras} más</div>` : '';
 
-    html += `<div class="cal-day${esHoy ? ' today' : ''}">
+    const fechaStr2 = `${year}-${String(month+1).padStart(2,'0')}-${String(dia).padStart(2,'0')}`;
+    const clickFn = which==='ped'?`selectPedDate('${fechaStr2}')`:`selectAgeDate('${fechaStr2}')`;
+    html += `<div class="cal-day${esHoy ? ' today' : ''}" onclick="${clickFn}" style="cursor:pointer">
       <div class="cal-day-num">${dia}</div>
       ${chips}${masLabel}
     </div>`;
@@ -1576,6 +1659,126 @@ window.delEv = delEv;
 
 /* TIMESTAMPS en contexto OTTO */
 // Ya incluidos en savePed y saveEv con creadoEn
+
+
+/* ── PEDIDOS: semana clickeable + tickets ── */
+let pedSelectedDate = null;
+let pedCalExpanded = false;
+let ageSelectedDate = null;
+let ageCalExpanded = false;
+
+function renderPedWeek() {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const lunes = new Date(hoy);
+  const dow = hoy.getDay() === 0 ? 6 : hoy.getDay() - 1;
+  lunes.setDate(hoy.getDate() - dow);
+  const dias = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  
+  // Totales semana
+  const tots = {};
+  for (let i = 0; i < 7; i++) {
+    const f = new Date(lunes); f.setDate(lunes.getDate()+i);
+    const fs = f.toISOString().split('T')[0];
+    S.pedidos.filter(p=>p.fecha===fs).forEach(p=>p.items.forEach(item=>{
+      tots[item.p]=(tots[item.p]||0)+item.q;
+    }));
+  }
+  const proWeek = document.getElementById('proWeekGrid');
+  const produceWeek = document.getElementById('produceWeek');
+  if (Object.keys(tots).length) {
+    proWeek.innerHTML = Object.entries(tots).map(([p,q])=>
+      `<div class="produce-item"><span class="prod-name">${p}</span><span class="prod-qty">${q}</span></div>`
+    ).join('');
+    produceWeek.style.display='block';
+  } else {
+    produceWeek.style.display='none';
+  }
+
+  let html='';
+  for (let i=0;i<7;i++) {
+    const fecha = new Date(lunes); fecha.setDate(lunes.getDate()+i);
+    const fs = fecha.toISOString().split('T')[0];
+    const esHoy = fecha.getTime()===hoy.getTime();
+    const esSel = fs===pedSelectedDate;
+    const peds = S.pedidos.filter(p=>p.fecha===fs);
+    const chips = peds.slice(0,2).map(p=>
+      `<div class="w-chip ped">${p.cli.substring(0,6).toUpperCase()}</div>`
+    ).join('');
+    const mas = peds.length>2?`<div style="font-size:7px;color:var(--on-surface-var);font-weight:700">+${peds.length-2}</div>`:'';
+    html+=`<div class="week-col${esHoy?' today':''}${esSel?' selected':''}" onclick="selectPedDate('${fs}')">
+      <div class="week-col-name">${dias[i]}</div>
+      <div class="week-col-num">${fecha.getDate()}</div>
+      ${chips}${mas}
+    </div>`;
+  }
+  document.getElementById('pedWeekRow').innerHTML=html;
+}
+
+function selectPedDate(fechaStr) {
+  pedSelectedDate = pedSelectedDate === fechaStr ? null : fechaStr;
+  renderPedWeek();
+  renderPeds();
+  // Si hay mes expandido, re-renderizar para marcar selección
+  if (pedCalExpanded) renderCal('ped');
+}
+window.selectPedDate = selectPedDate;
+
+function toggleCalPed() {
+  pedCalExpanded = !pedCalExpanded;
+  document.getElementById('pedMonthWrap').style.display = pedCalExpanded ? 'block' : 'none';
+  document.getElementById('pedMonthNav').style.display = pedCalExpanded ? 'flex' : 'none';
+  const btn = document.getElementById('pedExpandBtn');
+  btn.classList.toggle('on', pedCalExpanded);
+  btn.innerHTML = `<span class="material-icons-round" style="font-size:14px">calendar_month</span> ${pedCalExpanded?'Ver semana':'Ver mes'}`;
+  if (pedCalExpanded) renderCal('ped');
+}
+window.toggleCalPed = toggleCalPed;
+
+/* ── AGENDA: semana clickeable ── */
+function renderAgeWeek() {
+  const hoy = new Date(); hoy.setHours(0,0,0,0);
+  const lunes = new Date(hoy);
+  const dow = hoy.getDay()===0?6:hoy.getDay()-1;
+  lunes.setDate(hoy.getDate()-dow);
+  const dias=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  let html='';
+  for (let i=0;i<7;i++) {
+    const fecha=new Date(lunes);fecha.setDate(lunes.getDate()+i);
+    const fs=fecha.toISOString().split('T')[0];
+    const esHoy=fecha.getTime()===hoy.getTime();
+    const esSel=fs===ageSelectedDate;
+    const evs=S.eventos.filter(e=>e.fecha===fs);
+    const chips=evs.slice(0,2).map(e=>
+      `<div class="w-chip ${e.prio==='urgente'?'ev-urg':'ev'}">${e.tit.substring(0,6).toUpperCase()}</div>`
+    ).join('');
+    const mas=evs.length>2?`<div style="font-size:7px;color:var(--on-surface-var);font-weight:700">+${evs.length-2}</div>`:'';
+    html+=`<div class="week-col${esHoy?' today':''}${esSel?' selected':''}" onclick="selectAgeDate('${fs}')">
+      <div class="week-col-name">${dias[i]}</div>
+      <div class="week-col-num">${fecha.getDate()}</div>
+      ${chips}${mas}
+    </div>`;
+  }
+  document.getElementById('ageWeekRow').innerHTML=html;
+}
+
+function selectAgeDate(fechaStr) {
+  ageSelectedDate = ageSelectedDate === fechaStr ? null : fechaStr;
+  renderAgeWeek();
+  renderEvs();
+  if (ageCalExpanded) renderCal('age');
+}
+window.selectAgeDate = selectAgeDate;
+
+function toggleCalAge() {
+  ageCalExpanded = !ageCalExpanded;
+  document.getElementById('ageMonthWrap').style.display = ageCalExpanded?'block':'none';
+  document.getElementById('ageMonthNav').style.display = ageCalExpanded?'flex':'none';
+  const btn = document.getElementById('ageExpandBtn');
+  btn.classList.toggle('on', ageCalExpanded);
+  btn.innerHTML=`<span class="material-icons-round" style="font-size:14px">calendar_month</span> ${ageCalExpanded?'Ver semana':'Ver mes'}`;
+  if (ageCalExpanded) renderCal('age');
+}
+window.toggleCalAge = toggleCalAge;
 
 window.goTab=goTab;
 window.setTipo=setTipo;
