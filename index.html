@@ -592,24 +592,46 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
   <div class="panel" id="p-ped">
     <div class="sec-title">Pedidos</div>
 
-    <!-- CALENDARIO PEDIDOS -->
-    <div class="cal-wrap" id="calPed">
-      <div class="cal-header">
-        <div class="cal-title" id="calPedTitle"></div>
-        <div class="cal-nav">
-          <button class="cal-nav-btn" onclick="calNav('ped',-1)"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
-          <button class="cal-nav-btn" onclick="calNav('ped',1)"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
-        </div>
-      </div>
-      <div class="cal-grid" id="calPedGrid"></div>
+    <!-- 1. Total a producir esta semana -->
+    <div class="produce-week" id="produceWeek" style="display:none">
+      <div class="produce-week-lbl">Total a producir esta semana</div>
+      <div class="produce-grid" id="proWeekGrid"></div>
     </div>
 
-    <div id="proBox" style="display:none" class="produce-card">
-      <div class="produce-lbl">Total a producir</div>
-      <div class="produce-grid" id="proGrid"></div>
+    <!-- 2. Calendario semana + expandible mes -->
+    <div class="week-cal-wrap">
+      <div class="week-cal-header">
+        <div class="week-cal-title">Esta semana</div>
+        <div class="week-cal-actions">
+          <div class="cal-nav" id="pedMonthNav" style="display:none">
+            <button class="cal-nav-btn" onclick="calNav('ped',-1)"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
+            <button class="cal-nav-btn" onclick="calNav('ped',1)"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
+          </div>
+          <button class="btn-expand-cal" id="pedExpandBtn" onclick="toggleCalPed()">
+            <span class="material-icons-round" style="font-size:14px">calendar_month</span> Ver mes
+          </button>
+        </div>
+      </div>
+      <!-- Semana clickeable -->
+      <div class="week-row" id="pedWeekRow"></div>
+      <!-- Mes expandible (oculto por defecto) -->
+      <div class="month-cal-wrap" id="pedMonthWrap" style="display:none">
+        <div style="font-size:12px;font-weight:800;color:var(--on-surface-var);margin-bottom:8px;" id="calPedTitle"></div>
+        <div class="cal-grid" id="calPedGrid"></div>
+      </div>
     </div>
+
+    <!-- 3. Tickets del día seleccionado -->
+    <div class="tickets-section">
+      <div class="tickets-date-header">
+        <span id="pedSelectedDateLbl">Todos los pedidos</span>
+      </div>
+      <div id="pedContainer"><div class="empty"><span>📋</span>Sin pedidos aún.</div></div>
+    </div>
+
+    <!-- 4. Agregar pedido — siempre abajo -->
     <div class="m3-card">
-      <div class="m3-card-title">Nuevo pedido</div>
+      <div class="m3-card-title">+ Agregar pedido</div>
       <div class="inp-row">
         <div class="m3-field"><input class="m3-inp" id="pCli" placeholder=" "><label class="m3-lbl">Cliente</label></div>
         <div class="m3-field"><input class="m3-inp" id="pFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha entrega</label></div>
@@ -628,7 +650,6 @@ header{background:var(--surface);padding:12px 16px;display:flex;align-items:cent
       <button class="add-prod-btn" onclick="addProd()"><span class="material-icons-round" style="font-size:18px">add</span>Agregar producto</button>
       <button class="m3-btn rpl" onclick="savePed()"><span class="material-icons-round">save</span>Guardar pedido</button>
     </div>
-    <div id="pedContainer"><div class="empty"><span>📋</span>Sin pedidos aún.</div></div>
   </div>
 
   <!-- AGENDA -->
