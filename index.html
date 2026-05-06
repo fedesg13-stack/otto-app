@@ -416,12 +416,12 @@ header{
 .week-cal-actions{display:flex;align-items:center;gap:8px;}
 .btn-expand-cal{background:var(--bg3);border:1px solid var(--line);border-radius:var(--rfull);padding:5px 11px;font-family:var(--font);font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;}
 .btn-expand-cal.on{background:var(--blue-t);color:var(--blue);border-color:rgba(59,130,246,.25);}
-.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.week-col{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 2px;border-radius:var(--r6);transition:background .1s;}
+.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;overflow:hidden;}
+.week-col{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 1px;border-radius:var(--r6);transition:background .1s;min-width:0;overflow:hidden;}
 .week-col:active{background:var(--bg3);}
 .week-col.selected{background:var(--bg3);}
-.week-col-name{font-size:9px;font-weight:500;color:var(--t4);text-transform:uppercase;}
-.week-col-num{font-size:13px;font-weight:600;color:var(--t2);width:26px;height:26px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
+.week-col-name{font-size:8px;font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:0;}
+.week-col-num{font-size:12px;font-weight:600;color:var(--t2);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;}
 .week-col.today .week-col-num{background:var(--blue);color:#fff;font-weight:700;}
 .week-col.selected:not(.today) .week-col-num{background:var(--bg4);color:var(--t1);}
 .w-chip{width:100%;padding:1px 3px;border-radius:3px;font-size:7px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.6;max-width:44px;}
@@ -673,6 +673,23 @@ header{
 
 /* ── LABEL SECTION ── */
 .section-lbl{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t4);padding:14px 16px 8px;display:block;}
+
+/* ── MI NEGOCIO COLAPSABLE ── */
+.mn-collapse-item{border:1px solid var(--line);border-radius:var(--r14);margin-bottom:8px;overflow:hidden;}
+.mn-collapse-btn{width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--bg2);border:none;font-family:var(--font);font-size:14px;font-weight:600;color:var(--t1);cursor:pointer;text-align:left;transition:background .1s;}
+.mn-collapse-btn:active{background:var(--bg3);}
+.mn-collapse-arrow{font-size:18px!important;color:var(--t4);transition:transform .2s;}
+.mn-collapse-item.open .mn-collapse-arrow{transform:rotate(180deg);}
+.mn-collapse-body{padding:12px 14px 14px;background:var(--bg2);border-top:1px solid var(--line);}
+
+/* ── FORM SHEET FIX ── */
+.form-sheet{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg2);border-radius:20px 20px 0 0;z-index:351;max-height:85vh;overflow-y:auto;border-top:1px solid var(--line);}
+.form-sheet.open{display:block;animation:slideUp .28s cubic-bezier(.32,0,.2,1) forwards;}
+
+/* ── OTTO CARD sin margen lateral (ocupa todo el ancho del panel) ── */
+.otto-card{margin:0 0 12px;background:var(--bg2);border-radius:0;border:none;border-bottom:1px solid var(--line);}
+.otto-card:first-child{border-top:1px solid var(--line);}
+
 </style>
 </head>
 
@@ -804,31 +821,31 @@ header{
     </div>
     <div class="menu-items">
       <button class="menu-item on" id="mi-home" onclick="menuNav('home')">
-        <span class="menu-item-icon" style="background:var(--accent-bg)"><span class="material-icons-round" style="color:var(--blue)">home</span></span>
+        <span class="menu-item-icon" style="background:var(--blue-t)"><span class="material-icons-round" style="color:var(--blue)">home</span></span>
         <span class="menu-item-label">Inicio</span>
       </button>
-      <button class="menu-item" id="mi-fin" onclick="menuNav('fin')">
-        <span class="menu-item-icon" style="background:var(--teal-t)"><span class="material-icons-round" style="color:var(--teal)">payments</span></span>
-        <span class="menu-item-label">Finanzas</span>
-      </button>
-      <button class="menu-item" id="mi-ped" onclick="menuNav('ped')">
-        <span class="menu-item-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">receipt_long</span></span>
-        <span class="menu-item-label">Pedidos</span>
-      </button>
-      <button class="menu-item" id="mi-age" onclick="menuNav('age')">
-        <span class="menu-item-icon" style="background:#fff3e0"><span class="material-icons-round" style="color:#e65100">calendar_month</span></span>
-        <span class="menu-item-label">Agenda</span>
-      </button>
-      <button class="menu-item" id="mi-task" onclick="menuNav('task')">
-        <span class="menu-item-icon" style="background:var(--green-t)"><span class="material-icons-round" style="color:var(--green)">check_circle</span></span>
-        <span class="menu-item-label">Tareas</span>
-      </button>
       <button class="menu-item" id="mi-mn" onclick="menuNav('mn')">
-        <span class="menu-item-icon" style="background:#f3e5f5"><span class="material-icons-round" style="color:#7b1fa2">storefront</span></span>
+        <span class="menu-item-icon" style="background:var(--purple-t)"><span class="material-icons-round" style="color:var(--purple)">storefront</span></span>
         <span class="menu-item-label">Mi negocio</span>
       </button>
+      <button class="menu-item" id="mi-fin" onclick="menuNav('fin')">
+        <span class="menu-item-icon" style="background:var(--green-t)"><span class="material-icons-round" style="color:var(--green)">account_balance_wallet</span></span>
+        <span class="menu-item-label">Finanzas</span>
+      </button>
+      <button class="menu-item" id="mi-age" onclick="menuNav('age')">
+        <span class="menu-item-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">calendar_month</span></span>
+        <span class="menu-item-label">Agenda</span>
+      </button>
+      <button class="menu-item" id="mi-ped" onclick="menuNav('ped')">
+        <span class="menu-item-icon" style="background:var(--teal-t)"><span class="material-icons-round" style="color:var(--teal)">receipt_long</span></span>
+        <span class="menu-item-label">Pedidos</span>
+      </button>
+      <button class="menu-item" id="mi-task" onclick="menuNav('task')">
+        <span class="menu-item-icon" style="background:var(--red-t)"><span class="material-icons-round" style="color:var(--red)">check_circle</span></span>
+        <span class="menu-item-label">Tareas</span>
+      </button>
       <button class="menu-item" id="mi-chat" onclick="menuNav('chat')">
-        <span class="menu-item-icon" style="background:var(--accent-bg)"><span class="material-icons-round" style="color:var(--blue)">smart_toy</span></span>
+        <span class="menu-item-icon" style="background:var(--blue-t)"><span class="material-icons-round" style="color:var(--blue)">smart_toy</span></span>
         <span class="menu-item-label">Hablar con OTTO</span>
       </button>
     </div>
@@ -873,7 +890,21 @@ header{
   <!-- HOME -->
   <div class="panel on" id="p-home">
 
-    <!-- Hero balance -->
+    <!-- 1. OTTO Slider (análisis IA) -->
+    <div class="otto-card">
+      <div class="otto-slider-wrap" id="ottoSliderWrap">
+        <div class="otto-slider" id="ottoSlider"></div>
+      </div>
+      <div class="slider-dots" id="sliderDots"></div>
+    </div>
+
+    <!-- 2. Semana con indicadores de color -->
+    <div class="week-wrap">
+      <div class="week-header">Esta semana</div>
+      <div class="week-grid" id="weekGrid"></div>
+    </div>
+
+    <!-- 3. Balance del mes -->
     <div class="home-hero" id="homeHero">
       <div class="home-hero-lbl">Balance del mes</div>
       <div class="home-hero-amt" id="hNet">$0</div>
@@ -889,35 +920,21 @@ header{
       </div>
     </div>
 
-    <!-- Quick actions -->
-    <div class="quick-actions">
-      <button class="qa-btn rpl" onclick="openSheet('fin')">
-        <div class="qa-icon" style="background:var(--green-t)"><span class="material-icons-round" style="color:var(--green)">add_circle</span></div>
-        <div class="qa-lbl">Finanza</div>
-      </button>
-      <button class="qa-btn rpl" onclick="openSheet('ped')">
-        <div class="qa-icon" style="background:var(--blue-t2)"><span class="material-icons-round" style="color:var(--blue)">receipt_long</span></div>
-        <div class="qa-lbl">Pedido</div>
-      </button>
-      <button class="qa-btn rpl" onclick="openSheet('age')">
-        <div class="qa-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">event</span></div>
-        <div class="qa-lbl">Evento</div>
-      </button>
-      <button class="qa-btn rpl" onclick="openSheet('task')">
-        <div class="qa-icon" style="background:var(--purple-t)"><span class="material-icons-round" style="color:var(--purple)">check_circle</span></div>
-        <div class="qa-lbl">Tarea</div>
-      </button>
+    <!-- 4. Notas rápidas -->
+    <div class="notas-wrap">
+      <div class="notas-header">
+        <div class="notas-title">Notas rápidas</div>
+        <button class="notas-save" onclick="saveNota()">Guardar</button>
+      </div>
+      <textarea class="notas-textarea" id="notasArea" placeholder="Anotá cualquier cosa…"></textarea>
+      <div class="notas-saved" id="notasSaved"></div>
     </div>
 
-    <!-- OTTO card con slider + chat -->
-    <div class="otto-card">
-      <div class="otto-slider-wrap" id="ottoSliderWrap">
-        <div class="otto-slider" id="ottoSlider"></div>
-      </div>
-      <div class="slider-dots" id="sliderDots"></div>
+    <!-- 5. Chat con OTTO -->
+    <div class="otto-card" style="margin-bottom:12px;">
       <button class="btn-quick-chat rpl" onclick="toggleQuickChat()">
         <span class="material-icons-round">smart_toy</span>
-        Preguntarle a OTTO
+        Consultarle a OTTO
       </button>
       <div id="quickChatWrap" style="display:none;padding:12px 14px 14px;border-top:1px solid var(--line);">
         <div class="chat-msgs" id="quickChatMsgs" style="max-height:200px;">
@@ -930,22 +947,6 @@ header{
       </div>
     </div>
 
-    <!-- Semana -->
-    <div class="week-wrap">
-      <div class="week-header">Esta semana</div>
-      <div class="week-grid" id="weekGrid"></div>
-    </div>
-
-    <!-- Notas -->
-    <div class="notas-wrap">
-      <div class="notas-header">
-        <div class="notas-title">Notas rápidas</div>
-        <button class="notas-save" onclick="saveNota()">Guardar</button>
-      </div>
-      <textarea class="notas-textarea" id="notasArea" placeholder="Anotá cualquier cosa…"></textarea>
-      <div class="notas-saved" id="notasSaved"></div>
-    </div>
-
   </div>
 
   <!-- FINANZAS -->
@@ -953,6 +954,12 @@ header{
     <div class="sec-title-row">
       <div class="sec-title">Finanzas</div>
       <button class="fab-add rpl" onclick="openSheet('fin')"><span class="material-icons-round">add</span> Nuevo</button>
+    </div>
+    <!-- Selector de mes -->
+    <div style="display:flex;align-items:center;gap:8px;padding:0 12px 12px;">
+      <button onclick="cambiarMesFin(-1)" style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r6);width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:18px;flex-shrink:0;">‹</button>
+      <div style="flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--t1);" id="finMesLbl"></div>
+      <button onclick="cambiarMesFin(1)" id="finMesBtnNext" style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r6);width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:18px;flex-shrink:0;">›</button>
     </div>
     <div class="bal-row">
       <div class="bal-card ing rpl" onclick="openModal('ingreso')">
@@ -1067,25 +1074,83 @@ header{
 
   <!-- MI NEGOCIO -->
   <div class="panel" id="p-mn">
-    <div class="sec-title" style="padding:16px 16px 0">Mi negocio</div>
+    <div class="sec-title-row">
+      <div class="sec-title">Mi negocio</div>
+      <button class="fab-add rpl" onclick="editPerfil()"><span class="material-icons-round">edit</span> Editar</button>
+    </div>
+    <!-- Perfil del local -->
     <div class="perfil-card" id="perfilCard">
       <div class="perfil-rubro" id="perfilRubro">💼 Mi negocio</div>
       <div class="perfil-nombre" id="perfilNombre">—</div>
       <div class="perfil-desc" id="perfilDesc">Completá tu perfil para que OTTO te conozca mejor</div>
-      <button class="mn-btn-edit" style="margin-top:10px" onclick="editPerfil()">✏️ Editar perfil</button>
     </div>
-    <div class="mn-tabs">
-      <button class="mn-tab on" onclick="switchMnTab('productos',this)">🛍️ Productos</button>
-      <button class="mn-tab" onclick="switchMnTab('clientes',this)">👤 Clientes</button>
-      <button class="mn-tab" onclick="switchMnTab('proveedores',this)">🏭 Proveedores</button>
-      <button class="mn-tab" onclick="switchMnTab('equipo',this)">👥 Equipo</button>
-      <button class="mn-tab" onclick="switchMnTab('servicios',this)">⚡ Servicios</button>
-      <button class="mn-tab" onclick="switchMnTab('impositiva',this)">📊 Impositiva</button>
+    <!-- Categorías colapsables -->
+    <div style="padding:0 12px;">
+      <div class="mn-collapse-item" id="mnc-productos">
+        <button class="mn-collapse-btn" onclick="toggleMnSection('productos')">
+          <span>🛍️ Productos</span><span class="mn-collapse-arrow material-icons-round">expand_more</span>
+        </button>
+        <div class="mn-collapse-body" id="mnb-productos" style="display:none;"></div>
+      </div>
+      <div class="mn-collapse-item" id="mnc-clientes">
+        <button class="mn-collapse-btn" onclick="toggleMnSection('clientes')">
+          <span>👤 Clientes</span><span class="mn-collapse-arrow material-icons-round">expand_more</span>
+        </button>
+        <div class="mn-collapse-body" id="mnb-clientes" style="display:none;"></div>
+      </div>
+      <div class="mn-collapse-item" id="mnc-proveedores">
+        <button class="mn-collapse-btn" onclick="toggleMnSection('proveedores')">
+          <span>🏭 Proveedores</span><span class="mn-collapse-arrow material-icons-round">expand_more</span>
+        </button>
+        <div class="mn-collapse-body" id="mnb-proveedores" style="display:none;"></div>
+      </div>
+      <div class="mn-collapse-item" id="mnc-equipo">
+        <button class="mn-collapse-btn" onclick="toggleMnSection('equipo')">
+          <span>👥 Equipo</span><span class="mn-collapse-arrow material-icons-round">expand_more</span>
+        </button>
+        <div class="mn-collapse-body" id="mnb-equipo" style="display:none;"></div>
+      </div>
+      <div class="mn-collapse-item" id="mnc-servicios">
+        <button class="mn-collapse-btn" onclick="toggleMnSection('servicios')">
+          <span>⚡ Servicios</span><span class="mn-collapse-arrow material-icons-round">expand_more</span>
+        </button>
+        <div class="mn-collapse-body" id="mnb-servicios" style="display:none;"></div>
+      </div>
+      <div class="mn-collapse-item" id="mnc-impositiva">
+        <button class="mn-collapse-btn" onclick="toggleMnSection('impositiva')">
+          <span>📊 Impositiva</span><span class="mn-collapse-arrow material-icons-round">expand_more</span>
+        </button>
+        <div class="mn-collapse-body" id="mnb-impositiva" style="display:none;"></div>
+      </div>
+      <!-- Contactos en Mi Negocio -->
+      <div class="mn-collapse-item" id="mnc-contactos">
+        <button class="mn-collapse-btn" onclick="toggleMnSection('contactos')">
+          <span>📋 Contactos</span><span class="mn-collapse-arrow material-icons-round">expand_more</span>
+        </button>
+        <div class="mn-collapse-body" id="mnb-contactos" style="display:none;">
+          <div id="cList" style="margin-bottom:10px;"><span style="font-size:13px;color:var(--t3)">Sin contactos aún.</span></div>
+          <div class="c-add-row">
+            <select class="c-sel" id="cTipo">
+              <option value="proveedor">🏭 Proveedor</option>
+              <option value="empleado">👤 Empleado</option>
+              <option value="servicio">⚡ Servicio</option>
+              <option value="cliente">🛒 Cliente fijo</option>
+              <option value="otro">📌 Otro</option>
+            </select>
+            <div class="m3-field" style="flex:1;min-width:0;margin-bottom:0">
+              <input class="m3-inp" id="cNom" placeholder=" "><label class="m3-lbl">Nombre</label>
+            </div>
+            <button class="m3-btn rpl" style="width:auto;margin-top:0;padding:11px 14px" onclick="addC()">+ Add</button>
+          </div>
+        </div>
+      </div>
     </div>
-    <div id="mnContent"></div>
+    <div style="height:16px;"></div>
+    <!-- Mantener mnContent oculto para compatibilidad JS -->
+    <div id="mnContent" style="display:none;"></div>
   </div>
 
-  <!-- OTTO + CONTACTOS -->
+  <!-- OTTO CHAT -->
   <div class="panel" id="p-chat">
     <div class="sec-title">Hablá con OTTO</div>
     <div class="m3-card">
@@ -1095,24 +1160,6 @@ header{
       <div class="chat-row">
         <input class="chat-inp" id="chatInp" placeholder="Preguntale a OTTO…" onkeydown="if(event.key==='Enter')sendMsg()">
         <button class="chat-send rpl" onclick="sendMsg()"><span class="material-icons-round">send</span></button>
-      </div>
-    </div>
-    <div class="sec-title" style="font-size:18px;margin-top:4px">Mis contactos</div>
-    <div class="m3-card">
-      <div class="m3-card-title">Proveedores · Empleados · Servicios</div>
-      <div id="cList"><span style="font-size:13px;color:var(--t3)">Sin contactos aún.</span></div>
-      <div class="c-add-row">
-        <select class="c-sel" id="cTipo">
-          <option value="proveedor">🏭 Proveedor</option>
-          <option value="empleado">👤 Empleado</option>
-          <option value="servicio">⚡ Servicio</option>
-          <option value="cliente">🛒 Cliente fijo</option>
-          <option value="otro">📌 Otro</option>
-        </select>
-        <div class="m3-field" style="flex:1;min-width:0;margin-bottom:0">
-          <input class="m3-inp" id="cNom" placeholder=" " style="border-radius:var(--r6);"><label class="m3-lbl">Nombre</label>
-        </div>
-        <button class="m3-btn rpl" style="width:auto;margin-top:0;padding:12px 16px" onclick="addC()">+ Add</button>
       </div>
     </div>
   </div>
@@ -1285,7 +1332,11 @@ function goTab(id,el){
   const nb=document.getElementById('nav-'+id);
   if(nb)nb.classList.add('on');
 }
-function goSection(id,el){goTab(id,el);window.scrollTo({top:0,behavior:'smooth'});}
+function goSection(id,el){
+  goTab(id,el);
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='fin') renderMovsFin();
+}
 function setTipo(t){S.tipo=t;document.getElementById('sIng').className='seg-btn'+(t==='ingreso'?' ing-on':'');document.getElementById('sGas').className='seg-btn'+(t==='gasto'?' gas-on':'');}
 
 // ── FIRESTORE PATHS ──
@@ -1311,7 +1362,7 @@ async function loadAllData(){
     S.contactos=cSnap.docs.map(d=>({...d.data(),id:d.id}));
     S.tareas=tSnap.docs.map(d=>({...d.data(),_id:d.id}));
     S.tareas.sort((a,b)=>new Date(a.fecha||'9999')-new Date(b.fecha||'9999'));
-    renderMovs();renderPeds();renderEvs();renderC();renderChips();renderTasks();
+    renderMovs();renderMovsFin();renderPeds();renderEvs();renderC();renderChips();renderTasks();
   }catch(e){
     console.error('Error cargando datos:', e);
     showToast('⚠️ Error al cargar datos. Revisá tu conexión.');
@@ -1417,6 +1468,7 @@ onAuthStateChanged(auth, async (user) => {
     renderPedWeek();
     renderAgeWeek();
     renderHome();
+    renderMovsFin();
 
   } else {
     // No logueado → mostrar pantalla de login
@@ -1449,7 +1501,7 @@ async function addMov(){
     document.getElementById('mMonto').value='';
     document.getElementById('mDesc').value='';
     document.getElementById('mCat').value='';
-    S.selC=null;renderChips();renderMovs();updateBanner();
+    S.selC=null;renderChips();renderMovs();renderMovsFin();updateBanner();renderHomeBal();
     closeSheet();
     showToast('✅ Movimiento guardado');
   }catch(e){showToast('❌ Error al guardar. Revisá tu conexión.');}
@@ -1485,12 +1537,13 @@ function renderMovs(){
 }
 
 function updBal(ing,gas){
+  // Solo actualiza el panel de Finanzas (total histórico)
   const b=ing-gas;
-  document.getElementById('bIng').textContent='$'+ing.toLocaleString();
-  document.getElementById('bGas').textContent='$'+gas.toLocaleString();
-  const el=document.getElementById('bNet');
-  el.textContent=(b>=0?'+':'')+'$'+Math.abs(b).toLocaleString();
-  el.style.color=b>0?'var(--green)':b<0?'var(--red)':'var(--blue)';
+  const fmtN=n=>'$'+n.toLocaleString('es-AR');
+  const set=(id,v,c)=>{const e=document.getElementById(id);if(e){e.textContent=v;if(c)e.style.color=c;}};
+  set('bIng',fmtN(ing));
+  set('bGas',fmtN(gas));
+  set('bNet',(b>=0?'+':'')+fmtN(Math.abs(b)),b>0?'var(--green)':b<0?'var(--red)':'var(--blue)');
 }
 
 // ── MODAL ──
@@ -1872,20 +1925,17 @@ function renderWeek(){
 }
 
 function renderHomeBal(){
+  // Hero del home — solo movimientos del mes actual
   const mes=new Date().toISOString().slice(0,7);
   const movsMes=S.movs.filter(m=>m.fecha&&m.fecha.startsWith(mes));
   const ing=movsMes.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
   const gas=movsMes.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
   const net=ing-gas;
-  const fmt2=n=>'$'+Math.abs(n).toLocaleString('es-AR');
-  const el=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
-  el('hIng','+'+fmt2(ing));
-  el('hGas','-'+fmt2(gas));
-  el('hNet',(net>=0?'+':'-')+fmt2(net));
-  el('bIng',fmt2(ing));el('bGas',fmt2(gas));el('bNet',fmt2(net));
-  // Color del hero balance según positivo/negativo
-  const heroAmt=document.getElementById('hNet');
-  if(heroAmt){heroAmt.style.color=net>=0?'var(--green)':net<0?'var(--red)':'var(--t1)';}
+  const fmtH=n=>'$'+n.toLocaleString('es-AR');
+  const setH=(id,v,c)=>{const e=document.getElementById(id);if(e){e.textContent=v;if(c)e.style.color=c;}};
+  setH('hIng','+'+fmtH(ing));
+  setH('hGas','-'+fmtH(gas));
+  setH('hNet',(net>=0?'+':'-')+fmtH(Math.abs(net)), net>0?'var(--green)':net<0?'var(--red)':'var(--t2)');
 }
 
 function saveNota(){
@@ -2177,12 +2227,19 @@ function renderMnContent(){
   const cfg=MN_CONFIG[mnTabActual];const items=S.miNegocio[mnTabActual]||[];const el=document.getElementById('mnContent');if(!el)return;
   const lista=items.length?items.map(item=>`<div class="mn-item"><div class="mn-item-icon" style="background:${cfg.bg}">${cfg.icon}</div><div class="mn-item-info"><div class="mn-item-name">${item.nombre||'—'}</div><div class="mn-item-sub">${getMnSubtitle(mnTabActual,item)}</div></div><div class="mn-item-actions"><button class="mn-btn-edit" onclick="editMnItem('${mnTabActual}','${item._id}')">✏️</button><button class="mn-btn-del" onclick="delMnItem('${mnTabActual}','${item._id}')">🗑️</button></div></div>`).join(''):`<div class="empty"><span>${cfg.icon}</span>Sin ${mnTabActual} aún.<br><small style="font-size:11px;opacity:.6">Agregá tu primer ${cfg.label.toLowerCase()}</small></div>`;
   el.innerHTML=`<div class="mn-section"><div class="mn-section-title">${cfg.icon} ${cfg.label}s<button class="mn-add-btn" onclick="addMnItem('${mnTabActual}')">+ Agregar</button></div><div class="mn-list">${lista}</div></div>`;
+  // Si algún collapse está abierto, re-renderizarlo
+  ['productos','clientes','proveedores','equipo','servicios','impositiva'].forEach(tab => {
+    const b = document.getElementById('mnb-' + tab);
+    if (b && b.style.display !== 'none') renderMnCollapseBody(tab);
+  });
 }
 
 function getMnSubtitle(tab,item){const parts=[];if(tab==='productos'){if(item.precio)parts.push('$'+Number(item.precio).toLocaleString());if(item.categoria)parts.push(item.categoria);}else if(tab==='clientes'){if(item.telefono)parts.push('📱 '+item.telefono);if(item.email)parts.push(item.email);}else if(tab==='proveedores'){if(item.queProvee)parts.push(item.queProvee);if(item.telefono)parts.push('📱 '+item.telefono);}else if(tab==='equipo'){if(item.rol)parts.push(item.rol);if(item.sueldo)parts.push('$'+Number(item.sueldo).toLocaleString());}else if(tab==='servicios'){if(item.costo)parts.push('$'+Number(item.costo).toLocaleString()+'/mes');if(item.vencimiento)parts.push('Vence: '+fmt(item.vencimiento));}else if(tab==='impositiva'){if(item.vencimiento)parts.push('Vence: '+fmt(item.vencimiento));if(item.monto)parts.push('$'+Number(item.monto).toLocaleString());}return parts.join(' · ')||item.notas||item.descripcion||'';}
 
 function addMnItem(tab){const cfg=MN_CONFIG[tab];const campos=cfg.campos.map(c=>`<div class="m3-field"><input class="m3-inp" id="mnf_${c.id}" type="${c.type||'text'}" placeholder=" " ${c.required?'required':''}><label class="m3-lbl">${c.label}${c.required?' *':''}</label></div>`).join('');openEdit(`Nuevo ${cfg.label}`,`${campos}<button class="m3-btn rpl" onclick="saveMnItem('${tab}',null)"><span class="material-icons-round">save</span>Guardar</button>`);}
 window.addMnItem=addMnItem;
+function openMnAdd(tab){addMnItem(tab);}
+window.openMnAdd=openMnAdd;
 
 function editMnItem(tab,id){const cfg=MN_CONFIG[tab];const item=(S.miNegocio[tab]||[]).find(x=>x._id===id);if(!item)return;const campos=cfg.campos.map(c=>`<div class="m3-field"><input class="m3-inp" id="mnf_${c.id}" type="${c.type||'text'}" value="${item[c.id]||''}" placeholder=" "><label class="m3-lbl">${c.label}</label></div>`).join('');openEdit(`Editar ${cfg.label}`,`${campos}<button class="m3-btn rpl" onclick="saveMnItem('${tab}','${id}')"><span class="material-icons-round">save</span>Guardar cambios</button>`);}
 window.editMnItem=editMnItem;
@@ -2190,13 +2247,13 @@ window.editMnItem=editMnItem;
 async function saveMnItem(tab,id){
   const cfg=MN_CONFIG[tab];const data={};cfg.campos.forEach(c=>{const el=document.getElementById('mnf_'+c.id);if(el)data[c.id]=el.value.trim();});
   if(!data.nombre){alert('El nombre es obligatorio.');return;}showSaving();
-  try{if(id){await updateDoc(doc(db,`usuarios/${S.uid}/mn_${tab}`,id),data);const idx=S.miNegocio[tab].findIndex(x=>x._id===id);if(idx>-1)S.miNegocio[tab][idx]={...S.miNegocio[tab][idx],...data};}else{const ref=await addDoc(col('mn_'+tab),{...data,creadoEn:new Date().toISOString()});if(!S.miNegocio[tab])S.miNegocio[tab]=[];S.miNegocio[tab].push({...data,_id:ref.id});}renderMnContent();closeEdit();showToast('✅ Guardado correctamente');}catch(e){showToast('❌ Error al guardar.');}
+  try{if(id){await updateDoc(doc(db,`usuarios/${S.uid}/mn_${tab}`,id),data);const idx=S.miNegocio[tab].findIndex(x=>x._id===id);if(idx>-1)S.miNegocio[tab][idx]={...S.miNegocio[tab][idx],...data};}else{const ref=await addDoc(col('mn_'+tab),{...data,creadoEn:new Date().toISOString()});if(!S.miNegocio[tab])S.miNegocio[tab]=[];S.miNegocio[tab].push({...data,_id:ref.id});}renderMnContent();renderMnCollapseBody(tab);closeEdit();showToast('✅ Guardado correctamente');}catch(e){showToast('❌ Error al guardar.');}
 }
 window.saveMnItem=saveMnItem;
 
 async function delMnItem(tab,id){
   if(!confirm('¿Eliminar este elemento?'))return;
-  try{await deleteDoc(doc(db,`usuarios/${S.uid}/mn_${tab}`,id));S.miNegocio[tab]=S.miNegocio[tab].filter(x=>x._id!==id);renderMnContent();showToast('🗑️ Eliminado');}catch(e){showToast('❌ Error.');}
+  try{await deleteDoc(doc(db,`usuarios/${S.uid}/mn_${tab}`,id));S.miNegocio[tab]=S.miNegocio[tab].filter(x=>x._id!==id);renderMnContent();renderMnCollapseBody(tab);showToast('🗑️ Eliminado');}catch(e){showToast('❌ Error.');}
 }
 window.delMnItem=delMnItem;
 
@@ -2351,13 +2408,15 @@ function closeMenu(){
   document.getElementById('menuIcon').textContent='menu';
 }
 function menuNav(id){
-  // Cambiar panel visible
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
   document.getElementById('p-'+id).classList.add('on');
-  // Marcar item activo en menú
   document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('on'));
   const mi=document.getElementById('mi-'+id);if(mi)mi.classList.add('on');
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add('on');
   closeMenu();
+  window.scrollTo({top:0,behavior:'smooth'});
+  if(id==='fin') renderMovsFin();
 }
 window.toggleMenu=toggleMenu;window.closeMenu=closeMenu;window.menuNav=menuNav;
 
@@ -2406,6 +2465,125 @@ function addQuickBub(text,who){
   box.scrollTop=99999;
 }
 window.sendQuickMsg=sendQuickMsg;
+
+// ── MI NEGOCIO COLAPSABLE ──
+const MN_TABS_LIST = ['productos','clientes','proveedores','equipo','servicios','impositiva'];
+
+function toggleMnSection(tab) {
+  const body = document.getElementById('mnb-' + tab);
+  const item = document.getElementById('mnc-' + tab);
+  if (!body) return;
+  const isOpen = body.style.display !== 'none';
+  // Cerrar todos
+  [...MN_TABS_LIST, 'contactos'].forEach(t => {
+    const b = document.getElementById('mnb-' + t);
+    const it = document.getElementById('mnc-' + t);
+    if (b) b.style.display = 'none';
+    if (it) it.classList.remove('open');
+  });
+  if (!isOpen) {
+    body.style.display = 'block';
+    item.classList.add('open');
+    if (tab !== 'contactos') renderMnCollapseBody(tab);
+  }
+}
+window.toggleMnSection = toggleMnSection;
+
+function renderMnCollapseBody(tab) {
+  const body = document.getElementById('mnb-' + tab);
+  if (!body) return;
+  const cfg = MN_CONFIG[tab];
+  if (!cfg) return;
+  const items = S.miNegocio[tab] || [];
+  const addBtn = `<button class="mn-add-btn" onclick="openMnAdd('${tab}')"><span class="material-icons-round" style="font-size:14px">add</span> Agregar</button>`;
+  if (!items.length) {
+    body.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:12px;color:var(--t4)">Sin elementos aún</span>${addBtn}</div>`;
+    return;
+  }
+  body.innerHTML = `
+    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">${addBtn}</div>
+    <div class="mn-list" style="padding:0;">
+      ${items.map(it => `
+        <div class="mn-item">
+          <div class="mn-item-icon" style="background:${cfg.bg||'var(--bg3)'};">${cfg.icon}</div>
+          <div class="mn-item-info">
+            <div class="mn-item-name">${it.nombre||'—'}</div>
+            ${it.precio ? `<div class="mn-item-sub">$${Number(it.precio).toLocaleString('es-AR')}</div>` : ''}
+            ${it.categoria ? `<div class="mn-item-sub" style="color:var(--blue)">${it.categoria}</div>` : ''}
+            ${it.contacto ? `<div class="mn-item-sub">${it.contacto}</div>` : ''}
+          </div>
+          <div class="mn-item-actions">
+            <button class="mn-btn-edit" onclick="editMnItem('${tab}','${it._id}')">✏️</button>
+            <button class="mn-btn-del" onclick="delMnItem('${tab}','${it._id}')">🗑️</button>
+          </div>
+        </div>`).join('')}
+    </div>`;
+}
+window.renderMnCollapseBody = renderMnCollapseBody;
+
+// ── SELECTOR DE MES EN FINANZAS ──
+let finMesOffset = 0; // 0 = mes actual, -1 = mes anterior, etc.
+
+function getFinMes() {
+  const d = new Date();
+  d.setMonth(d.getMonth() + finMesOffset);
+  return d.toISOString().slice(0, 7); // "2025-05"
+}
+
+function cambiarMesFin(delta) {
+  finMesOffset += delta;
+  // No permitir ir al futuro
+  if (finMesOffset > 0) { finMesOffset = 0; }
+  renderMovsFin();
+}
+window.cambiarMesFin = cambiarMesFin;
+
+function renderMovsFin() {
+  const mes = getFinMes();
+  const d = new Date(mes + '-01');
+  const lbl = d.toLocaleDateString('es-AR', {month:'long', year:'numeric'});
+  const lblEl = document.getElementById('finMesLbl');
+  if (lblEl) lblEl.textContent = lbl.charAt(0).toUpperCase() + lbl.slice(1);
+  // Deshabilitar botón "siguiente" si es mes actual
+  const btnNext = document.getElementById('finMesBtnNext');
+  if (btnNext) btnNext.style.opacity = finMesOffset >= 0 ? '0.3' : '1';
+
+  const movsMes = S.movs.filter(m => m.fecha && m.fecha.startsWith(mes));
+  const ing = movsMes.filter(m => m.tipo === 'ingreso').reduce((s, m) => s + m.monto, 0);
+  const gas = movsMes.filter(m => m.tipo === 'gasto').reduce((s, m) => s + m.monto, 0);
+  const b = ing - gas;
+  const fmtN = n => '$' + n.toLocaleString('es-AR');
+  const set = (id, v, c) => { const e = document.getElementById(id); if (e) { e.textContent = v; if (c) e.style.color = c; } };
+  set('bIng', fmtN(ing));
+  set('bGas', fmtN(gas));
+  set('bNet', (b >= 0 ? '+' : '') + fmtN(Math.abs(b)), b > 0 ? 'var(--green)' : b < 0 ? 'var(--red)' : 'var(--blue)');
+
+  // Lista de movimientos del mes seleccionado
+  const el = document.getElementById('movContainer');
+  if (!el) return;
+  if (!movsMes.length) { el.innerHTML = '<div class="empty"><span>💸</span>Sin movimientos en este período.</div>'; return; }
+  const grupos = {};
+  movsMes.forEach(m => {
+    const dk = new Date(m.fecha + 'T00:00:00').toLocaleDateString('es-AR', {month:'long', year:'numeric'});
+    const ku = dk.charAt(0).toUpperCase() + dk.slice(1);
+    if (!grupos[ku]) grupos[ku] = [];
+    grupos[ku].push(m);
+  });
+  el.innerHTML = Object.entries(grupos).map(([mes2, items]) => `
+    <div class="month-div">${mes2}</div>
+    ${items.map(m => {
+      const sub = m.contacto ? `${CI[m.contacto.tipo]||'📌'} ${m.contacto.nombre}` : (m.desc || '');
+      const icon = m.tipo === 'ingreso' ? 'trending_up' : 'trending_down';
+      return `<div class="mov-item">
+        <div class="mov-lead">
+          <div class="mov-icon ${m.tipo==='ingreso'?'ing':'gas'}"><span class="material-icons-round">${icon}</span></div>
+          <div><div class="mov-cat">${m.cat}</div>${sub ? `<div class="mov-meta">${sub}</div>` : ''}</div>
+        </div>
+        <div><div class="mov-amt ${m.tipo==='ingreso'?'ing':'gas'}">${m.tipo==='ingreso'?'+':'-'}$${m.monto.toLocaleString()}</div><div class="mov-date-small">${fmt(m.fecha)}</div></div>
+      </div>`;
+    }).join('')}`).join('');
+}
+window.renderMovsFin = renderMovsFin;
 </script>
 </body>
 </html>
