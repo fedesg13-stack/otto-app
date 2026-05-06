@@ -943,7 +943,7 @@ header {
 <!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div style="text-align:center;margin-bottom:36px;">
-    <div style="width:140px;height:42px;color:var(--bosque);margin:0 auto 16px;"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" fill="none">  <!-- O izquierda -->  <circle cx="30" cy="30" r="26" stroke="currentColor" stroke-width="7"/>  <circle cx="30" cy="30" r="10" fill="currentColor"/>  <!-- T primero -->  <rect x="68" y="4" width="34" height="7" rx="3.5" fill="currentColor"/>  <rect x="81" y="4" width="8" height="52" rx="4" fill="currentColor"/>  <!-- T segundo -->  <rect x="114" y="4" width="34" height="7" rx="3.5" fill="currentColor"/>  <rect x="127" y="4" width="8" height="52" rx="4" fill="currentColor"/>  <!-- O derecha -->  <circle cx="190" cy="30" r="26" stroke="currentColor" stroke-width="7"/>  <circle cx="190" cy="30" r="10" fill="currentColor"/></svg></div>
+    <div style="font-family:'DM Serif Display',serif;font-size:42px;font-weight:400;color:var(--bosque);margin:0 auto 16px;letter-spacing:2px;">OTTO</div>
     <div style="font-size:18px;font-weight:600;color:var(--t1);line-height:1.4;">Tu nuevo socio<br>para crecer tranquilo.</div>
     <div style="font-size:13px;color:var(--t3);margin-top:8px;">Más claridad. Menos caos.</div>
   </div>
@@ -1009,7 +1009,7 @@ header {
 
 <!-- LOADING -->
 <div id="loadingScreen">
-  <div style="width:100px;height:30px;color:var(--bosque);margin-bottom:20px;"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" fill="none">  <!-- O izquierda -->  <circle cx="30" cy="30" r="26" stroke="currentColor" stroke-width="7"/>  <circle cx="30" cy="30" r="10" fill="currentColor"/>  <!-- T primero -->  <rect x="68" y="4" width="34" height="7" rx="3.5" fill="currentColor"/>  <rect x="81" y="4" width="8" height="52" rx="4" fill="currentColor"/>  <!-- T segundo -->  <rect x="114" y="4" width="34" height="7" rx="3.5" fill="currentColor"/>  <rect x="127" y="4" width="8" height="52" rx="4" fill="currentColor"/>  <!-- O derecha -->  <circle cx="190" cy="30" r="26" stroke="currentColor" stroke-width="7"/>  <circle cx="190" cy="30" r="10" fill="currentColor"/></svg></div>
+  <div style="font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:var(--bosque);margin-bottom:20px;letter-spacing:1px;">OTTO</div>
   <div class="loading-spinner"></div>
   <div class="loading-text">Cargando tus datos…</div>
 </div>
@@ -1017,8 +1017,8 @@ header {
 <!-- APP -->
 <div id="app">
   <header>
-    <button onclick="menuNav('home')" style="background:transparent;border:none;cursor:pointer;padding:4px;border-radius:var(--r6);color:var(--bosque);">
-      <div style="width:72px;height:22px;color:var(--bosque);"><svg viewBox="0 0 220 60" xmlns="http://www.w3.org/2000/svg" fill="none">  <!-- O izquierda -->  <circle cx="30" cy="30" r="26" stroke="currentColor" stroke-width="7"/>  <circle cx="30" cy="30" r="10" fill="currentColor"/>  <!-- T primero -->  <rect x="68" y="4" width="34" height="7" rx="3.5" fill="currentColor"/>  <rect x="81" y="4" width="8" height="52" rx="4" fill="currentColor"/>  <!-- T segundo -->  <rect x="114" y="4" width="34" height="7" rx="3.5" fill="currentColor"/>  <rect x="127" y="4" width="8" height="52" rx="4" fill="currentColor"/>  <!-- O derecha -->  <circle cx="190" cy="30" r="26" stroke="currentColor" stroke-width="7"/>  <circle cx="190" cy="30" r="10" fill="currentColor"/></svg></div>
+    <button onclick="menuNav('home')" style="background:transparent;border:none;cursor:pointer;padding:6px 10px;border-radius:var(--r6);">
+      <span style="font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--bosque);">OTTO</span>
     </button>
     <div style="display:flex;align-items:center;gap:8px;">
       <div class="user-chip">
@@ -1945,7 +1945,7 @@ window.renderHomeMovsRecientes=renderHomeMovsRecientes;
 
 function renderMovs(){
   const el=document.getElementById('movContainer');
-  if(!S.movs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-icon">💸</div><div class="empty-state-title">Aún no hay movimientos</div><div class="empty-state-sub">Registrá tu primera venta<br>y empezá a ver tus resultados.</div><button class="empty-state-btn" onclick="closeFab();openSheet('fin')">+ Nuevo movimiento</button></div>';updBal(0,0);renderHomeMovsRecientes();return;}
+  if(!S.movs.length){el.innerHTML=`<div class="empty-state"><div class="empty-state-icon">💸</div><div class="empty-state-title">Aún no hay movimientos</div><div class="empty-state-sub">Registrá tu primera venta<br>y empezá a ver tus resultados.</div><button class="empty-state-btn" onclick="closeFab();openSheet('fin')">+ Nuevo movimiento</button></div>`;updBal(0,0);renderHomeMovsRecientes();return;}
   const grupos={};let ing=0,gas=0;
   S.movs.forEach(m=>{
     if(m.tipo==='ingreso')ing+=m.monto;else gas+=m.monto;
@@ -2728,7 +2728,8 @@ window.goTab=goTab;window.setTipo=setTipo;window.calNav=calNav;
 
 /* ── BOTTOM SHEETS DE FORMULARIOS ── */
 function openSheet(tipo){
-  // Cerrar primero todo
+  // Cerrar FAB y todo lo anterior
+  closeFab();
   document.querySelectorAll('.form-sheet').forEach(s=>{s.classList.remove('open');s.style.display='none';});
   const hoy=new Date().toISOString().split('T')[0];
   if(tipo==='fin'){const mf=document.getElementById('mFecha');if(mf)mf.value=hoy;}
@@ -3044,19 +3045,14 @@ function renderMovsFin() {
     if (!grupos[ku]) grupos[ku] = [];
     grupos[ku].push(m);
   });
-  el.innerHTML = Object.entries(grupos).map(([mes2, items]) => `
-    <div class="mov-group"><div class="mov-group-header">${mes2}</div>
-    <div>${items.map(m => {
+  el.innerHTML = Object.entries(grupos).map(([mes2, items]) => {
+    const rows = items.map(m => {
       const sub = m.contacto ? `${CI[m.contacto.tipo]||'📌'} ${m.contacto.nombre}` : (m.desc || '');
       const icon = m.tipo === 'ingreso' ? 'trending_up' : 'trending_down';
-      return `<div class="mov-item">
-        <div class="mov-lead">
-          <div class="mov-icon ${m.tipo==='ingreso'?'ing':'gas'}"><span class="material-icons-round">${icon}</span></div>
-          <div><div class="mov-cat">${m.cat}</div>${sub ? `<div class="mov-meta">${sub}</div>` : ''}</div>
-        </div>
-        <div><div class="mov-amt ${m.tipo==='ingreso'?'ing':'gas'}">${m.tipo==='ingreso'?'+':'-'}$${m.monto.toLocaleString()}</div><div class="mov-date-small">${fmt(m.fecha)}</div></div>
-      </div>`;
-    }).join('')}`).join('');
+      return `<div class="mov-item"><div class="mov-lead"><div class="mov-icon ${m.tipo==='ingreso'?'ing':'gas'}"><span class="material-icons-round">${icon}</span></div><div><div class="mov-cat">${m.cat}</div>${sub ? `<div class="mov-meta">${sub}</div>` : ''}</div></div><div><div class="mov-amt ${m.tipo==='ingreso'?'ing':'gas'}">${m.tipo==='ingreso'?'+':'-'}$${m.monto.toLocaleString()}</div><div class="mov-date-small">${fmt(m.fecha)}</div></div></div>`;
+    }).join('');
+    return `<div class="mov-group"><div class="mov-group-header">${mes2}</div>${rows}</div>`;
+  }).join('');
 }
 window.renderMovsFin = renderMovsFin;
 
@@ -3301,12 +3297,7 @@ function closeFab() {
 window.toggleFab = toggleFab;
 window.closeFab = closeFab;
 
-// Cerrar FAB al abrir un sheet
-const _origOpenSheet = window.openSheet;
-window.openSheet = function(tipo) {
-  closeFab();
-  if(_origOpenSheet) _origOpenSheet(tipo);
-};
+// FAB se cierra cuando se abre sheet - ya incluido en openSheet
 
 
 // ── FILTRO TIPO FINANZAS ──
