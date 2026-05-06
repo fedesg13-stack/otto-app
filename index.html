@@ -63,7 +63,7 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);min-height:100
 .loading-spinner{width:32px;height:32px;border:2px solid var(--line2);border-top-color:var(--blue);border-radius:50%;animation:spin .65s linear infinite;}
 .loading-text{font-size:12px;font-weight:400;color:var(--t3);letter-spacing:.2px;}
 
-#app{display:none;min-height:100vh;padding-bottom:80px;}
+#app{display:none;min-height:100vh;padding-bottom:92px;}
 #app.visible{display:block;}
 
 /* ── HEADER ── */
@@ -157,34 +157,120 @@ header{
 }
 .menu-logout:active{background:var(--red2);color:#fff;}
 
-/* ── NAV INFERIOR ── */
+/* ── NAV INFERIOR — 3 botones ── */
+@keyframes fabIn{from{opacity:0;transform:translateY(8px) scale(.85);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes fabOut{from{opacity:1;transform:translateY(0) scale(1);}to{opacity:0;transform:translateY(8px) scale(.85);}}
+
 .bottom-bar{
   position:fixed;bottom:0;left:50%;transform:translateX(-50%);
   width:100%;max-width:430px;
-  background:var(--bg2);border-top:1px solid var(--line);
-  display:flex;align-items:stretch;z-index:50;
-  padding:6px 4px max(12px,env(safe-area-inset-bottom));
+  background:var(--bg);border-top:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:50;
+  padding:10px 20px max(16px,env(safe-area-inset-bottom));
+  gap:0;
 }
-.nav-btn{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
-  background:transparent;border:none;cursor:pointer;
-  font-family:var(--font);font-size:9px;font-weight:600;
-  color:var(--t4);padding:5px 2px;border-radius:var(--r10);
+
+/* ── Botón izquierdo / derecho ── */
+.nav-side-btn{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:var(--r14);padding:10px 20px;
+  cursor:pointer;font-family:var(--font);
   transition:all .18s cubic-bezier(.4,0,.2,1);
   -webkit-tap-highlight-color:transparent;
+  min-width:96px;
 }
-.nav-btn:active{background:var(--bg3);}
-.nav-btn .nav-icon-wrap{
-  width:44px;height:28px;border-radius:var(--rfull);
-  display:flex;align-items:center;justify-content:center;
+.nav-side-btn:active{transform:scale(.96);}
+.nav-side-btn.on{background:var(--blue-t);border-color:rgba(59,130,246,.3);}
+.nav-side-btn .material-icons-round{font-size:22px;color:var(--t3);transition:color .15s;}
+.nav-side-btn.on .material-icons-round{color:var(--blue);}
+.nav-side-lbl{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;transition:color .15s;}
+.nav-side-btn.on .nav-side-lbl{color:var(--blue);}
+
+/* Botón OTTO — gradiente especial */
+.nav-otto-btn{
+  display:flex;flex-direction:column;align-items:center;gap:4px;
+  background:linear-gradient(135deg,var(--blue),var(--purple));
+  border:none;border-radius:var(--r14);padding:10px 20px;
+  cursor:pointer;font-family:var(--font);
   transition:all .18s cubic-bezier(.4,0,.2,1);
+  -webkit-tap-highlight-color:transparent;
+  min-width:96px;
+  box-shadow:0 4px 14px rgba(59,130,246,.35);
 }
-.nav-btn .material-icons-round{font-size:22px;transition:all .18s;}
-.nav-btn.on .nav-icon-wrap{background:var(--blue-t);}
-.nav-btn.on{color:var(--blue);}
-.nav-btn.on .material-icons-round{font-size:24px;}
-.nav-lbl{font-size:9px;font-weight:600;letter-spacing:.2px;line-height:1;}
-.nav-dot{display:none;}
+.nav-otto-btn:active{transform:scale(.96);box-shadow:0 2px 6px rgba(59,130,246,.25);}
+.nav-otto-btn.on{opacity:1;}
+.nav-otto-btn .material-icons-round{font-size:22px;color:#fff;}
+.nav-otto-lbl{font-size:10px;font-weight:700;color:rgba(255,255,255,.85);letter-spacing:.3px;}
+
+/* ── Botón FAB central ── */
+.nav-fab-btn{
+  width:60px;height:60px;border-radius:50%;
+  background:var(--blue);
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 20px rgba(59,130,246,.5),0 0 0 0 rgba(59,130,246,.3);
+  transition:all .2s cubic-bezier(.4,0,.2,1);
+  -webkit-tap-highlight-color:transparent;
+  position:relative;z-index:1;
+  flex-shrink:0;
+  margin-bottom:4px;
+}
+.nav-fab-btn:active{transform:scale(.93);box-shadow:0 2px 10px rgba(59,130,246,.4);}
+.nav-fab-btn.open{background:var(--bg4);box-shadow:0 2px 12px rgba(0,0,0,.3);}
+.nav-fab-btn .material-icons-round{font-size:28px;color:#fff;transition:transform .25s cubic-bezier(.4,0,.2,1);}
+.nav-fab-btn.open .material-icons-round{transform:rotate(45deg);}
+
+/* ── FAB menu desplegable ── */
+.fab-menu{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+  width:calc(100% - 32px);max-width:398px;
+  display:none;z-index:49;
+  flex-direction:column;gap:8px;
+  pointer-events:none;
+}
+.fab-menu.open{
+  display:flex;pointer-events:auto;
+}
+.fab-menu-item{
+  display:flex;align-items:center;gap:14px;
+  background:var(--bg2);border:1px solid var(--line2);
+  border-radius:var(--r14);padding:13px 18px;
+  cursor:pointer;font-family:var(--font);
+  transition:all .15s;
+  opacity:0;transform:translateY(10px);
+  -webkit-tap-highlight-color:transparent;
+  animation:fabIn .22s cubic-bezier(.4,0,.2,1) forwards;
+}
+.fab-menu-item:nth-child(1){animation-delay:.04s;}
+.fab-menu-item:nth-child(2){animation-delay:.08s;}
+.fab-menu-item:nth-child(3){animation-delay:.12s;}
+.fab-menu-item:nth-child(4){animation-delay:.16s;}
+.fab-menu-item:active{transform:scale(.98);}
+.fab-menu-icon{
+  width:40px;height:40px;border-radius:var(--r12);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.fab-menu-icon .material-icons-round{font-size:20px;}
+.fab-menu-text{flex:1;}
+.fab-menu-name{font-size:14px;font-weight:700;color:var(--t1);}
+.fab-menu-sub{font-size:11px;color:var(--t3);margin-top:1px;}
+.fab-menu-arrow{color:var(--t4);}
+
+/* Overlay para cerrar el FAB */
+.fab-overlay{
+  display:none;position:fixed;inset:0;z-index:48;
+  background:rgba(0,0,0,.4);backdrop-filter:blur(2px);
+}
+.fab-overlay.open{display:block;}
+
+/* Ocultar nav-btn legacy */
+.nav-btn{display:none!important;}
+.nav-dot{display:none!important;}
+.nav-lbl{display:none!important;}
+.nav-icon-wrap{display:none!important;}
 
 /* ── BOTTOM BAR LEGACY ── */
 .bottom-btn{display:none!important;}
@@ -674,7 +760,7 @@ header{
 .form-collapsible{animation:fadeUp .18s ease;}
 
 /* ── TOAST / SAVING ── */
-.toast{position:fixed;bottom:84px;left:50%;transform:translateX(-50%);background:var(--bg4);color:var(--t1);border:1px solid var(--line2);padding:11px 18px;border-radius:var(--rfull);font-size:12px;font-weight:500;z-index:500;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none;}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--bg4);color:var(--t1);border:1px solid var(--line2);padding:11px 18px;border-radius:var(--rfull);font-size:12px;font-weight:500;z-index:500;opacity:0;transition:opacity .25s;white-space:nowrap;pointer-events:none;}
 .toast.show{opacity:1;}
 .saving{position:fixed;top:56px;right:14px;background:var(--blue-t);color:var(--blue);border:1px solid rgba(59,130,246,.2);padding:5px 11px;border-radius:var(--rfull);font-size:10px;font-weight:600;z-index:100;opacity:0;transition:opacity .25s;}
 .saving.show{opacity:1;}
@@ -867,39 +953,70 @@ header{
     </button>
   </div>
 
-  <!-- NAV INFERIOR -->
+  <!-- FAB OVERLAY -->
+  <div class="fab-overlay" id="fabOverlay" onclick="closeFab()"></div>
+
+  <!-- FAB MENU -->
+  <div class="fab-menu" id="fabMenu">
+    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('fin')">
+      <div class="fab-menu-icon" style="background:var(--green-t)">
+        <span class="material-icons-round" style="color:var(--green)">account_balance_wallet</span>
+      </div>
+      <div class="fab-menu-text">
+        <div class="fab-menu-name">Nueva finanza</div>
+        <div class="fab-menu-sub">Ingreso o gasto</div>
+      </div>
+      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+    </div>
+    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('ped')">
+      <div class="fab-menu-icon" style="background:var(--teal-t)">
+        <span class="material-icons-round" style="color:var(--teal)">receipt_long</span>
+      </div>
+      <div class="fab-menu-text">
+        <div class="fab-menu-name">Nuevo pedido</div>
+        <div class="fab-menu-sub">Cliente y productos</div>
+      </div>
+      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+    </div>
+    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('age')">
+      <div class="fab-menu-icon" style="background:var(--amber-t)">
+        <span class="material-icons-round" style="color:var(--amber)">calendar_month</span>
+      </div>
+      <div class="fab-menu-text">
+        <div class="fab-menu-name">Nuevo evento</div>
+        <div class="fab-menu-sub">Agenda y citas</div>
+      </div>
+      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+    </div>
+    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('task')">
+      <div class="fab-menu-icon" style="background:var(--purple-t)">
+        <span class="material-icons-round" style="color:var(--purple)">check_circle</span>
+      </div>
+      <div class="fab-menu-text">
+        <div class="fab-menu-name">Nueva tarea</div>
+        <div class="fab-menu-sub">Pendientes y recordatorios</div>
+      </div>
+      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+    </div>
+  </div>
+
+  <!-- NAV INFERIOR — 3 botones -->
   <nav class="bottom-bar" id="bottomNav">
-    <button class="nav-btn on" id="nav-home" onclick="goSection('home',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">home</span></div>
-      <span class="nav-lbl">Inicio</span>
+    <!-- Izquierda: Mi Negocio -->
+    <button class="nav-side-btn" id="nav-mn" onclick="goSection('mn',this)">
+      <span class="material-icons-round">storefront</span>
+      <span class="nav-side-lbl">Mi negocio</span>
     </button>
-    <button class="nav-btn" id="nav-mn" onclick="goSection('mn',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">storefront</span></div>
-      <span class="nav-lbl">Negocio</span>
+
+    <!-- Centro: FAB + -->
+    <button class="nav-fab-btn" id="fabBtn" onclick="toggleFab()">
+      <span class="material-icons-round">add</span>
     </button>
-    <button class="nav-btn" id="nav-fin" onclick="goSection('fin',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">account_balance_wallet</span></div>
-      <span class="nav-lbl">Finanzas</span>
-    </button>
-    <button class="nav-btn" id="nav-prod" onclick="goSection('prod',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">bakery_dining</span></div>
-      <span class="nav-lbl">Producción</span>
-    </button>
-    <button class="nav-btn" id="nav-ped" onclick="goSection('ped',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">receipt_long</span></div>
-      <span class="nav-lbl">Pedidos</span>
-    </button>
-    <button class="nav-btn" id="nav-age" onclick="goSection('age',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">calendar_month</span></div>
-      <span class="nav-lbl">Agenda</span>
-    </button>
-    <button class="nav-btn" id="nav-task" onclick="goSection('task',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">check_circle</span></div>
-      <span class="nav-lbl">Tareas</span>
-    </button>
-    <button class="nav-btn" id="nav-chat" onclick="goSection('chat',this)">
-      <div class="nav-icon-wrap"><span class="material-icons-round">smart_toy</span></div>
-      <span class="nav-lbl">OTTO</span>
+
+    <!-- Derecha: OTTO -->
+    <button class="nav-otto-btn" id="nav-chat" onclick="goSection('chat',this)">
+      <span class="material-icons-round">smart_toy</span>
+      <span class="nav-otto-lbl">OTTO</span>
     </button>
   </nav>
 
@@ -1412,11 +1529,14 @@ function showSaving(){const s=document.getElementById('saving');s.classList.add(
 function fmt(f){if(!f)return'';return new Date(f+'T00:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'});}
 function goTab(id,el){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
-  document.getElementById('p-'+id).classList.add('on');
+  // Quitar estado activo de todos los botones de nav
+  document.querySelectorAll('.nav-btn,.nav-side-btn,.nav-otto-btn').forEach(b=>b.classList.remove('on'));
+  const panel=document.getElementById('p-'+id);
+  if(panel)panel.classList.add('on');
+  // Marcar activo — el elemento pasado O el del nav
   if(el)el.classList.add('on');
   const nb=document.getElementById('nav-'+id);
-  if(nb)nb.classList.add('on');
+  if(nb&&nb!==el)nb.classList.add('on');
 }
 function goSection(id,el){
   goTab(id,el);
@@ -2509,10 +2629,11 @@ function closeMenu(){
 }
 function menuNav(id){
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
-  document.getElementById('p-'+id).classList.add('on');
+  const panel=document.getElementById('p-'+id);if(panel)panel.classList.add('on');
   document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('on'));
   const mi=document.getElementById('mi-'+id);if(mi)mi.classList.add('on');
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('on'));
+  // Resetear nav botones
+  document.querySelectorAll('.nav-btn,.nav-side-btn,.nav-otto-btn').forEach(b=>b.classList.remove('on'));
   const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add('on');
   closeMenu();
   window.scrollTo({top:0,behavior:'smooth'});
@@ -2902,6 +3023,37 @@ function renderProd() {
   }).join('');
 }
 window.renderProd = renderProd;
+
+
+// ── FAB MENÚ ──
+let fabOpen = false;
+function toggleFab() {
+  fabOpen = !fabOpen;
+  const btn = document.getElementById('fabBtn');
+  const menu = document.getElementById('fabMenu');
+  const overlay = document.getElementById('fabOverlay');
+  btn.classList.toggle('open', fabOpen);
+  menu.classList.toggle('open', fabOpen);
+  overlay.classList.toggle('open', fabOpen);
+}
+function closeFab() {
+  fabOpen = false;
+  const btn = document.getElementById('fabBtn');
+  const menu = document.getElementById('fabMenu');
+  const overlay = document.getElementById('fabOverlay');
+  if(btn) btn.classList.remove('open');
+  if(menu) menu.classList.remove('open');
+  if(overlay) overlay.classList.remove('open');
+}
+window.toggleFab = toggleFab;
+window.closeFab = closeFab;
+
+// Cerrar FAB al abrir un sheet
+const _origOpenSheet = window.openSheet;
+window.openSheet = function(tipo) {
+  closeFab();
+  if(_origOpenSheet) _origOpenSheet(tipo);
+};
 
 </script>
 </body>
