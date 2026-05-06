@@ -186,15 +186,6 @@ header{
 .form-sheet-overlay{display:none;position:fixed;inset:0;z-index:350;background:rgba(0,0,0,.7);backdrop-filter:blur(6px);}
 .form-sheet-overlay.visible{display:block;}
 
-.form-sheet{
-  display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);
-  width:100%;max-width:430px;
-  background:var(--bg2);border-radius:20px 20px 0 0;
-  z-index:351;max-height:92vh;overflow-y:auto;
-  border-top:1px solid var(--line);
-}
-.form-sheet.open{display:block;animation:slideUp .28s cubic-bezier(.32,0,.2,1) forwards;}
-
 .form-sheet-handle{display:flex;justify-content:center;padding:12px 0 0;}
 .form-sheet-bar{width:28px;height:3px;border-radius:2px;background:var(--line2);}
 
@@ -212,7 +203,7 @@ header{
   color:var(--t3);font-size:18px;transition:all .15s;
 }
 .form-sheet-close:active{background:var(--bg4);color:var(--t1);}
-.form-sheet-body{padding:16px 18px 36px;}
+.form-sheet-body{padding:16px 18px 48px;}
 
 /* ── MODAL SHEET ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;backdrop-filter:blur(6px);}
@@ -242,7 +233,7 @@ header{
 .edit-close{background:var(--bg3);border:none;border-radius:50%;width:30px;height:30px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--t3);}
 
 /* ── PANELS ── */
-.panel{display:none;padding:0 0 8px;}
+.panel{display:none;padding:0 0 24px;}
 .panel.on{display:block;}
 .sec-title{font-size:20px;font-weight:700;color:var(--t1);margin-bottom:16px;letter-spacing:-.3px;padding:16px 16px 0;}
 .sec-title-row{display:flex;align-items:center;justify-content:space-between;padding:16px 16px 0;margin-bottom:16px;}
@@ -250,14 +241,14 @@ header{
 
 /* ── CARDS GENERALES ── */
 .card{background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);padding:16px;}
-.m3-card{background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);padding:16px;margin-bottom:12px;}
+.m3-card{background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);padding:16px;margin:0 12px 12px;}
 .m3-card-title{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;color:var(--t3);margin-bottom:14px;}
 
 /* ── HOME: BALANCE HERO ── */
 .home-hero{
   margin:0 12px 12px;
   background:var(--bg2);border-radius:var(--r18);
-  border:1px solid var(--line);padding:20px;
+  border:1px solid var(--line);padding:20px;overflow:hidden;
 }
 .home-hero-lbl{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:6px;}
 .home-hero-amt{font-size:36px;font-weight:700;color:var(--t1);letter-spacing:-1px;margin-bottom:16px;}
@@ -273,7 +264,7 @@ header{
 .qa-btn{
   display:flex;flex-direction:column;align-items:center;gap:6px;
   background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);
-  padding:14px 8px;cursor:pointer;transition:all .15s;border:none;
+  padding:14px 8px;cursor:pointer;transition:all .15s;
   font-family:var(--font);
 }
 .qa-btn:active{background:var(--bg3);}
@@ -315,9 +306,9 @@ header{
 .btn-quick-chat .material-icons-round{font-size:16px;color:var(--blue);}
 
 /* ── HOME: SEMANA ── */
-.week-wrap{margin:0 12px 12px;background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);padding:14px;}
+.week-wrap{margin:0 12px 12px;background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);padding:14px;overflow:hidden;}
 .week-header{font-size:10px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--t3);margin-bottom:12px;}
-.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.week-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;}
 .week-day{display:flex;flex-direction:column;align-items:center;gap:2px;min-height:52px;}
 .week-day-name{font-size:9px;font-weight:500;color:var(--t4);text-transform:uppercase;margin-bottom:2px;}
 .week-day-num{font-size:12px;font-weight:600;color:var(--t2);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;}
@@ -410,17 +401,17 @@ header{
 .prod-qty{font-size:20px;font-weight:700;color:var(--amber);}
 
 /* ── CALENDARIO SEMANA (pedidos/agenda) ── */
-.week-cal-wrap{margin:0 12px 12px;background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);padding:14px;}
+.week-cal-wrap{margin:0 12px 12px;background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);padding:14px;overflow:hidden;}
 .week-cal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
 .week-cal-title{font-size:13px;font-weight:600;color:var(--t1);}
 .week-cal-actions{display:flex;align-items:center;gap:8px;}
 .btn-expand-cal{background:var(--bg3);border:1px solid var(--line);border-radius:var(--rfull);padding:5px 11px;font-family:var(--font);font-size:11px;font-weight:500;color:var(--t3);cursor:pointer;display:flex;align-items:center;gap:4px;transition:all .15s;}
 .btn-expand-cal.on{background:var(--blue-t);color:var(--blue);border-color:rgba(59,130,246,.25);}
-.week-row{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;overflow:hidden;}
-.week-col{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:5px 1px;border-radius:var(--r6);transition:background .1s;min-width:0;overflow:hidden;}
+.week-row{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;}
+.week-col{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:4px 1px;border-radius:var(--r6);transition:background .1s;overflow:hidden;min-width:0;}
 .week-col:active{background:var(--bg3);}
 .week-col.selected{background:var(--bg3);}
-.week-col-name{font-size:8px;font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:0;}
+.week-col-name{font-size:10px;font-weight:700;color:var(--t4);letter-spacing:0;}
 .week-col-num{font-size:12px;font-weight:600;color:var(--t2);width:24px;height:24px;display:flex;align-items:center;justify-content:center;border-radius:50%;flex-shrink:0;}
 .week-col.today .week-col-num{background:var(--blue);color:#fff;font-weight:700;}
 .week-col.selected:not(.today) .week-col-num{background:var(--bg4);color:var(--t1);}
@@ -683,12 +674,12 @@ header{
 .mn-collapse-body{padding:12px 14px 14px;background:var(--bg2);border-top:1px solid var(--line);}
 
 /* ── FORM SHEET FIX ── */
-.form-sheet{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg2);border-radius:20px 20px 0 0;z-index:351;max-height:85vh;overflow-y:auto;border-top:1px solid var(--line);}
+.form-sheet{display:none;position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:var(--bg2);border-radius:20px 20px 0 0;z-index:351;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line);}
 .form-sheet.open{display:block;animation:slideUp .28s cubic-bezier(.32,0,.2,1) forwards;}
 
-/* ── OTTO CARD sin margen lateral (ocupa todo el ancho del panel) ── */
-.otto-card{margin:0 0 12px;background:var(--bg2);border-radius:0;border:none;border-bottom:1px solid var(--line);}
-.otto-card:first-child{border-top:1px solid var(--line);}
+/* ── OTTO CARD ── */
+.otto-card{margin:0 12px 12px;background:var(--bg2);border-radius:var(--r14);border:1px solid var(--line);overflow:hidden;}
+.panel.on>.otto-card:first-child{margin-top:12px;}
 
 </style>
 </head>
@@ -855,25 +846,37 @@ header{
     </button>
   </div>
 
-  <!-- BARRA INFERIOR FIJA -->
-  <div class="bottom-bar">
-    <button class="bottom-btn rpl" onclick="openSheet('fin')">
-      <div class="bb-icon"><span class="material-icons-round">add</span></div>
-      <span>Finanza</span>
+  <!-- NAV INFERIOR -->
+  <nav class="bottom-bar">
+    <button class="nav-btn on" id="nav-home" onclick="goSection('home',this)">
+      <span class="material-icons-round">home</span>
+      <div class="nav-dot"></div>
     </button>
-    <button class="bottom-btn rpl" onclick="openSheet('ped')">
-      <div class="bb-icon"><span class="material-icons-round">add</span></div>
-      <span>Pedido</span>
+    <button class="nav-btn" id="nav-mn" onclick="goSection('mn',this)">
+      <span class="material-icons-round">storefront</span>
+      <div class="nav-dot"></div>
     </button>
-    <button class="bottom-btn rpl" onclick="openSheet('age')">
-      <div class="bb-icon"><span class="material-icons-round">add</span></div>
-      <span>Evento</span>
+    <button class="nav-btn" id="nav-fin" onclick="goSection('fin',this)">
+      <span class="material-icons-round">account_balance_wallet</span>
+      <div class="nav-dot"></div>
     </button>
-    <button class="bottom-btn rpl" onclick="openSheet('task')">
-      <div class="bb-icon"><span class="material-icons-round">add</span></div>
-      <span>Tarea</span>
+    <button class="nav-btn" id="nav-age" onclick="goSection('age',this)">
+      <span class="material-icons-round">calendar_month</span>
+      <div class="nav-dot"></div>
     </button>
-  </div>
+    <button class="nav-btn" id="nav-ped" onclick="goSection('ped',this)">
+      <span class="material-icons-round">receipt_long</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-task" onclick="goSection('task',this)">
+      <span class="material-icons-round">check_circle</span>
+      <div class="nav-dot"></div>
+    </button>
+    <button class="nav-btn" id="nav-chat" onclick="goSection('chat',this)">
+      <span class="material-icons-round">smart_toy</span>
+      <div class="nav-dot"></div>
+    </button>
+  </nav>
 
   <!-- MODAL -->
   <div class="overlay" id="overlay" onclick="closeModal()"></div>
@@ -1008,7 +1011,7 @@ header{
       </div>
     </div>
     <div class="tickets-section">
-      <div class="tickets-date-header">
+      <div class="tickets-date-header" id="pedSelectedDateLbl">
         Todos los pedidos
       </div>
       <div id="pedContainer"><div class="empty"><span>📋</span>Sin pedidos aún.</div></div>
@@ -1045,7 +1048,7 @@ header{
       </div>
     </div>
     <div id="ageEventsSection">
-      <div class="tickets-date-header">Todos los eventos</div>
+      <div class="tickets-date-header" id="ageSelectedDateLbl">Todos los eventos</div>
       <div id="evContainer"><div class="empty"><span>📅</span>Sin eventos aún.</div></div>
     </div>
   </div>
@@ -1066,9 +1069,9 @@ header{
       </div>
       <div class="cal-grid" id="calTaskGrid"></div>
     </div>
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);margin-bottom:10px;">Pendientes</div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t4);padding:12px 16px 6px;">Pendientes</div>
     <div id="taskPendList"><div class="empty"><span>✅</span>Sin tareas pendientes.</div></div>
-    <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.5px;color:var(--t4);margin:16px 0 10px;">Completadas</div>
+    <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t4);padding:8px 16px 6px;">Completadas</div>
     <div id="taskDoneList"><div class="empty" style="padding:16px 0"><span style="font-size:24px">🎉</span>Nada completado aún.</div></div>
   </div>
 
@@ -1152,7 +1155,7 @@ header{
 
   <!-- OTTO CHAT -->
   <div class="panel" id="p-chat">
-    <div class="sec-title">Hablá con OTTO</div>
+    <div class="sec-title" style="padding:16px 16px 12px;">Hablá con OTTO</div>
     <div class="m3-card">
       <div class="chat-msgs" id="chatMsgs">
         <div class="msg"><div class="msg-av">O</div><div class="msg-bub otto">¡Hola! 👋 Soy OTTO, tu socio silencioso. Tengo todos tus datos. ¿En qué te ayudo hoy?</div></div>
@@ -1320,6 +1323,15 @@ const CC={proveedor:'#e8710a',empleado:'#1a73e8',servicio:'#00897b',cliente:'#7b
 const CI={proveedor:'🏭',empleado:'👤',servicio:'⚡',cliente:'🛒',otro:'📌'};
 let S={nombre:'',negocio:'',tipo:'ingreso',movs:[],pedidos:[],eventos:[],contactos:[],tareas:[],catalogo:[],nota:'',perfil:null,miNegocio:{productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},selC:null,uid:null};
 
+const MN_CONFIG={
+  productos:{icon:'🛍️',label:'Producto / Servicio',campos:[{id:'nombre',label:'Nombre',type:'text',required:true},{id:'precio',label:'Precio de venta',type:'number'},{id:'costo',label:'Costo / precio de costo',type:'number'},{id:'categoria',label:'Categoría',type:'text'},{id:'descripcion',label:'Descripción',type:'text'}],color:'var(--amber)',bg:'var(--amber-t)'},
+  clientes:{icon:'👤',label:'Cliente',campos:[{id:'nombre',label:'Nombre completo',type:'text',required:true},{id:'telefono',label:'Teléfono / WhatsApp',type:'text'},{id:'email',label:'Email',type:'email'},{id:'direccion',label:'Dirección de entrega',type:'text'},{id:'notas',label:'Notas',type:'text'}],color:'var(--blue)',bg:'var(--blue-t2)'},
+  proveedores:{icon:'🏭',label:'Proveedor',campos:[{id:'nombre',label:'Nombre / empresa',type:'text',required:true},{id:'contacto',label:'Contacto',type:'text'},{id:'telefono',label:'Teléfono',type:'text'},{id:'queProvee',label:'¿Qué provee?',type:'text'},{id:'condiciones',label:'Condiciones de pago',type:'text'}],color:'#e8710a',bg:'var(--amber-t)'},
+  equipo:{icon:'👥',label:'Miembro del equipo',campos:[{id:'nombre',label:'Nombre completo',type:'text',required:true},{id:'rol',label:'Rol / puesto',type:'text'},{id:'telefono',label:'Teléfono',type:'text'},{id:'horario',label:'Horario',type:'text'},{id:'sueldo',label:'Sueldo / pago',type:'number'}],color:'var(--teal)',bg:'var(--teal-t)'},
+  servicios:{icon:'⚡',label:'Servicio / suscripción',campos:[{id:'nombre',label:'Nombre del servicio',type:'text',required:true},{id:'costo',label:'Costo mensual',type:'number'},{id:'vencimiento',label:'Próximo vencimiento',type:'date'},{id:'notas',label:'Notas',type:'text'}],color:'var(--blue)',bg:'var(--blue-t2)'},
+  impositiva:{icon:'📊',label:'Obligación impositiva',campos:[{id:'nombre',label:'Nombre (ej: IVA, Ingresos Brutos)',type:'text',required:true},{id:'vencimiento',label:'Próximo vencimiento',type:'date'},{id:'monto',label:'Monto estimado',type:'number'},{id:'periodicidad',label:'Periodicidad',type:'text'},{id:'notas',label:'Notas',type:'text'}],color:'#b3261e',bg:'var(--red-t)'}
+};
+
 // ── HELPERS ──
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function showSaving(){const s=document.getElementById('saving');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1500);}
@@ -1336,6 +1348,8 @@ function goSection(id,el){
   goTab(id,el);
   window.scrollTo({top:0,behavior:'smooth'});
   if(id==='fin') renderMovsFin();
+  if(id==='ped') { renderPedWeek(); renderPeds(); }
+  if(id==='age') { renderAgeWeek(); renderEvs(); }
 }
 function setTipo(t){S.tipo=t;document.getElementById('sIng').className='seg-btn'+(t==='ingreso'?' ing-on':'');document.getElementById('sGas').className='seg-btn'+(t==='gasto'?' gas-on':'');}
 
@@ -1548,7 +1562,8 @@ function updBal(ing,gas){
 
 // ── MODAL ──
 function openModal(tipo){
-  const movs=S.movs.filter(m=>m.tipo===tipo);
+  const mes=getFinMes();
+  const movs=S.movs.filter(m=>m.tipo===tipo&&m.fecha&&m.fecha.startsWith(mes));
   const total=movs.reduce((s,m)=>s+m.monto,0);
   const esIng=tipo==='ingreso';
   const color=esIng?'var(--green)':'var(--red)';
@@ -1752,15 +1767,8 @@ window.saveEv=saveEv;
 
 // ── BANNER ──
 function updateBanner(){
-  const ing=S.movs.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
-  const gas=S.movs.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
-  const bal=ing-gas;let msg='';
-  if(!S.movs.length&&!S.pedidos.length&&!S.eventos.length){msg=`Bienvenido, <strong>${S.nombre.split(' ')[0]}</strong>. Empezá cargando datos. 🚀`;}
-  else if(S.movs.length&&bal>0){msg=`📈 Balance positivo: <strong>+$${bal.toLocaleString()}</strong>. ¡Los ingresos superan los gastos!`;}
-  else if(S.movs.length&&bal<0){msg=`⚠️ Los gastos superan los ingresos en <strong>$${Math.abs(bal).toLocaleString()}</strong>.`;}
-  else if(S.pedidos.length){const tot=S.pedidos.filter(p=>!p.archivado).reduce((s,p)=>s+p.items.reduce((ss,i)=>ss+i.q,0),0);msg=`📋 <strong>${S.pedidos.filter(p=>!p.archivado).length} pedido(s)</strong> activos con ${tot} unidades para producir.`;}
-  else if(S.eventos.length){msg=`📅 <strong>${S.eventos.length} evento(s)</strong> agendados.`;}
-  if(msg)document.getElementById('ottoBanner').innerHTML=msg;
+  // Actualiza el slider de OTTO en home con datos frescos
+  renderSlider();
 }
 
 // ── CHAT CON IA ──
@@ -1899,7 +1907,7 @@ window.goSlide=goSlide;
 function renderWeek(){
   const hoy=new Date();hoy.setHours(0,0,0,0);
   const lunes=new Date(hoy);const dow=hoy.getDay()===0?6:hoy.getDay()-1;lunes.setDate(hoy.getDate()-dow);
-  const diasFull=['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const diasFull=['L','M','X','J','V','S','D'];
   let html='';
   for(let i=0;i<7;i++){
     const fecha=new Date(lunes);fecha.setDate(lunes.getDate()+i);
@@ -2211,15 +2219,6 @@ window.savePerfil=savePerfil;
 
 /* ── MI NEGOCIO ── */
 let mnTabActual='productos';
-const MN_CONFIG={
-  productos:{icon:'🛍️',label:'Producto / Servicio',campos:[{id:'nombre',label:'Nombre',type:'text',required:true},{id:'precio',label:'Precio de venta',type:'number'},{id:'costo',label:'Costo / precio de costo',type:'number'},{id:'categoria',label:'Categoría',type:'text'},{id:'descripcion',label:'Descripción',type:'text'}],color:'var(--amber)',bg:'var(--amber-t)'},
-  clientes:{icon:'👤',label:'Cliente',campos:[{id:'nombre',label:'Nombre completo',type:'text',required:true},{id:'telefono',label:'Teléfono / WhatsApp',type:'text'},{id:'email',label:'Email',type:'email'},{id:'direccion',label:'Dirección de entrega',type:'text'},{id:'notas',label:'Notas',type:'text'}],color:'var(--blue)',bg:'var(--accent-bg)'},
-  proveedores:{icon:'🏭',label:'Proveedor',campos:[{id:'nombre',label:'Nombre / empresa',type:'text',required:true},{id:'contacto',label:'Contacto',type:'text'},{id:'telefono',label:'Teléfono',type:'text'},{id:'queProvee',label:'¿Qué provee?',type:'text'},{id:'condiciones',label:'Condiciones de pago',type:'text'}],color:'#e8710a',bg:'var(--amber-t)'},
-  equipo:{icon:'👥',label:'Miembro del equipo',campos:[{id:'nombre',label:'Nombre completo',type:'text',required:true},{id:'rol',label:'Rol / puesto',type:'text'},{id:'telefono',label:'Teléfono',type:'text'},{id:'horario',label:'Horario',type:'text'},{id:'sueldo',label:'Sueldo / pago',type:'number'}],color:'var(--teal)',bg:'var(--teal-t)'},
-  servicios:{icon:'⚡',label:'Servicio / suscripción',campos:[{id:'nombre',label:'Nombre del servicio',type:'text',required:true},{id:'costo',label:'Costo mensual',type:'number'},{id:'vencimiento',label:'Próximo vencimiento',type:'date'},{id:'notas',label:'Notas',type:'text'}],color:'var(--blue)',bg:'var(--accent-bg)'},
-  impositiva:{icon:'📊',label:'Obligación impositiva',campos:[{id:'nombre',label:'Nombre (ej: IVA, Ingresos Brutos)',type:'text',required:true},{id:'vencimiento',label:'Próximo vencimiento',type:'date'},{id:'monto',label:'Monto estimado',type:'number'},{id:'periodicidad',label:'Periodicidad',type:'text'},{id:'notas',label:'Notas',type:'text'}],color:'#b3261e',bg:'var(--red-t)'}
-};
-
 function switchMnTab(tab,el){mnTabActual=tab;document.querySelectorAll('.mn-tab').forEach(t=>t.classList.remove('on'));if(el)el.classList.add('on');renderMnContent();}
 window.switchMnTab=switchMnTab;
 
