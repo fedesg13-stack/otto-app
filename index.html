@@ -2506,52 +2506,65 @@ function updateBanner(){
   renderSlider();
 }
 
-// ── CHAT CON IA ──
-async function sendMsg(){
-  const inp=document.getElementById('chatInp');
-  const msg=inp.value.trim();if(!msg)return;
-  inp.value='';addBub(msg,'me');
-  const tid='t'+Date.now();
-  const box=document.getElementById('chatMsgs');
-  box.innerHTML+=`<div class="msg" id="${tid}"><div class="msg-av">O</div><div class="msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-  box.scrollTop=99999;
-  const ing=S.movs.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
-  const gas=S.movs.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
-  const pedDet=S.pedidos.length?S.pedidos.filter(p=>!p.archivado).map(p=>`  • CLIENTE: ${p.cli} | FECHA: ${p.fecha}${p.hora?' HORA: '+p.hora:''} | PRODUCTOS: ${p.items.map(i=>i.q+'x '+i.p).join(', ')}`).join('\n'):'  (sin pedidos activos)';
-  const evDet=S.eventos.length?S.eventos.map(e=>`  • ${e.tit} | FECHA: ${e.fecha}${e.hora?' HORA: '+e.hora:''}${e.cliente?' CLIENTE: '+e.cliente:''} | PRIORIDAD: ${e.prio}${e.desc?' | DETALLE: '+e.desc:''}`).join('\n'):'  (sin eventos)';
-  const movDet=S.movs.length?S.movs.slice(0,10).map(m=>`  • ${m.tipo.toUpperCase()} $${m.monto} | FECHA: ${m.fecha} | CAT: ${m.cat}${m.contacto?' | CONTACTO: '+m.contacto.nombre:''}`).join('\n'):'  (sin movimientos)';
-  const cDet=S.contactos.length?S.contactos.map(c=>`  • ${c.nombre} (${c.tipo})`).join('\n'):'  (sin contactos)';
-  const taskDet=S.tareas.filter(t=>!t.done).length?S.tareas.filter(t=>!t.done).map(t=>`  • ${t.tit}${t.fecha?' | FECHA: '+t.fecha:''}${t.desc?' | '+t.desc:''}`).join('\n'):'  (sin tareas pendientes)';
-  const ctx=`Sos OTTO, el socio silencioso de ${S.nombre}, dueño/a de "${S.negocio}".
-Sos conciso, directo, cálido y práctico. Hablás en español rioplatense. Sin asteriscos ni markdown. Máximo 3 oraciones.
-FECHA DE HOY: ${new Date().toLocaleDateString('es-AR', {weekday:'long', year:'numeric', month:'long', day:'numeric'})}.
-CRÍTICO: Usá ÚNICAMENTE los datos de abajo. No inventes.
+// ── CHAT PRINCIPAL — OTTO CON PERSONALIDAD E HISTORIAL ──
+let chatHistory = [];
 
-=== FINANZAS === Ingresos:$${ing} Gastos:$${gas} Balance:$${ing-gas}
-${movDet}
-=== PEDIDOS ACTIVOS ===
-${pedDet}
-=== AGENDA ===
-${evDet}
-=== CONTACTOS ===
-${cDet}
-=== TAREAS PENDIENTES ===
-${taskDet}
-=== NOTA RÁPIDA ===
-${S.nota || '(sin notas)'}`;
-  try{
-    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:1000,system:ctx,messages:[{role:'user',content:msg}]})});
-    const data=await res.json();
-    const reply=data.content?.[0]?.text||(data.error?'Error: '+JSON.stringify(data.error):'Sin respuesta');
-    document.getElementById(tid)?.remove();addBub(reply,'otto');
-  }catch(e){document.getElementById(tid)?.remove();addBub('Tuve un problema conectándome. Intentá de nuevo.','otto');}
+async function sendMsg(){
+  const inp = document.getElementById('chatInp');
+  const msg = inp.value.trim();
+  if(!msg) return;
+  inp.value = '';
+  addBub(msg, 'me');
+
+  const tid = 't' + Date.now();
+  const box = document.getElementById('chatMsgs');
+  box.innerHTML += `<div class="msg" id="${tid}"><div class="msg-av">O</div><div class="msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  box.scrollTop = 99999;
+
+  // Agregar al historial para que OTTO recuerde la conversación
+  chatHistory.push({ role: 'user', content: msg });
+
+  // Contexto completo del negocio + instrucciones de personalidad
+  const system = buildOttoContext() + `
+
+CÓMO RESPONDÉS:
+- Máximo 3 oraciones. Directo, sin rodeos, sin relleno.
+- Si detectás algo importante en los datos (gastos altos, pedido próximo, tarea urgente), lo mencionás aunque no te lo pregunten.
+- Si no tenés el dato que te piden, lo decís: "No tengo ese dato aún."
+- Sin asteriscos, sin markdown, sin guiones de lista. Solo texto corrido.
+- Usás el nombre del dueño cuando suma, no en cada oración.`;
+
+  try {
+    const res = await fetch('/.netlify/functions/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 500,
+        system,
+        messages: chatHistory.slice(-10) // últimos 10 para contexto de conversación
+      })
+    });
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Tuve un problema. Intentá de nuevo.';
+    document.getElementById(tid)?.remove();
+    addBub(reply, 'otto');
+    chatHistory.push({ role: 'assistant', content: reply });
+    if(chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  } catch(e) {
+    document.getElementById(tid)?.remove();
+    addBub('No me pude conectar. Verificá tu conexión e intentá de nuevo.', 'otto');
+    chatHistory.pop();
+  }
 }
-function addBub(text,who){
-  const box=document.getElementById('chatMsgs');
-  box.innerHTML+=`<div class="msg ${who==='me'?'me':''}"><div class="msg-av">${who==='otto'?'O':S.nombre[0]?.toUpperCase()||'U'}</div><div class="msg-bub ${who}">${text}</div></div>`;
-  box.scrollTop=99999;
+
+function addBub(text, who){
+  const box = document.getElementById('chatMsgs');
+  const av = who === 'otto' ? 'O' : (S.nombre?.[0]?.toUpperCase() || 'U');
+  box.innerHTML += `<div class="msg ${who==='me'?'me':''}"><div class="msg-av">${av}</div><div class="msg-bub ${who}">${text}</div></div>`;
+  box.scrollTop = 99999;
 }
-window.sendMsg=sendMsg;
+window.sendMsg = sendMsg;
 
 /* ── CALENDARIO ── */
 const CAL_STATE={ped:new Date(),age:new Date(),task:new Date()};
