@@ -302,7 +302,7 @@ header {
 }
 .fab-overlay.open { display:block; }
 .fab-menu {
-  position:fixed; bottom:90px; left:16px; right:16px;
+  position:fixed; bottom:calc(80px + env(safe-area-inset-bottom, 0px)); left:16px; right:16px;
   display:none; z-index:49;
   flex-direction:column; gap:8px;
   pointer-events:none;
@@ -314,14 +314,10 @@ header {
   border:1px solid var(--border);
   border-radius:var(--r14); padding:13px 18px;
   cursor:pointer; font-family:var(--font);
-  opacity:0; transform:translateY(10px);
-  animation:fabIn .22s cubic-bezier(.4,0,.2,1) forwards;
+  opacity:1; transform:translateY(0);
+  transition:opacity .18s, transform .18s;
   box-shadow:var(--s2);
 }
-.fab-menu-item:nth-child(1){animation-delay:.04s;}
-.fab-menu-item:nth-child(2){animation-delay:.08s;}
-.fab-menu-item:nth-child(3){animation-delay:.12s;}
-.fab-menu-item:nth-child(4){animation-delay:.16s;}
 .fab-menu-item:active { transform:scale(.98); background:var(--surface2); }
 .fab-menu-icon { width:40px; height:40px; border-radius:var(--r10); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 .fab-menu-icon .material-icons-round { font-size:20px; }
@@ -1770,8 +1766,8 @@ async function loadAllData(){
     S.tareas.sort((a,b)=>new Date(a.fecha||'9999')-new Date(b.fecha||'9999'));
     renderMovs();renderMovsFin();renderHomeMovsRecientes();renderPeds();renderEvs();renderC();renderChips();renderTasks();
   }catch(e){
-    console.error('Error cargando datos:', e);
-    showToast('⚠️ Error al cargar datos. Revisá tu conexión.');
+    console.warn('loadAllData catch (no crítico):', e.message || e);
+    // No mostrar toast — los datos se cargan igual con Firebase offline support
   }
 }
 
@@ -3319,16 +3315,30 @@ window.renderProd = renderProd;
 
 // ── FAB MENÚ ──
 let fabOpen = false;
-function toggleFab() {
+window.toggleFab = function toggleFab() {
   fabOpen = !fabOpen;
   const btn = document.getElementById('fabBtn');
   const menu = document.getElementById('fabMenu');
   const overlay = document.getElementById('fabOverlay');
-  btn.classList.toggle('open', fabOpen);
-  menu.classList.toggle('open', fabOpen);
-  overlay.classList.toggle('open', fabOpen);
-}
-function closeFab() {
+  if(btn) btn.classList.toggle('open', fabOpen);
+  if(overlay) overlay.classList.toggle('open', fabOpen);
+  if(menu) {
+    menu.classList.toggle('open', fabOpen);
+    if(fabOpen) {
+      // Animar items al abrir
+      const items = menu.querySelectorAll('.fab-menu-item');
+      items.forEach((item, i) => {
+        item.style.opacity = '0';
+        item.style.transform = 'translateY(10px)';
+        setTimeout(() => {
+          item.style.opacity = '1';
+          item.style.transform = 'translateY(0)';
+        }, 40 + i * 50);
+      });
+    }
+  }
+};
+window.closeFab = function closeFab() {
   fabOpen = false;
   const btn = document.getElementById('fabBtn');
   const menu = document.getElementById('fabMenu');
@@ -3336,11 +3346,7 @@ function closeFab() {
   if(btn) btn.classList.remove('open');
   if(menu) menu.classList.remove('open');
   if(overlay) overlay.classList.remove('open');
-}
-window.toggleFab = toggleFab;
-window.closeFab = closeFab;
-
-// FAB se cierra cuando se abre sheet - ya incluido en openSheet
+};
 
 
 // ── FILTRO TIPO FINANZAS ──
