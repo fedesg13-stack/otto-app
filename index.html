@@ -296,14 +296,14 @@ header {
 
 /* ── FAB MENU ── */
 .fab-overlay {
-  display:none; position:fixed; inset:0; z-index:48;
+  display:none; position:fixed; inset:0; z-index:200;
   background:rgba(26,31,28,.45);
   backdrop-filter:blur(3px);
 }
 .fab-overlay.open { display:block; }
 .fab-menu {
   position:fixed; bottom:calc(80px + env(safe-area-inset-bottom, 0px)); left:16px; right:16px;
-  display:none; z-index:49;
+  display:none; z-index:201;
   flex-direction:column; gap:8px;
   pointer-events:none;
 }
@@ -1104,52 +1104,6 @@ header {
   </div>
 
   <!-- FAB OVERLAY -->
-  <div class="fab-overlay" id="fabOverlay" onclick="closeFab()"></div>
-
-  <!-- FAB MENU -->
-  <div class="fab-menu" id="fabMenu">
-    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('fin')">
-      <div class="fab-menu-icon" style="background:var(--green-bg)">
-        <span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span>
-      </div>
-      <div class="fab-menu-text">
-        <div class="fab-menu-name">Nueva finanza</div>
-        <div class="fab-menu-sub">Ingreso o gasto</div>
-      </div>
-      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
-    </div>
-    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('ped')">
-      <div class="fab-menu-icon" style="background:var(--teal-t)">
-        <span class="material-icons-round" style="color:var(--teal)">receipt_long</span>
-      </div>
-      <div class="fab-menu-text">
-        <div class="fab-menu-name">Nuevo pedido</div>
-        <div class="fab-menu-sub">Cliente y productos</div>
-      </div>
-      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
-    </div>
-    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('age')">
-      <div class="fab-menu-icon" style="background:var(--amber-t)">
-        <span class="material-icons-round" style="color:var(--amber)">calendar_month</span>
-      </div>
-      <div class="fab-menu-text">
-        <div class="fab-menu-name">Nuevo evento</div>
-        <div class="fab-menu-sub">Agenda y citas</div>
-      </div>
-      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
-    </div>
-    <div class="fab-menu-item rpl" onclick="closeFab();openSheet('task')">
-      <div class="fab-menu-icon" style="background:var(--purple-t)">
-        <span class="material-icons-round" style="color:var(--purple)">check_circle</span>
-      </div>
-      <div class="fab-menu-text">
-        <div class="fab-menu-name">Nueva tarea</div>
-        <div class="fab-menu-sub">Pendientes y recordatorios</div>
-      </div>
-      <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
-    </div>
-  </div>
-
   <!-- NAV INFERIOR — 3 botones -->
   <nav class="bottom-bar" id="bottomNav">
     <!-- Izquierda: Menú hamburguesa -->
@@ -3516,5 +3470,51 @@ document.addEventListener('click', function(e) {
 });
 
 </script>
+
+<!-- FAB OVERLAY + MENU — fuera del #app para z-index correcto -->
+<div class="fab-overlay" id="fabOverlay" onclick="closeFab()"></div>
+<div class="fab-menu" id="fabMenu">
+  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('fin')">
+    <div class="fab-menu-icon" style="background:var(--green-bg)">
+      <span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span>
+    </div>
+    <div class="fab-menu-text">
+      <div class="fab-menu-name">Nueva finanza</div>
+      <div class="fab-menu-sub">Ingreso o gasto</div>
+    </div>
+    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+  </div>
+  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('ped')">
+    <div class="fab-menu-icon" style="background:var(--teal-t)">
+      <span class="material-icons-round" style="color:var(--teal)">receipt_long</span>
+    </div>
+    <div class="fab-menu-text">
+      <div class="fab-menu-name">Nuevo pedido</div>
+      <div class="fab-menu-sub">Cliente y productos</div>
+    </div>
+    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+  </div>
+  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('age')">
+    <div class="fab-menu-icon" style="background:var(--amber-t)">
+      <span class="material-icons-round" style="color:var(--amber)">calendar_month</span>
+    </div>
+    <div class="fab-menu-text">
+      <div class="fab-menu-name">Nuevo evento</div>
+      <div class="fab-menu-sub">Agenda y citas</div>
+    </div>
+    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+  </div>
+  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('task')">
+    <div class="fab-menu-icon" style="background:var(--purple-t)">
+      <span class="material-icons-round" style="color:var(--purple)">check_circle</span>
+    </div>
+    <div class="fab-menu-text">
+      <div class="fab-menu-name">Nueva tarea</div>
+      <div class="fab-menu-sub">Pendientes y recordatorios</div>
+    </div>
+    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+  </div>
+</div>
+
 </body>
 </html>
