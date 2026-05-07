@@ -428,6 +428,23 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
 .field-trigger.filled{color:var(--t1);border-color:var(--border);}
 .field-trigger-lbl{font-size:12px;color:var(--t4);display:block;margin-bottom:4px;}
 
+
+/* ── HISTORIAL ARCHIVADOS ── */
+.historial-toggle{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;background:transparent;border:none;width:100%;font-family:var(--font);}
+.historial-toggle-lbl{font-size:12px;font-weight:600;color:var(--t4);display:flex;align-items:center;gap:6px;}
+.historial-body{display:none;padding:0 12px 8px;}
+.historial-body.on{display:block;}
+/* Swipe actions en cards (tap largo = menú) */
+.card-actions{display:flex;gap:6px;padding:6px 12px 10px;border-top:1px solid var(--border2);}
+.card-action{flex:1;background:var(--surface2);border:none;border-radius:var(--r10);padding:8px 4px;font-family:var(--font);font-size:12px;font-weight:600;color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px;transition:all .12s;-webkit-tap-highlight-color:transparent;}
+.card-action:active{background:var(--surface3);}
+.card-action.edit{color:var(--bosque);}
+.card-action.del{color:var(--red);}
+.card-action .material-icons-round{font-size:15px;}
+/* Ticket archivado */
+.ticket.archivado{opacity:.6;}
+.ticket.archivado .ticket-cli{text-decoration:line-through;}
+
 </style>
 </head>
 <body>
@@ -610,6 +627,14 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
       <div class="ped-cal-strip"><div class="ped-week" id="ped-week"></div></div>
       <div id="ped-produce" style="margin:0 12px 10px;display:none;"></div>
       <div class="peds-list" id="ped-list"></div>
+      <!-- Historial archivados -->
+      <div style="margin:8px 12px 0;">
+        <button class="historial-toggle rpl" id="ped-hist-btn">
+          <span class="historial-toggle-lbl"><span class="material-icons-round" style="font-size:16px">archive</span>Historial entregados</span>
+          <span class="material-icons-round" style="font-size:18px;color:var(--t4)" id="ped-hist-arrow">expand_more</span>
+        </button>
+        <div class="historial-body" id="ped-hist-body"></div>
+      </div>
     </div>
 
     <!-- AGENDA -->
@@ -1247,6 +1272,51 @@ async function delMov(id){
 }
 window.delMov=delMov;
 
+// ── EDITAR MOVIMIENTO ──
+function editMov(id){
+  const m = S.movs.find(m=>m._id===id); if(!m) return;
+  const body = `
+    <div class="tipo-pills" style="margin-bottom:12px;">
+      <button class="tipo-pill ing${m.tipo==='ingreso'?' sel':''} rpl" id="ep-pill-ing">
+        <span class="material-icons-round">trending_up</span>Ingreso
+      </button>
+      <button class="tipo-pill gas${m.tipo==='gasto'?' sel':''} rpl" id="ep-pill-gas">
+        <span class="material-icons-round">trending_down</span>Gasto
+      </button>
+    </div>
+    <div class="m3-field"><input class="m3-inp" id="ep-monto" type="number" value="${m.monto}" placeholder=" " inputmode="decimal"><label class="m3-lbl">Monto</label></div>
+    <div class="m3-field"><input class="m3-inp" id="ep-cat" value="${m.cat||''}" placeholder=" "><label class="m3-lbl">Categoría</label></div>
+    <div class="m3-field"><input class="m3-inp" id="ep-fecha" type="date" value="${m.fecha||''}" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+    <div class="m3-field"><input class="m3-inp" id="ep-desc" value="${m.desc||''}" placeholder=" "><label class="m3-lbl">Nota</label></div>
+    <button class="btn-save rpl" id="ep-save">Guardar cambios</button>
+  `;
+  openEdit('✏️ Editar movimiento', body);
+  // Pills interactivas dentro del edit
+  let tipoEdit = m.tipo;
+  g('ep-pill-ing').addEventListener('click',()=>{
+    tipoEdit='ingreso';
+    g('ep-pill-ing').classList.add('sel'); g('ep-pill-gas').classList.remove('sel');
+  });
+  g('ep-pill-gas').addEventListener('click',()=>{
+    tipoEdit='gasto';
+    g('ep-pill-gas').classList.add('sel'); g('ep-pill-ing').classList.remove('sel');
+  });
+  g('ep-save').addEventListener('click', async ()=>{
+    const monto=parseFloat(g('ep-monto')?.value);
+    if(!monto||monto<=0){toast('Monto inválido');return;}
+    const upd={tipo:tipoEdit,monto,cat:g('ep-cat')?.value.trim()||m.cat,fecha:g('ep-fecha')?.value||m.fecha,desc:g('ep-desc')?.value.trim()||''};
+    saving();
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/movimientos/${id}`),upd);
+      Object.assign(m, upd);
+      S.ottoCache=[];
+      closeEdit(); toast('✅ Movimiento actualizado');
+      renderMovsFin(); renderHomeBal();
+    }catch(e){console.error(e);toast('Error al guardar');}
+  });
+}
+window.editMov=editMov;
+
 async function savePed(){
   const cli=(g('s-ped-cli')?.value||'').trim();
   if(!cli){toast('Seleccioná un cliente');return;}
@@ -1279,6 +1349,82 @@ async function delPed(id){
   catch(e){console.error(e);}
 }
 window.delPed=delPed;
+
+async function reabrirPed(id){
+  try{
+    await updateDoc(doc(db,`usuarios/${S.uid}/pedidos/${id}`),{archivado:false});
+    const p=S.pedidos.find(p=>p._id===id); if(p) p.archivado=false;
+    renderPeds(); renderPedWeek(); renderProduceDia();
+    toast('Pedido reabierto');
+  }catch(e){console.error(e);}
+}
+window.reabrirPed=reabrirPed;
+
+// ── EDITAR PEDIDO ──
+function editPed(id){
+  const p = S.pedidos.find(p=>p._id===id); if(!p) return;
+  const prodsHtml = (p.items||[]).map(i=>
+    `<div class="prod-row" data-orig="${(i.p||'').replace(/"/g,'&quot;')}">
+      <span class="prod-row-name">${i.p||''}</span>
+      <div class="prod-row-qty">
+        <button class="qty-btn rpl" data-a="dec">−</button>
+        <span class="qty-num">${i.q||1}</span>
+        <button class="qty-btn rpl" data-a="inc">+</button>
+      </div>
+      <button class="prod-row-del rpl"><span class="material-icons-round" style="font-size:18px">close</span></button>
+    </div>`
+  ).join('');
+  const body = `
+    <div class="m3-field"><input class="m3-inp" id="ep-cli" value="${(p.cli||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Cliente</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="ep-fecha" type="date" value="${p.fecha||''}" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+      <div class="m3-field"><input class="m3-inp" id="ep-hora" type="time" value="${p.hora||''}" placeholder=" "><label class="m3-lbl">Hora</label></div>
+    </div>
+    <label class="sec-lbl">Productos</label>
+    <div id="ep-prods">${prodsHtml}</div>
+    <button class="add-prod-btn rpl" id="ep-add-prod" style="margin-bottom:8px;"><span class="material-icons-round" style="font-size:16px">add</span>Agregar producto</button>
+    <div class="m3-field"><textarea class="m3-select" id="ep-notas" rows="2" style="resize:none;padding-top:10px;" placeholder="Notas…">${p.notas||''}</textarea></div>
+    <button class="btn-save rpl" id="ep-save">Guardar cambios</button>
+  `;
+  openEdit('✏️ Editar pedido', body);
+  // Listeners para productos existentes
+  g('ep-prods').querySelectorAll('.prod-row').forEach(row=>{
+    row.querySelector('[data-a="dec"]').addEventListener('click',()=>{const n=row.querySelector('.qty-num');const v=parseInt(n.textContent)-1;if(v<1)row.remove();else n.textContent=v;});
+    row.querySelector('[data-a="inc"]').addEventListener('click',()=>{const n=row.querySelector('.qty-num');n.textContent=parseInt(n.textContent)+1;});
+    row.querySelector('.prod-row-del').addEventListener('click',()=>row.remove());
+  });
+  // Agregar producto nuevo
+  g('ep-add-prod').addEventListener('click',()=>{
+    const nombre=prompt('Nombre del producto:'); if(!nombre) return;
+    const box=g('ep-prods');
+    const div=document.createElement('div'); div.className='prod-row';
+    div.innerHTML=`<span class="prod-row-name">${nombre}</span><div class="prod-row-qty"><button class="qty-btn rpl" data-a="dec">−</button><span class="qty-num">1</span><button class="qty-btn rpl" data-a="inc">+</button></div><button class="prod-row-del rpl"><span class="material-icons-round" style="font-size:18px">close</span></button>`;
+    div.querySelector('[data-a="dec"]').addEventListener('click',()=>{const n=div.querySelector('.qty-num');const v=parseInt(n.textContent)-1;if(v<1)div.remove();else n.textContent=v;});
+    div.querySelector('[data-a="inc"]').addEventListener('click',()=>{const n=div.querySelector('.qty-num');n.textContent=parseInt(n.textContent)+1;});
+    div.querySelector('.prod-row-del').addEventListener('click',()=>div.remove());
+    box.appendChild(div);
+  });
+  // Guardar
+  g('ep-save').addEventListener('click', async ()=>{
+    const cli=g('ep-cli')?.value.trim(); if(!cli){toast('Ingresá el cliente');return;}
+    const items=[];
+    g('ep-prods').querySelectorAll('.prod-row').forEach(row=>{
+      const n=row.querySelector('.prod-row-name')?.textContent||'';
+      const q=parseInt(row.querySelector('.qty-num')?.textContent||'1');
+      if(n)items.push({p:n,q});
+    });
+    const upd={cli,fecha:g('ep-fecha')?.value||p.fecha,hora:g('ep-hora')?.value||'',items,notas:g('ep-notas')?.value.trim()||''};
+    saving();
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/pedidos/${id}`),upd);
+      Object.assign(p,upd);
+      S.ottoCache=[];
+      closeEdit(); toast('✅ Pedido actualizado');
+      renderPeds(); renderPedWeek(); renderProduceDia();
+    }catch(e){console.error(e);toast('Error al guardar');}
+  });
+}
+window.editPed=editPed;
 
 async function saveEv(){
   const tit=g('s-age-tit')?.value.trim();
@@ -1420,12 +1566,35 @@ function renderMovsFin(){
   const grupos={};
   movs.forEach(m=>{const k=m.fecha||'Sin fecha';if(!grupos[k])grupos[k]=[];grupos[k].push(m);});
   list.innerHTML=Object.entries(grupos).map(([f,ms])=>
-    `<div class="mov-group-hdr">${fmtM(f)}</div>${ms.map(m=>`<div class="card"><div class="card-row">
-      <div class="card-icon" style="background:${m.tipo==='ingreso'?'var(--green-bg)':'var(--red-bg)'}"><span class="material-icons-round" style="color:${m.tipo==='ingreso'?'var(--bosque)':'var(--red)'}">${m.tipo==='ingreso'?'trending_up':'trending_down'}</span></div>
-      <div class="card-info"><div class="card-title">${m.cat||'Sin cat.'}</div><div class="card-sub">${m.desc||''}</div></div>
-      <div class="card-right"><div class="card-amt ${m.tipo==='ingreso'?'pos':'neg'}">${m.tipo==='ingreso'?'+':'-'}${fmtARS(m.monto)}</div><div class="card-date">${fmt(m.fecha)}</div></div>
-    </div></div>`).join('')}`
+    `<div class="mov-group-hdr">${fmtM(f)}</div>${ms.map(m=>`
+    <div class="card">
+      <div class="card-row">
+        <div class="card-icon" style="background:${m.tipo==='ingreso'?'var(--green-bg)':'var(--red-bg)'}">
+          <span class="material-icons-round" style="color:${m.tipo==='ingreso'?'var(--bosque)':'var(--red)'}">${m.tipo==='ingreso'?'trending_up':'trending_down'}</span>
+        </div>
+        <div class="card-info">
+          <div class="card-title">${m.cat||'Sin cat.'}</div>
+          <div class="card-sub">${m.desc||''}</div>
+        </div>
+        <div class="card-right">
+          <div class="card-amt ${m.tipo==='ingreso'?'pos':'neg'}">${m.tipo==='ingreso'?'+':'-'}${fmtARS(m.monto)}</div>
+          <div class="card-date">${fmt(m.fecha)}</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="card-action edit rpl" data-id="${m._id}" data-a="edit"><span class="material-icons-round">edit</span>Editar</button>
+        <button class="card-action del rpl" data-id="${m._id}" data-a="del"><span class="material-icons-round">delete_outline</span>Eliminar</button>
+      </div>
+    </div>`).join('')}`
   ).join('');
+  // Listeners acciones
+  list.querySelectorAll('[data-a]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=btn.dataset.id;
+      if(btn.dataset.a==='edit') editMov(id);
+      else if(btn.dataset.a==='del'&&confirm('¿Eliminar este movimiento?')) delMov(id);
+    });
+  });
 }
 window.renderMovsFin=renderMovsFin;
 
@@ -1514,6 +1683,7 @@ function renderPeds(){
       </div>
       <div class="ticket-prods">${(p.items||[]).map(i=>`${i.q}× ${i.p}`).join(' · ')||'Sin productos'}</div>
       <div class="ticket-footer">
+        <button class="ticket-btn rpl" data-id="${p._id}" data-a="edit" style="color:var(--bosque);">✏️ Editar</button>
         <button class="ticket-btn done rpl" data-id="${p._id}" data-a="arch">✓ Entregado</button>
         <button class="ticket-btn rpl" data-id="${p._id}" data-a="del" style="color:var(--red)">🗑️</button>
       </div>
@@ -1521,12 +1691,49 @@ function renderPeds(){
   }).join('');
   list.querySelectorAll('[data-a]').forEach(btn=>{
     btn.addEventListener('click',()=>{
-      if(btn.dataset.a==='arch')archivarPed(btn.dataset.id);
-      else if(btn.dataset.a==='del'&&confirm('¿Eliminar pedido?'))delPed(btn.dataset.id);
+      const id=btn.dataset.id;
+      if(btn.dataset.a==='edit') editPed(id);
+      else if(btn.dataset.a==='arch') archivarPed(id);
+      else if(btn.dataset.a==='del'&&confirm('¿Eliminar pedido?')) delPed(id);
+    });
+  });
+  renderHistorialPeds();
+}
+window.renderPeds=renderPeds;
+
+function renderHistorialPeds(){
+  const body=g('ped-hist-body'); if(!body) return;
+  const archivados=S.pedidos.filter(p=>p.archivado)
+    .sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''))
+    .slice(0,30);
+  if(!archivados.length){
+    body.innerHTML='<div style="padding:8px 4px;font-size:13px;color:var(--t4);">Sin pedidos entregados aún.</div>';
+    return;
+  }
+  body.innerHTML=archivados.map(p=>`
+    <div class="ticket archivado" style="margin-bottom:6px;">
+      <div class="ticket-top">
+        <div>
+          <div class="ticket-cli">${p.cli||'Sin cliente'}</div>
+          <div style="font-size:12px;color:var(--t4);margin-top:2px;">${p.fecha?fmt(p.fecha):''}${p.hora?' · '+p.hora:''}</div>
+        </div>
+        <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:var(--rfull);background:var(--surface2);color:var(--t4);">Entregado</span>
+      </div>
+      <div class="ticket-prods">${(p.items||[]).map(i=>`${i.q}× ${i.p}`).join(' · ')||'Sin productos'}</div>
+      <div class="ticket-footer">
+        <button class="ticket-btn rpl" data-id="${p._id}" data-a="reabrir">↩ Reabrir</button>
+        <button class="ticket-btn rpl" data-id="${p._id}" data-a="del" style="color:var(--red)">🗑️</button>
+      </div>
+    </div>`).join('');
+  body.querySelectorAll('[data-a]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=btn.dataset.id;
+      if(btn.dataset.a==='reabrir') reabrirPed(id);
+      else if(btn.dataset.a==='del'&&confirm('¿Eliminar?')) delPed(id);
     });
   });
 }
-window.renderPeds=renderPeds;
+window.renderHistorialPeds=renderHistorialPeds;
 
 // Producción del día seleccionado (modo normal)
 // o de toda la semana (modo semana)
@@ -1943,6 +2150,15 @@ g('nota-inp')?.addEventListener('input',()=>{
   notaTimer=setTimeout(async()=>{if(!S.uid)return;try{await setDoc(doc(db,`usuarios/${S.uid}/notas/nota`),{texto:S.nota});}catch(e){}},1500);
 });
 document.querySelectorAll('.fin-tab').forEach(tab=>{tab.addEventListener('click',()=>{document.querySelectorAll('.fin-tab').forEach(t=>t.classList.remove('sel'));tab.classList.add('sel');S.finFiltro=tab.dataset.filter;renderMovsFin();});});
+// Historial toggle
+g('ped-hist-btn')?.addEventListener('click',()=>{
+  const body=g('ped-hist-body');
+  const arrow=g('ped-hist-arrow');
+  if(!body)return;
+  const open=body.classList.toggle('on');
+  if(arrow)arrow.textContent=open?'expand_less':'expand_more';
+  if(open) renderHistorialPeds();
+});
 g('ob-start-btn')?.addEventListener('click',()=>showOb('ob1'));
 g('ob-skip-btn')?.addEventListener('click',()=>g('onboarding').classList.remove('on'));
 g('obNegocio')?.addEventListener('input',()=>{const btn=g('ob1-btn');if(btn)btn.disabled=!g('obNegocio').value.trim();});
