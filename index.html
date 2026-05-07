@@ -96,10 +96,19 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);-webkit-font-s
 #app.on{display:flex;}
 
 /* Header */
-header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;background:var(--surface);border-bottom:1px solid var(--border2);flex-shrink:0;position:sticky;top:0;z-index:50;}
-.hd-logo{background:transparent;border:none;cursor:pointer;padding:6px 8px;border-radius:var(--r10);color:var(--bosque);display:flex;align-items:center;}
+header{display:flex;align-items:center;height:68px;padding:0 10px;background:var(--surface);border-bottom:1px solid var(--border2);flex-shrink:0;position:sticky;top:0;z-index:50;}
+.hd-logo{background:transparent;border:none;cursor:pointer;padding:6px 8px;border-radius:var(--r10);color:var(--bosque);display:flex;align-items:center;flex-shrink:0;}
 .hd-logo svg{width:68px;height:20px;}
-.hd-negocio{flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 8px;}
+.hd-negocio{
+  flex:1;text-align:center;
+  font-family:'DM Serif Display',serif;
+  font-size:22px;font-weight:400;font-style:italic;
+  color:var(--bosque);
+  letter-spacing:-.3px;
+  line-height:1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding:0 6px;
+}
 .hd-menu-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r10);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);}
 
 /* Panels */
