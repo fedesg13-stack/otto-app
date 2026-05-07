@@ -1023,53 +1023,80 @@ window.closePicker=closePicker;
 function renderFinCatChips(){}  // legacy — se usa el picker
 window.renderFinCatChips=renderFinCatChips;
 
-function getFinCats(){
-  const todas=[];
-  const add=(v)=>{ if(v&&!todas.includes(v)) todas.push(v); };
+// Estructura de dos niveles para el picker de categorías
+function getFinSecciones(){
+  const secciones = [];
 
-  // 1. Categorías de productos de Mi Negocio (primera prioridad)
-  (S.miNegocio.productos||[]).forEach(p=>{ add(p.categoria); });
+  // Secciones de Mi Negocio que tengan ítems
+  const MAP = [
+    { key:'productos',  label:'Productos',   icon:'🛍️', sub: p => p.nombre },
+    { key:'servicios',  label:'Servicios',    icon:'⚡', sub: s => s.nombre },
+    { key:'proveedores',label:'Proveedores',  icon:'🏭', sub: p => p.nombre },
+    { key:'equipo',     label:'Equipo',       icon:'👥', sub: e => e.nombre },
+    { key:'impositiva', label:'Impositiva',   icon:'📊', sub: i => i.nombre },
+    { key:'clientes',   label:'Clientes',     icon:'👤', sub: c => c.nombre },
+  ];
+  MAP.forEach(({key,label,icon,sub})=>{
+    const items=(S.miNegocio[key]||[]).map(sub).filter(Boolean);
+    if(items.length) secciones.push({id:key, name:`${icon} ${label}`, items});
+  });
 
-  // 2. Nombres de productos como atajos de ingreso rápido
-  (S.miNegocio.productos||[]).forEach(p=>{ add(p.nombre); });
+  // Historial: categorías que ya se usaron
+  const hist=[...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))];
+  if(hist.length) secciones.push({id:'historial', name:'🕐 Usadas antes', items:hist});
 
-  // 3. Nombres de servicios
-  (S.miNegocio.servicios||[]).forEach(s=>{ add(s.nombre); });
+  // Siempre agregar categorías genéricas
+  secciones.push({
+    id:'general', name:'📋 Generales',
+    items:['Ventas','Materiales','Sueldos','Alquiler','Marketing','Equipamiento','Transporte','Impuestos','Otros']
+  });
 
-  // 4. Proveedores como categoría de gasto
-  (S.miNegocio.proveedores||[]).forEach(p=>{ add(p.nombre); });
-
-  // 5. Categorías que ya se usaron en movimientos anteriores (historial)
-  (S.movs||[]).forEach(m=>{ add(m.cat); });
-
-  // 6. Base siempre al final como fallback
-  ['Ventas','Materiales','Sueldos','Servicios','Alquiler','Marketing','Equipamiento','Transporte','Impuestos','Otros']
-    .forEach(add);
-
-  return todas;
+  return secciones;
 }
 
 function openFinCatPicker(){
-  const cats = getFinCats();
-  const sel = g('s-fin-cat')?.value||'';
+  const secciones = getFinSecciones();
+  // Nivel 1: mostrar secciones
   openPicker({
-    title: 'Categoría',
-    items: cats.map(c=>({id:c, name:c})),
-    selected: sel,
-    onSelect: (id, name) => {
-      g('s-fin-cat').value = name;
-      const lbl = g('fin-cat-trigger-lbl');
-      if(lbl){ lbl.textContent=name; lbl.style.color='var(--t1)'; }
-      g('fin-cat-trigger').classList.add('filled');
+    title: 'Categoría — sección',
+    items: secciones.map(s=>({id:s.id, name:s.name, sub:`${s.items.length} ítems`})),
+    selected: '',
+    onSelect: (id) => {
+      const sec = secciones.find(s=>s.id===id);
+      if(!sec) return;
+      // Nivel 2: mostrar ítems de esa sección
+      setTimeout(()=>{
+        openPicker({
+          title: sec.name,
+          items: sec.items.map(i=>({id:i, name:i})),
+          selected: g('s-fin-cat')?.value||'',
+          onSelect: (itemId, itemName) => {
+            g('s-fin-cat').value = itemName;
+            const lbl = g('fin-cat-trigger-lbl');
+            if(lbl){ lbl.textContent=itemName; lbl.style.color='var(--t1)'; }
+            g('fin-cat-trigger')?.classList.add('filled');
+          },
+          onAdd: {
+            label: 'Usar este texto como categoría',
+            fn: (val) => {
+              const nombre = val; if(!nombre) return;
+              g('s-fin-cat').value = nombre;
+              const lbl = g('fin-cat-trigger-lbl');
+              if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
+              g('fin-cat-trigger')?.classList.add('filled');
+            }
+          }
+        });
+      }, 60);
     },
     onAdd: {
-      label: 'Agregar categoría nueva',
-      fn: async (val) => {
-        const nombre = val || prompt('Nombre de la categoría:');
-        if(!nombre) return;
+      label: 'Escribir categoría manualmente',
+      fn: (val) => {
+        const nombre = val; if(!nombre) return;
         g('s-fin-cat').value = nombre;
         const lbl = g('fin-cat-trigger-lbl');
         if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
+        g('fin-cat-trigger')?.classList.add('filled');
       }
     }
   });
