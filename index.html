@@ -16,73 +16,77 @@
    Font: Inter + DM Serif Display
    ═══════════════════════════════════════════════════ */
 :root{
-  /* Paleta oficial del brand book */
-  --bosque:   #234136;
-  --bosque2:  #1a3029;
-  --salvia:   #5E7A68;
-  --salvia2:  #4a6354;
-  --arena:    #E7DCC6;
-  --arena2:   #d9cdb6;
-  --niebla:   #F2F4F1;
-  --carbon:   #1A1F1C;
-  --carbon2:  #2d342f;
+  /* ═══ PALETA OFICIAL — Brand Book OTTO ═══ */
+  --bosque:  #234136;
+  --salvia:  #5E7A68;
+  --arena:   #E7DCC6;
+  --niebla:  #F2F4F1;
+  --carbon:  #1A1F1C;
 
-  /* Superficies */
-  --bg:       #F2F4F1;
-  --surface:  #ffffff;
-  --surface2: #f8f9f7;
-  --surface3: #eef0ec;
-  --border:   rgba(35,65,54,.1);
-  --border2:  rgba(35,65,54,.06);
+  /* ═══ SUPERFICIES ═══ */
+  /* Fondo: Gris Niebla. Cards: blanco cálido. Inputs: ligeramente más oscuros */
+  --bg:       #F2F4F1;   /* Gris Niebla — fondo */
+  --surface:  #FAFAF8;   /* cards — blanco muy ligeramente cálido */
+  --surface2: #F0EDE8;   /* inputs, chips — tono Arena muy diluido */
+  --surface3: #E8E4DE;   /* hover, activo — Arena medio */
 
-  /* Textos */
-  --t1:  #1A1F1C;
-  --t2:  #2d342f;
-  --t3:  #5e7a68;
-  --t4:  #8fa898;
-  --t5:  #b8c9be;
+  /* ═══ TEXTO ═══ */
+  --t1: #1A1F1C;
+  --t2: #2D3530;
+  --t3: #5E7A68;
+  --t4: #8FA898;
+  --t5: #B8C9BE;
 
-  /* Semánticos — apagados, elegantes */
-  --green:    #234136;
-  --green-bg: #e8efe9;
-  --green-t:  rgba(35,65,54,.1);
-  --red:      #9b3a2c;
-  --red-bg:   #fdf0ee;
-  --red-t:    rgba(155,58,44,.1);
-  --amber:    #7a5c1e;
-  --amber-bg: #fdf7ea;
-  --amber-t:  rgba(122,92,30,.1);
-  --blue:     #234136;   /* En este brand el "acento" es verde bosque */
-  --blue-t:   rgba(35,65,54,.1);
-  --blue-t2:  rgba(35,65,54,.06);
-  --teal:     #2a5c4e;
-  --teal-t:   rgba(42,92,78,.1);
-  --purple:   #4a3d6b;
-  --purple-t: rgba(74,61,107,.1);
+  /* ═══ BORDES ═══ */
+  --border:  rgba(35,65,54,.12);
+  --border2: rgba(35,65,54,.07);
 
-  /* Sombras muy sutiles — brand book dice "sombras muy sutiles" */
+  /* ═══ SOMBRAS ═══ */
   --s1: 0 1px 3px rgba(26,31,28,.06), 0 1px 2px rgba(26,31,28,.04);
-  --s2: 0 4px 12px rgba(26,31,28,.08), 0 1px 4px rgba(26,31,28,.04);
-  --s3: 0 8px 24px rgba(26,31,28,.1),  0 2px 8px rgba(26,31,28,.05);
-  --s4: 0 16px 40px rgba(26,31,28,.12), 0 4px 12px rgba(26,31,28,.06);
+  --s2: 0 3px 10px rgba(26,31,28,.08);
+  --s3: 0 6px 20px rgba(26,31,28,.10);
+  --s4: 0 12px 40px rgba(26,31,28,.12);
 
-  /* Radios — bordes suaves */
-  --r6:   6px;  --r10: 10px; --r14: 14px;
-  --r18:  18px; --r24: 24px; --rfull: 999px;
+  /* ═══ SEMÁNTICOS ═══ */
+  --green:    #234136;
+  --green-bg: #EAF0EC;
+  --green-t:  rgba(35,65,54,.10);
 
-  /* Tipografía */
-  --font:        'Inter', sans-serif;
-  --font-serif:  'DM Serif Display', serif;
+  --red:      #8B2E1E;
+  --red-bg:   #F7EAE8;
+  --red-t:    rgba(139,46,30,.10);
 
-  /* Alias para compatibilidad con código existente */
+  --amber:    #7A5C1E;
+  --amber-bg: #F5EED8;
+  --amber-t:  rgba(122,92,30,.10);
+
+  --teal:     #1E6352;
+  --teal-t:   rgba(30,99,82,.10);
+
+  --purple:   #4A3D6B;
+  --purple-t: rgba(74,61,107,.10);
+
+  --blue:    #234136;
+  --blue-t:  rgba(35,65,54,.10);
+  --blue-t2: rgba(35,65,54,.06);
+
+  /* ═══ ALIAS ═══ */
   --bg2:    var(--surface);
   --bg3:    var(--surface2);
   --bg4:    var(--surface3);
   --line:   var(--border);
   --line2:  var(--border2);
-  --accent: var(--bosque);
-  --accent-bg: var(--green-bg);
-  --accent-t:  var(--green-t);
+  --bosque2: #1A3029;
+  --carbon2: #2D3530;
+  --salvia2: #4A6354;
+  --arena2:  #D9CDB6;
+
+  /* ═══ RADIOS ═══ */
+  --r6:6px; --r10:10px; --r12:12px; --r14:14px; --r18:18px; --r24:24px; --rfull:999px;
+
+  /* ═══ TIPOGRAFÍA ═══ */
+  --font:       'Inter', sans-serif;
+  --font-serif: 'DM Serif Display', serif;
 }
 
 *, *::before, *::after {
@@ -295,36 +299,37 @@ header {
 .bb-icon { display:none !important; }
 
 /* ── FAB MENU ── */
-.fab-overlay {
-  display:none; position:fixed; inset:0; z-index:200;
-  background:rgba(26,31,28,.45);
-  backdrop-filter:blur(3px);
+/* FAB sheet selector */
+.fab-sel-overlay {
+  display:none; position:fixed; inset:0; z-index:380;
+  background:rgba(26,31,28,.5);
+  backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px);
 }
-.fab-overlay.open { display:block; }
-.fab-menu {
-  position:fixed; bottom:calc(80px + env(safe-area-inset-bottom, 0px)); left:16px; right:16px;
-  display:none; z-index:201;
-  flex-direction:column; gap:8px;
-  pointer-events:none;
+.fab-sel-overlay.open { display:block; }
+.fab-sel-sheet {
+  display:none; position:fixed; bottom:0; left:0; right:0;
+  background:var(--surface); border-radius:20px 20px 0 0;
+  z-index:381; padding:0 16px calc(16px + env(safe-area-inset-bottom));
+  box-shadow:0 -4px 32px rgba(26,31,28,.15);
 }
-.fab-menu.open { display:flex; pointer-events:auto; }
-.fab-menu-item {
-  display:flex; align-items:center; gap:14px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:var(--r14); padding:13px 18px;
+.fab-sel-sheet.open { display:block; animation:slideUp .25s cubic-bezier(.32,0,.2,1) forwards; }
+.fab-sel-handle { display:flex; justify-content:center; padding:12px 0 4px; }
+.fab-sel-bar { width:32px; height:3px; border-radius:2px; background:var(--border); }
+.fab-sel-title { font-size:13px; font-weight:600; color:var(--t3); text-align:center; padding:4px 0 16px; letter-spacing:.3px; }
+.fab-sel-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; padding-bottom:8px; }
+.fab-sel-btn {
+  display:flex; flex-direction:column; align-items:center; gap:10px;
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:var(--r18); padding:20px 16px;
   cursor:pointer; font-family:var(--font);
-  opacity:1; transform:translateY(0);
-  transition:opacity .18s, transform .18s;
-  box-shadow:var(--s2);
+  transition:all .15s; -webkit-tap-highlight-color:transparent;
+  text-align:center;
 }
-.fab-menu-item:active { transform:scale(.98); background:var(--surface2); }
-.fab-menu-icon { width:40px; height:40px; border-radius:var(--r10); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
-.fab-menu-icon .material-icons-round { font-size:20px; }
-.fab-menu-text { flex:1; }
-.fab-menu-name { font-size:14px; font-weight:600; color:var(--t1); }
-.fab-menu-sub  { font-size:11px; color:var(--t3); margin-top:1px; }
-.fab-menu-arrow { color:var(--t5); }
+.fab-sel-btn:active { background:var(--surface3); transform:scale(.97); }
+.fab-sel-icon { width:48px; height:48px; border-radius:var(--r14); display:flex; align-items:center; justify-content:center; }
+.fab-sel-icon .material-icons-round { font-size:24px; }
+.fab-sel-name { font-size:14px; font-weight:600; color:var(--t1); }
+.fab-sel-sub { font-size:11px; color:var(--t4); margin-top:2px; }
 
 /* ── FORM SHEETS ── */
 .form-sheet-overlay {
@@ -3267,40 +3272,35 @@ function renderProd() {
 window.renderProd = renderProd;
 
 
-// ── FAB MENÚ ──
-let fabOpen = false;
-window.toggleFab = function toggleFab() {
-  fabOpen = !fabOpen;
-  const btn = document.getElementById('fabBtn');
-  const menu = document.getElementById('fabMenu');
-  const overlay = document.getElementById('fabOverlay');
-  if(btn) btn.classList.toggle('open', fabOpen);
-  if(overlay) overlay.classList.toggle('open', fabOpen);
-  if(menu) {
-    menu.classList.toggle('open', fabOpen);
-    if(fabOpen) {
-      // Animar items al abrir
-      const items = menu.querySelectorAll('.fab-menu-item');
-      items.forEach((item, i) => {
-        item.style.opacity = '0';
-        item.style.transform = 'translateY(10px)';
-        setTimeout(() => {
-          item.style.opacity = '1';
-          item.style.transform = 'translateY(0)';
-        }, 40 + i * 50);
-      });
-    }
-  }
+// ── FAB SELECTOR ──
+window.toggleFab = function() {
+  const sheet   = document.getElementById('fabSelSheet');
+  const overlay = document.getElementById('fabSelOverlay');
+  const btn     = document.getElementById('fabBtn');
+  if (!sheet) return;
+  const opening = !sheet.classList.contains('open');
+  sheet.classList.toggle('open', opening);
+  if(overlay) overlay.classList.toggle('open', opening);
+  if(btn) btn.classList.toggle('open', opening);
 };
-window.closeFab = function closeFab() {
-  fabOpen = false;
-  const btn = document.getElementById('fabBtn');
-  const menu = document.getElementById('fabMenu');
-  const overlay = document.getElementById('fabOverlay');
-  if(btn) btn.classList.remove('open');
-  if(menu) menu.classList.remove('open');
-  if(overlay) overlay.classList.remove('open');
+
+window.closeFab = function() {
+  document.getElementById('fabSelSheet')  ?.classList.remove('open');
+  document.getElementById('fabSelOverlay')?.classList.remove('open');
+  document.getElementById('fabBtn')       ?.classList.remove('open');
 };
+
+// Conectar botones — el módulo corre con DOM ya listo
+const _fabOv = document.getElementById('fabSelOverlay');
+const _fabFin  = document.getElementById('fabBtnFin');
+const _fabPed  = document.getElementById('fabBtnPed');
+const _fabAge  = document.getElementById('fabBtnAge');
+const _fabTask = document.getElementById('fabBtnTask');
+if(_fabOv)   _fabOv.addEventListener('click',   window.closeFab);
+if(_fabFin)  _fabFin.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('fin'),  80); });
+if(_fabPed)  _fabPed.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('ped'),  80); });
+if(_fabAge)  _fabAge.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('age'),  80); });
+if(_fabTask) _fabTask.addEventListener('click', function(){ window.closeFab(); setTimeout(()=>openSheet('task'), 80); });
 
 
 // ── FILTRO TIPO FINANZAS ──
@@ -3471,48 +3471,32 @@ document.addEventListener('click', function(e) {
 
 </script>
 
-<!-- FAB OVERLAY + MENU — fuera del #app para z-index correcto -->
-<div class="fab-overlay" id="fabOverlay" onclick="closeFab()"></div>
-<div class="fab-menu" id="fabMenu">
-  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('fin')">
-    <div class="fab-menu-icon" style="background:var(--green-bg)">
-      <span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span>
-    </div>
-    <div class="fab-menu-text">
-      <div class="fab-menu-name">Nueva finanza</div>
-      <div class="fab-menu-sub">Ingreso o gasto</div>
-    </div>
-    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
-  </div>
-  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('ped')">
-    <div class="fab-menu-icon" style="background:var(--teal-t)">
-      <span class="material-icons-round" style="color:var(--teal)">receipt_long</span>
-    </div>
-    <div class="fab-menu-text">
-      <div class="fab-menu-name">Nuevo pedido</div>
-      <div class="fab-menu-sub">Cliente y productos</div>
-    </div>
-    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
-  </div>
-  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('age')">
-    <div class="fab-menu-icon" style="background:var(--amber-t)">
-      <span class="material-icons-round" style="color:var(--amber)">calendar_month</span>
-    </div>
-    <div class="fab-menu-text">
-      <div class="fab-menu-name">Nuevo evento</div>
-      <div class="fab-menu-sub">Agenda y citas</div>
-    </div>
-    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
-  </div>
-  <div class="fab-menu-item rpl" onclick="closeFab();openSheet('task')">
-    <div class="fab-menu-icon" style="background:var(--purple-t)">
-      <span class="material-icons-round" style="color:var(--purple)">check_circle</span>
-    </div>
-    <div class="fab-menu-text">
-      <div class="fab-menu-name">Nueva tarea</div>
-      <div class="fab-menu-sub">Pendientes y recordatorios</div>
-    </div>
-    <span class="material-icons-round fab-menu-arrow" style="font-size:18px">chevron_right</span>
+<!-- FAB SELECTOR SHEET -->
+<div class="fab-sel-overlay" id="fabSelOverlay"></div>
+<div class="fab-sel-sheet" id="fabSelSheet">
+  <div class="fab-sel-handle"><div class="fab-sel-bar"></div></div>
+  <div class="fab-sel-title">¿Qué querés agregar?</div>
+  <div class="fab-sel-grid">
+    <button class="fab-sel-btn" id="fabBtnFin">
+      <div class="fab-sel-icon" style="background:var(--green-bg)"><span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span></div>
+      <div class="fab-sel-name">Finanza</div>
+      <div class="fab-sel-sub">Ingreso o gasto</div>
+    </button>
+    <button class="fab-sel-btn" id="fabBtnPed">
+      <div class="fab-sel-icon" style="background:var(--teal-t)"><span class="material-icons-round" style="color:var(--teal)">receipt_long</span></div>
+      <div class="fab-sel-name">Pedido</div>
+      <div class="fab-sel-sub">Cliente y entrega</div>
+    </button>
+    <button class="fab-sel-btn" id="fabBtnAge">
+      <div class="fab-sel-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">calendar_month</span></div>
+      <div class="fab-sel-name">Evento</div>
+      <div class="fab-sel-sub">Agenda y citas</div>
+    </button>
+    <button class="fab-sel-btn" id="fabBtnTask">
+      <div class="fab-sel-icon" style="background:var(--purple-t)"><span class="material-icons-round" style="color:var(--purple)">check_circle</span></div>
+      <div class="fab-sel-name">Tarea</div>
+      <div class="fab-sel-sub">Recordatorio</div>
+    </button>
   </div>
 </div>
 
