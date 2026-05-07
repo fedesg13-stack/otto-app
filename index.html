@@ -2737,24 +2737,28 @@ window.goTab=goTab;window.setTipo=setTipo;window.calNav=calNav;
 
 /* ── BOTTOM SHEETS DE FORMULARIOS ── */
 function openSheet(tipo){
-  // Cerrar FAB
   if(window.closeFab) window.closeFab();
-  document.querySelectorAll('.form-sheet').forEach(s=>{s.classList.remove('open');s.style.display='none';});
+  // Cerrar todos — SOLO con clases, nunca style.display
+  document.querySelectorAll('.form-sheet').forEach(s=>{
+    s.classList.remove('open');
+    s.removeAttribute('style');
+  });
   const hoy=new Date().toISOString().split('T')[0];
   if(tipo==='fin'){const mf=document.getElementById('mFecha');if(mf)mf.value=hoy;}
   if(tipo==='ped'){const pf=document.getElementById('pFecha');if(pf)pf.value=hoy;renderCatSelectorSheet();}
   if(tipo==='age'){const ef=document.getElementById('evFecha');if(ef)ef.value=hoy;renderClienteSelectorSheet();}
   if(tipo==='task'){const tf=document.getElementById('taskFecha');if(tf)tf.value=hoy;}
-  const ov=document.getElementById('formSheetOverlay');if(ov)ov.classList.add('visible');
+  const ov=document.getElementById('formSheetOverlay');
+  if(ov)ov.classList.add('visible');
   const sh=document.getElementById('sheet-'+tipo);
-  if(sh){sh.style.display='block';sh.classList.add('open');}
+  if(sh) sh.classList.add('open');
 }
 function closeSheet(){
   const ov=document.getElementById('formSheetOverlay');
   if(ov)ov.classList.remove('visible');
   document.querySelectorAll('.form-sheet').forEach(s=>{
     s.classList.remove('open');
-    s.style.display='none';
+    s.removeAttribute('style');
   });
 }
 window.openSheet=openSheet;window.closeSheet=closeSheet;
