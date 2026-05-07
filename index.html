@@ -1024,16 +1024,28 @@ function renderFinCatChips(){}  // legacy — se usa el picker
 window.renderFinCatChips=renderFinCatChips;
 
 function getFinCats(){
-  // Base siempre disponible
-  const base=['Ventas','Materiales','Sueldos','Servicios','Alquiler','Marketing','Equipamiento','Transporte','Impuestos','Otros'];
-  // Categorías únicas de los productos de Mi Negocio
-  const deMiNegocio=[...new Set((S.miNegocio.productos||[]).map(p=>p.categoria).filter(Boolean))];
-  // Nombres de productos como categorías de venta rápida
-  const nombresProds=(S.miNegocio.productos||[]).map(p=>p.nombre).filter(Boolean).slice(0,8);
-  // Unir todo sin duplicados, con las de Mi Negocio primero si existen
-  const todas=deMiNegocio.length
-    ? [...deMiNegocio, ...base.filter(b=>!deMiNegocio.includes(b))]
-    : base;
+  const todas=[];
+  const add=(v)=>{ if(v&&!todas.includes(v)) todas.push(v); };
+
+  // 1. Categorías de productos de Mi Negocio (primera prioridad)
+  (S.miNegocio.productos||[]).forEach(p=>{ add(p.categoria); });
+
+  // 2. Nombres de productos como atajos de ingreso rápido
+  (S.miNegocio.productos||[]).forEach(p=>{ add(p.nombre); });
+
+  // 3. Nombres de servicios
+  (S.miNegocio.servicios||[]).forEach(s=>{ add(s.nombre); });
+
+  // 4. Proveedores como categoría de gasto
+  (S.miNegocio.proveedores||[]).forEach(p=>{ add(p.nombre); });
+
+  // 5. Categorías que ya se usaron en movimientos anteriores (historial)
+  (S.movs||[]).forEach(m=>{ add(m.cat); });
+
+  // 6. Base siempre al final como fallback
+  ['Ventas','Materiales','Sueldos','Servicios','Alquiler','Marketing','Equipamiento','Transporte','Impuestos','Otros']
+    .forEach(add);
+
   return todas;
 }
 
@@ -1493,41 +1505,71 @@ window.renderPeds=renderPeds;
 // o de toda la semana (modo semana)
 function renderProduceDia(){
   const wrap=g('ped-produce');if(!wrap)return;
-  if(!S.pedModoSemana){
-    wrap.style.display='none';
-    wrap.innerHTML='';
-    return;
+
+  // ── Producción del día seleccionado (siempre visible si hay pedidos) ──
+  const activosDia=S.pedFecha
+    ? S.pedidos.filter(p=>!p.archivado&&p.fecha===S.pedFecha)
+    : [];
+  const totsDia={};
+  activosDia.forEach(p=>(p.items||[]).forEach(i=>{totsDia[i.p]=(totsDia[i.p]||0)+i.q;}));
+
+  // ── Producción semanal (solo si está activado el modo semana) ──
+  let htmlSemana='';
+  if(S.pedModoSemana){
+    const today=new Date();today.setHours(0,0,0,0);
+    const mon=new Date(today);mon.setDate(today.getDate()-(today.getDay()||7)+1);
+    const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+    const activosSem=S.pedidos.filter(p=>{
+      if(p.archivado||!p.fecha)return false;
+      const fd=new Date(p.fecha+'T00:00:00');
+      return fd>=mon&&fd<=sun;
+    });
+    if(activosSem.length){
+      const totsSem={};
+      activosSem.forEach(p=>(p.items||[]).forEach(i=>{totsSem[i.p]=(totsSem[i.p]||0)+i.q;}));
+      htmlSemana=`<div class="card" style="margin:0 0 8px;">
+        <div style="padding:12px 16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción · Semana</div>
+            <div style="font-size:11px;color:var(--t3);">${activosSem.length} pedido${activosSem.length>1?'s':''}</div>
+          </div>
+          ${Object.entries(totsSem).map(([n,q])=>`
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
+              <span style="font-size:13px;color:var(--t1);">${n}</span>
+              <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
+            </div>`).join('')}
+        </div>
+      </div>`;
+    }
   }
-  // Modo semana: producción de toda la semana
-  const today=new Date();today.setHours(0,0,0,0);
-  const mon=new Date(today);mon.setDate(today.getDate()-(today.getDay()||7)+1);
-  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
-  const activos=S.pedidos.filter(p=>{
-    if(p.archivado||!p.fecha)return false;
-    const fd=new Date(p.fecha+'T00:00:00');
-    return fd>=mon&&fd<=sun;
-  });
-  if(!activos.length){wrap.style.display='none';wrap.innerHTML='';return;}
-  const tots={};
-  activos.forEach(p=>(p.items||[]).forEach(i=>{tots[i.p]=(tots[i.p]||0)+i.q;}));
-  wrap.style.display='block';
-  wrap.innerHTML=`<div class="card" style="margin:0 0 8px;">
-    <div style="padding:12px 16px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción semanal</div>
-        <div style="font-size:11px;color:var(--t3);">${activos.length} pedido${activos.length>1?'s':''}</div>
+
+  // Etiqueta dinámica del día
+  const fd=S.pedFecha?new Date(S.pedFecha+'T00:00:00'):null;
+  const diff=fd?Math.ceil((fd-new Date(hoy()+'T00:00:00'))/86400000):null;
+  const cuando=diff===0?'Hoy':diff===1?'Mañana':fd?fd.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'short'}):'';
+
+  let htmlDia='';
+  if(Object.keys(totsDia).length){
+    htmlDia=`<div class="card" style="margin:0 0 8px;">
+      <div style="padding:12px 16px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción · ${cuando}</div>
+          <div style="font-size:11px;color:var(--t3);">${activosDia.length} pedido${activosDia.length>1?'s':''}</div>
+        </div>
+        ${Object.entries(totsDia).map(([n,q])=>`
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
+            <span style="font-size:13px;color:var(--t1);">${n}</span>
+            <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
+          </div>`).join('')}
       </div>
-      ${Object.entries(tots).map(([n,q])=>`
-        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
-          <span style="font-size:13px;color:var(--t1);">${n}</span>
-          <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
-        </div>`).join('')}
-    </div>
-  </div>`;
+    </div>`;
+  }
+
+  const html = htmlDia + htmlSemana;
+  wrap.style.display = html ? 'block' : 'none';
+  wrap.innerHTML = html;
 }
 window.renderProduceDia=renderProduceDia;
-
-// Mantener por compatibilidad
 function renderProduceSemana(){ renderProduceDia(); }
 window.renderProduceSemana=renderProduceSemana;
 
