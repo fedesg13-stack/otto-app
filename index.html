@@ -1642,6 +1642,35 @@ header {
 <div class="saving" id="saving">Guardando…</div>
 
 <!-- FIREBASE SDK -->
+<!-- FAB SELECTOR SHEET — debe estar ANTES del script -->
+<div class="fab-sel-overlay" id="fabSelOverlay"></div>
+<div class="fab-sel-sheet" id="fabSelSheet">
+  <div class="fab-sel-handle"><div class="fab-sel-bar"></div></div>
+  <div class="fab-sel-title">¿Qué querés agregar?</div>
+  <div class="fab-sel-grid">
+    <button class="fab-sel-btn" id="fabBtnFin">
+      <div class="fab-sel-icon" style="background:var(--green-bg)"><span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span></div>
+      <div class="fab-sel-name">Finanza</div>
+      <div class="fab-sel-sub">Ingreso o gasto</div>
+    </button>
+    <button class="fab-sel-btn" id="fabBtnPed">
+      <div class="fab-sel-icon" style="background:var(--teal-t)"><span class="material-icons-round" style="color:var(--teal)">receipt_long</span></div>
+      <div class="fab-sel-name">Pedido</div>
+      <div class="fab-sel-sub">Cliente y entrega</div>
+    </button>
+    <button class="fab-sel-btn" id="fabBtnAge">
+      <div class="fab-sel-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">calendar_month</span></div>
+      <div class="fab-sel-name">Evento</div>
+      <div class="fab-sel-sub">Agenda y citas</div>
+    </button>
+    <button class="fab-sel-btn" id="fabBtnTask">
+      <div class="fab-sel-icon" style="background:var(--purple-t)"><span class="material-icons-round" style="color:var(--purple)">check_circle</span></div>
+      <div class="fab-sel-name">Tarea</div>
+      <div class="fab-sel-sub">Recordatorio</div>
+    </button>
+  </div>
+</div>
+
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
 import { getFirestore, collection, doc, addDoc, getDocs, deleteDoc, setDoc, updateDoc } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
@@ -3470,35 +3499,6 @@ document.addEventListener('click', function(e) {
 });
 
 </script>
-
-<!-- FAB SELECTOR SHEET -->
-<div class="fab-sel-overlay" id="fabSelOverlay"></div>
-<div class="fab-sel-sheet" id="fabSelSheet">
-  <div class="fab-sel-handle"><div class="fab-sel-bar"></div></div>
-  <div class="fab-sel-title">¿Qué querés agregar?</div>
-  <div class="fab-sel-grid">
-    <button class="fab-sel-btn" id="fabBtnFin">
-      <div class="fab-sel-icon" style="background:var(--green-bg)"><span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span></div>
-      <div class="fab-sel-name">Finanza</div>
-      <div class="fab-sel-sub">Ingreso o gasto</div>
-    </button>
-    <button class="fab-sel-btn" id="fabBtnPed">
-      <div class="fab-sel-icon" style="background:var(--teal-t)"><span class="material-icons-round" style="color:var(--teal)">receipt_long</span></div>
-      <div class="fab-sel-name">Pedido</div>
-      <div class="fab-sel-sub">Cliente y entrega</div>
-    </button>
-    <button class="fab-sel-btn" id="fabBtnAge">
-      <div class="fab-sel-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">calendar_month</span></div>
-      <div class="fab-sel-name">Evento</div>
-      <div class="fab-sel-sub">Agenda y citas</div>
-    </button>
-    <button class="fab-sel-btn" id="fabBtnTask">
-      <div class="fab-sel-icon" style="background:var(--purple-t)"><span class="material-icons-round" style="color:var(--purple)">check_circle</span></div>
-      <div class="fab-sel-name">Tarea</div>
-      <div class="fab-sel-sub">Recordatorio</div>
-    </button>
-  </div>
-</div>
 
 </body>
 </html>
