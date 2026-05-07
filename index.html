@@ -235,8 +235,9 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
 .week-day-lbl{font-size:10px;font-weight:500;color:var(--t4);}
 .week-day-num{font-size:14px;font-weight:600;color:var(--t2);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
 .week-day-num.today{background:var(--bosque);color:#fff;}
-.week-day-dot{width:4px;height:4px;border-radius:50%;background:var(--bosque);opacity:0;}
-.week-day-dot.on{opacity:1;}
+.week-day-dot{display:none;}
+.week-day-badge{min-width:16px;height:16px;border-radius:5px;background:var(--bosque);color:#fff;font-size:9px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;}
+.week-day-badge.on{display:flex;}
 /* OTTO slider */
 .otto-card{margin:0 12px 12px;background:var(--surface);border-radius:var(--r18);overflow:hidden;border:1px solid var(--border2);box-shadow:var(--s1);}
 .otto-slider-wrap{overflow:hidden;}
@@ -302,9 +303,10 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
 .ped-day-num{font-size:13px;font-weight:600;color:var(--t2);}
 .ped-day.sel .ped-day-num{color:#fff;}
 .ped-day.today .ped-day-num{color:var(--bosque);}
-.ped-dot{width:4px;height:4px;border-radius:50%;background:var(--bosque);opacity:0;}
-.ped-dot.on{opacity:1;}
-.ped-day.sel .ped-dot{background:#fff;}
+.ped-dot{display:none;}
+.ped-day-badge{min-width:16px;height:16px;border-radius:5px;background:var(--bosque);color:#fff;font-size:9px;font-weight:800;display:none;align-items:center;justify-content:center;padding:0 4px;}
+.ped-day-badge.on{display:flex;}
+.ped-day.sel .ped-day-badge{background:rgba(255,255,255,.9);color:var(--bosque);}
 /* Ticket */
 .ticket{background:var(--surface);border-radius:var(--r18);border:1px solid var(--border2);box-shadow:var(--s1);margin-bottom:8px;overflow:hidden;}
 .ticket-top{padding:13px 16px 8px;display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
@@ -1343,9 +1345,25 @@ function renderWeek(){
   wrap.innerHTML=days.map((d,i)=>{
     const ds=d.toISOString().split('T')[0];
     const isToday=d.getTime()===today.getTime();
-    const hasDot=S.pedidos.some(p=>p.fecha===ds&&!p.archivado)||S.eventos.some(e=>e.fecha===ds);
-    return `<div class="week-day"><span class="week-day-lbl">${DIAS[i]}</span><span class="week-day-num${isToday?' today':''}">${d.getDate()}</span><span class="week-day-dot${hasDot?' on':''}"></span></div>`;
+    const nPeds=S.pedidos.filter(p=>p.fecha===ds&&!p.archivado).length;
+    const nEvs=S.eventos.filter(e=>e.fecha===ds).length;
+    const total=nPeds+nEvs;
+    return `<div class="week-day${total?' rpl':''}" data-fecha="${ds}" style="${total?'cursor:pointer':''}">
+      <span class="week-day-lbl">${DIAS[i]}</span>
+      <span class="week-day-num${isToday?' today':''}">${d.getDate()}</span>
+      <span class="week-day-badge${total?' on':''}">${total||''}</span>
+    </div>`;
   }).join('');
+  wrap.querySelectorAll('.week-day[data-fecha]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      const fecha=el.dataset.fecha;
+      const n=S.pedidos.filter(p=>p.fecha===fecha&&!p.archivado).length;
+      if(n>0){
+        S.pedFecha=fecha; S.pedModoSemana=false;
+        navTo('ped'); renderPedWeek(); renderPeds(); renderProduceDia();
+      }
+    });
+  });
 }
 window.renderWeek=renderWeek;
 
@@ -1393,11 +1411,11 @@ function renderPedWeek(){
     const ds=d.toISOString().split('T')[0];
     const isToday=d.getTime()===today.getTime();
     const isSel=ds===sel;
-    const hasDot=S.pedidos.some(p=>p.fecha===ds&&!p.archivado);
+    const nDia=S.pedidos.filter(p=>p.fecha===ds&&!p.archivado).length;
     return `<div class="ped-day rpl${isToday&&!isSel?' today':''}${isSel?' sel':''}" data-fecha="${ds}">
       <span class="ped-day-lbl">${DIAS[i]}</span>
       <span class="ped-day-num">${d.getDate()}</span>
-      <span class="ped-dot${hasDot?' on':''}"></span>
+      <span class="ped-day-badge${nDia?' on':''}">${nDia||''}</span>
     </div>`;
   }).join('');
   wrap.querySelectorAll('.ped-day').forEach(d=>{
@@ -1524,8 +1542,8 @@ function renderAgeWeek(){
     const ds=d.toISOString().split('T')[0];
     const isToday=d.getTime()===today.getTime();
     const isSel=ds===sel;
-    const hasDot=S.eventos.some(e=>e.fecha===ds);
-    return `<div class="ped-day rpl${isToday&&!isSel?' today':''}${isSel?' sel':''}" data-fecha="${ds}"><span class="ped-day-lbl">${DIAS[i]}</span><span class="ped-day-num">${d.getDate()}</span><span class="ped-dot${hasDot?' on':''}"></span></div>`;
+    const nDia=S.eventos.filter(e=>e.fecha===ds).length;
+    return `<div class="ped-day rpl${isToday&&!isSel?' today':''}${isSel?' sel':''}" data-fecha="${ds}"><span class="ped-day-lbl">${DIAS[i]}</span><span class="ped-day-num">${d.getDate()}</span><span class="ped-day-badge${nDia?' on':''}">${nDia||''}</span></div>`;
   }).join('');
   wrap.querySelectorAll('.ped-day').forEach(d=>{
     d.addEventListener('click',()=>{S.ageFecha=d.dataset.fecha;renderAgeWeek();renderEvs();});
@@ -1809,6 +1827,10 @@ g('btnGoogle')?.addEventListener('click',loginGoogle);
 g('hd-logo-btn')?.addEventListener('click',()=>navTo('home'));
 g('hd-menu-btn')?.addEventListener('click',openMenu);
 g('nav-menu-btn')?.addEventListener('click',openMenu);
+g('h-week-btn')?.addEventListener('click',()=>{
+  S.pedFecha=hoy(); S.pedModoSemana=false;
+  navTo('ped'); renderPedWeek(); renderPeds(); renderProduceDia();
+});
 g('nav-fab')?.addEventListener('click',toggleFab);
 g('nav-otto-btn')?.addEventListener('click',()=>navTo('otto'));
 g('menu-overlay')?.addEventListener('click',closeMenu);
