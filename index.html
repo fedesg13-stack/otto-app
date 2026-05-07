@@ -16,61 +16,70 @@
    Font: Inter + DM Serif Display
    ═══════════════════════════════════════════════════ */
 :root{
-  /* ═══ PALETA OFICIAL — Brand Book OTTO ═══ */
+  /* ══ PALETA BRAND BOOK — exacta ══ */
   --bosque:  #234136;
   --salvia:  #5E7A68;
   --arena:   #E7DCC6;
   --niebla:  #F2F4F1;
   --carbon:  #1A1F1C;
 
-  /* ═══ SUPERFICIES ═══ */
-  /* Fondo: Gris Niebla. Cards: blanco cálido. Inputs: ligeramente más oscuros */
-  --bg:       #F2F4F1;   /* Gris Niebla — fondo */
-  --surface:  #FAFAF8;   /* cards — blanco muy ligeramente cálido */
-  --surface2: #F0EDE8;   /* inputs, chips — tono Arena muy diluido */
-  --surface3: #E8E4DE;   /* hover, activo — Arena medio */
+  /* ══ SUPERFICIES ══
+     Mockup: fondo blanco, cards blancas, inputs gris muy suave
+     El #F2F4F1 es solo el fondo detrás del contenedor */
+  --bg:       #F2F4F1;   /* Gris Niebla — fondo general */
+  --surface:  #FFFFFF;   /* cards, panels, sheets — blanco puro */
+  --surface2: #F7F8F6;   /* inputs, chips — gris muy suave neutro */
+  --surface3: #EFF0ED;   /* hover, active states */
 
-  /* ═══ TEXTO ═══ */
-  --t1: #1A1F1C;
-  --t2: #2D3530;
-  --t3: #5E7A68;
-  --t4: #8FA898;
-  --t5: #B8C9BE;
+  /* ══ TEXTO ══
+     Todo derivado del Carbón */
+  --t1: #1A1F1C;   /* Carbón — texto principal */
+  --t2: #2D3530;   /* casi carbón */
+  --t3: #5E7A68;   /* Verde Salvia — texto secundario */
+  --t4: #8FA898;   /* placeholder, label */
+  --t5: #B8C9BE;   /* texto muy sutil */
 
-  /* ═══ BORDES ═══ */
-  --border:  rgba(35,65,54,.12);
-  --border2: rgba(35,65,54,.07);
+  /* ══ BORDES ══
+     Muy sutiles, casi invisibles como el mockup */
+  --border:  rgba(26,31,28,.10);
+  --border2: rgba(26,31,28,.06);
 
-  /* ═══ SOMBRAS ═══ */
-  --s1: 0 1px 3px rgba(26,31,28,.06), 0 1px 2px rgba(26,31,28,.04);
-  --s2: 0 3px 10px rgba(26,31,28,.08);
-  --s3: 0 6px 20px rgba(26,31,28,.10);
-  --s4: 0 12px 40px rgba(26,31,28,.12);
+  /* ══ SOMBRAS ══ */
+  --s1: 0 1px 3px rgba(26,31,28,.05);
+  --s2: 0 2px 8px rgba(26,31,28,.07);
+  --s3: 0 6px 20px rgba(26,31,28,.09);
+  --s4: 0 16px 40px rgba(26,31,28,.11);
 
-  /* ═══ SEMÁNTICOS ═══ */
+  /* ══ SEMÁNTICOS — derivados de la paleta ══ */
+  /* Verde: ingresos, éxito → Bosque */
   --green:    #234136;
-  --green-bg: #EAF0EC;
-  --green-t:  rgba(35,65,54,.10);
+  --green-bg: #EBF0EC;   /* verde muy claro, casi blanco */
+  --green-t:  rgba(35,65,54,.08);
 
-  --red:      #8B2E1E;
-  --red-bg:   #F7EAE8;
-  --red-t:    rgba(139,46,30,.10);
+  /* Rojo: gastos, alertas */
+  --red:      #C0392B;
+  --red-bg:   #FDECEA;
+  --red-t:    rgba(192,57,43,.08);
 
-  --amber:    #7A5C1E;
-  --amber-bg: #F5EED8;
-  --amber-t:  rgba(122,92,30,.10);
+  /* Ámbar: pedidos, vencimientos */
+  --amber:    #B7770D;
+  --amber-bg: #FEF6E4;
+  --amber-t:  rgba(183,119,13,.08);
 
-  --teal:     #1E6352;
-  --teal-t:   rgba(30,99,82,.10);
+  /* Teal: calendario pedidos */
+  --teal:     #1A7A62;
+  --teal-t:   rgba(26,122,98,.08);
 
-  --purple:   #4A3D6B;
-  --purple-t: rgba(74,61,107,.10);
+  /* Púrpura: tareas */
+  --purple:   #5B4FCF;
+  --purple-t: rgba(91,79,207,.08);
 
+  /* Blue = alias bosque */
   --blue:    #234136;
-  --blue-t:  rgba(35,65,54,.10);
-  --blue-t2: rgba(35,65,54,.06);
+  --blue-t:  rgba(35,65,54,.08);
+  --blue-t2: rgba(35,65,54,.05);
 
-  /* ═══ ALIAS ═══ */
+  /* ══ ALIAS compatibilidad ══ */
   --bg2:    var(--surface);
   --bg3:    var(--surface2);
   --bg4:    var(--surface3);
@@ -81,10 +90,11 @@
   --salvia2: #4A6354;
   --arena2:  #D9CDB6;
 
-  /* ═══ RADIOS ═══ */
-  --r6:6px; --r10:10px; --r12:12px; --r14:14px; --r18:18px; --r24:24px; --rfull:999px;
+  /* ══ RADIOS ══ */
+  --r6:6px; --r10:10px; --r12:12px; --r14:14px;
+  --r18:18px; --r24:24px; --rfull:999px;
 
-  /* ═══ TIPOGRAFÍA ═══ */
+  /* ══ TIPOGRAFÍA ══ */
   --font:       'Inter', sans-serif;
   --font-serif: 'DM Serif Display', serif;
 }
@@ -960,7 +970,7 @@ header {
   </div>
   <div class="login-card">
     <div class="login-title">Entrá con tu cuenta Google</div>
-    <button class="btn-google rpl" onclick="loginGoogle()">
+    <button class="btn-google rpl" id="btnGoogle">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
       Continuar con Google
     </button>
@@ -1112,18 +1122,18 @@ header {
   <!-- NAV INFERIOR — 3 botones -->
   <nav class="bottom-bar" id="bottomNav">
     <!-- Izquierda: Menú hamburguesa -->
-    <button class="nav-side-btn" id="navMenuBtn" onclick="toggleMenu()">
+    <button class="nav-side-btn" id="navMenuBtn">
       <span class="material-icons-round">menu</span>
       <span class="nav-side-lbl">Menú</span>
     </button>
 
     <!-- Centro: FAB + -->
-    <button class="nav-fab-btn" id="fabBtn" onclick="toggleFab()">
+    <button class="nav-fab-btn" id="fabBtn">
       <span class="material-icons-round">add</span>
     </button>
 
     <!-- Derecha: OTTO -->
-    <button class="nav-otto-btn" id="nav-chat" onclick="menuNav('chat')">
+    <button class="nav-otto-btn" id="nav-chat">
       <span class="material-icons-round">smart_toy</span>
       <span class="nav-otto-lbl">OTTO</span>
     </button>
@@ -2727,8 +2737,8 @@ window.goTab=goTab;window.setTipo=setTipo;window.calNav=calNav;
 
 /* ── BOTTOM SHEETS DE FORMULARIOS ── */
 function openSheet(tipo){
-  // Cerrar FAB y todo lo anterior
-  closeFab();
+  // Cerrar FAB
+  if(window.closeFab) window.closeFab();
   document.querySelectorAll('.form-sheet').forEach(s=>{s.classList.remove('open');s.style.display='none';});
   const hoy=new Date().toISOString().split('T')[0];
   if(tipo==='fin'){const mf=document.getElementById('mFecha');if(mf)mf.value=hoy;}
@@ -3320,16 +3330,28 @@ window.closeFab = function() {
 };
 
 // Conectar botones — el módulo corre con DOM ya listo
-const _fabOv = document.getElementById('fabSelOverlay');
+// ── Conectar TODOS los botones via addEventListener (sin onclick inline) ──
+const _btnFab  = document.getElementById('fabBtn');
+const _btnMenu = document.getElementById('navMenuBtn');
+const _btnOtto = document.getElementById('nav-chat');
+const _btnGoogle = document.getElementById('btnGoogle');
+const _fabOv   = document.getElementById('fabSelOverlay');
 const _fabFin  = document.getElementById('fabBtnFin');
 const _fabPed  = document.getElementById('fabBtnPed');
 const _fabAge  = document.getElementById('fabBtnAge');
 const _fabTask = document.getElementById('fabBtnTask');
-if(_fabOv)   _fabOv.addEventListener('click',   window.closeFab);
-if(_fabFin)  _fabFin.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('fin'),  80); });
-if(_fabPed)  _fabPed.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('ped'),  80); });
-if(_fabAge)  _fabAge.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('age'),  80); });
-if(_fabTask) _fabTask.addEventListener('click', function(){ window.closeFab(); setTimeout(()=>openSheet('task'), 80); });
+
+if(_btnFab)  _btnFab.addEventListener('click',  function(){ window.toggleFab(); });
+if(_btnMenu) _btnMenu.addEventListener('click', function(){ toggleMenu(); });
+if(_btnOtto) _btnOtto.addEventListener('click', function(){ menuNav('chat'); });
+if(_btnGoogle) _btnGoogle.addEventListener('click', function(){ loginGoogle(); });
+if(_fabOv)   _fabOv.addEventListener('click',   function(){ window.closeFab(); });
+if(_fabFin)  _fabFin.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('fin'),  50); });
+if(_fabPed)  _fabPed.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('ped'),  50); });
+if(_fabAge)  _fabAge.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('age'),  50); });
+if(_fabTask) _fabTask.addEventListener('click', function(){ window.closeFab(); setTimeout(()=>openSheet('task'), 50); });
+
+console.log('OTTO: botones conectados', {fab:!!_btnFab, fin:!!_fabFin, ped:!!_fabPed});
 
 
 // ── FILTRO TIPO FINANZAS ──
