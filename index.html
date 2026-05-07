@@ -472,12 +472,15 @@ header {
 .otto-slide { min-width:100%; padding:16px; box-sizing:border-box; }
 .otto-slide-label {
   display:flex; align-items:center; gap:6px;
-  font-size:9px; font-weight:700; letter-spacing:1.2px;
-  text-transform:uppercase; color:var(--bosque); margin-bottom:8px;
+  font-size:10px; font-weight:700; letter-spacing:.8px;
+  text-transform:uppercase; color:var(--bosque); margin-bottom:10px;
 }
-.otto-dot { width:5px; height:5px; border-radius:50%; background:var(--bosque); animation:pulse 2s infinite; }
-.otto-slide-text { font-size:13px; line-height:1.65; color:var(--t2); font-weight:400; }
+.otto-dot { width:6px; height:6px; border-radius:50%; background:var(--bosque); animation:pulse 2s infinite; }
+.otto-slide-text { font-size:14px; line-height:1.7; color:var(--t1); font-weight:400; }
 .otto-slide-text strong { color:var(--bosque); font-weight:700; }
+.otto-slide-sub { font-size:11px; color:var(--t3); margin-top:6px; font-style:italic; }
+.otto-loading { display:flex; align-items:center; gap:8px; color:var(--t3); font-size:13px; }
+.otto-loading .typing span { width:5px; height:5px; background:var(--bosque); }
 .slider-dots { display:flex; justify-content:center; gap:5px; padding:10px 0 14px; }
 .slider-dot { width:4px; height:4px; border-radius:50%; background:var(--border); transition:all .2s; cursor:pointer; }
 .slider-dot.on { background:var(--bosque); width:14px; border-radius:2px; }
@@ -820,28 +823,121 @@ header {
 .cat-sel-custom { padding:8px; border-top:1px solid var(--border2); }
 
 /* ── ONBOARDING ── */
-#onboarding { position:fixed; inset:0; z-index:280; background:var(--bg); display:none; flex-direction:column; align-items:center; justify-content:center; padding:32px; }
-#onboarding::before { content:''; position:absolute; inset:0; background:radial-gradient(ellipse at 30% 20%, rgba(35,65,54,.08) 0%, transparent 60%); pointer-events:none; }
+/* ── ONBOARDING WOW ── */
+#onboarding {
+  position:fixed; inset:0; z-index:280;
+  display:none; flex-direction:column;
+  background:var(--bosque);
+  overflow:hidden;
+}
 #onboarding.visible { display:flex; }
-.ob-card { background:var(--surface); border:1px solid var(--border2); border-radius:var(--r24); padding:28px 22px; width:100%; max-width:340px; position:relative; box-shadow:var(--s3); }
-.ob-step { display:none; flex-direction:column; gap:16px; }
-.ob-step.on { display:flex; }
-.ob-progress { display:flex; gap:5px; justify-content:center; margin-bottom:10px; }
-.ob-dot { width:6px; height:6px; border-radius:50%; background:var(--border); transition:all .25s; }
-.ob-dot.on { background:var(--bosque); width:18px; border-radius:3px; }
-.ob-title { font-size:20px; font-weight:700; color:var(--t1); text-align:center; line-height:1.3; font-family:var(--font); letter-spacing:-.3px; }
-.ob-sub { font-size:13px; color:var(--t3); text-align:center; font-weight:400; line-height:1.55; }
-.ob-options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
-.ob-option { background:var(--surface2); border:1.5px solid var(--border); border-radius:var(--r14); padding:14px 10px; text-align:center; cursor:pointer; transition:all .15s; font-family:var(--font); font-size:13px; font-weight:500; color:var(--t2); }
-.ob-option:active { border-color:var(--bosque); }
-.ob-option.sel { background:var(--green-bg); color:var(--bosque); border-color:rgba(35,65,54,.3); }
-.ob-option-icon { font-size:22px; display:block; margin-bottom:5px; }
-.ob-inp { background:var(--surface2); border:1.5px solid var(--border); color:var(--t1); padding:13px; border-radius:var(--r10); font-family:var(--font); font-size:14px; font-weight:400; outline:none; width:100%; transition:border-color .15s; }
-.ob-inp:focus { border-color:var(--bosque); }
-.ob-inp::placeholder { color:var(--t5); }
-.ob-btn { background:var(--bosque); color:#fff; border:none; padding:14px; border-radius:var(--rfull); font-family:var(--font); font-size:14px; font-weight:600; cursor:pointer; transition:all .15s; box-shadow:0 4px 16px rgba(35,65,54,.3); }
-.ob-btn:active { background:var(--bosque2); }
-.ob-skip { background:transparent; border:none; color:var(--t4); font-family:var(--font); font-size:12px; cursor:pointer; text-decoration:underline; text-align:center; }
+
+/* Pantalla 0: Welcome full screen */
+.ob-welcome {
+  display:none; flex:1; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:40px 32px; text-align:center;
+  position:relative;
+}
+.ob-welcome.on { display:flex; }
+.ob-welcome-bg {
+  position:absolute; inset:0; pointer-events:none;
+  background:radial-gradient(ellipse at 50% 30%, rgba(255,255,255,.06) 0%, transparent 60%);
+}
+.ob-welcome-logo { width:160px; height:46px; color:rgba(255,255,255,.95); margin-bottom:48px; }
+.ob-welcome-title { font-size:32px; font-weight:700; color:#fff; line-height:1.2; letter-spacing:-.8px; margin-bottom:14px; }
+.ob-welcome-sub { font-size:16px; color:rgba(255,255,255,.65); font-weight:400; line-height:1.6; margin-bottom:56px; max-width:280px; }
+.ob-welcome-btn {
+  width:100%; max-width:300px;
+  background:#fff; color:var(--bosque);
+  border:none; border-radius:var(--rfull);
+  padding:17px 32px; font-family:var(--font);
+  font-size:16px; font-weight:700; cursor:pointer;
+  transition:all .18s; letter-spacing:-.2px;
+  box-shadow:0 8px 32px rgba(0,0,0,.2);
+}
+.ob-welcome-btn:active { transform:scale(.98); }
+.ob-welcome-skip { color:rgba(255,255,255,.4); font-family:var(--font); font-size:13px; background:transparent; border:none; cursor:pointer; margin-top:20px; text-decoration:underline; }
+
+/* Pantallas 1-3: card sobre fondo verde */
+.ob-card-wrap {
+  display:none; flex:1; flex-direction:column;
+  background:var(--bosque);
+  padding:0;
+}
+.ob-card-wrap.on { display:flex; }
+.ob-card-top {
+  padding:48px 28px 24px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:8px;
+}
+.ob-card-step { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:1.2px; color:rgba(255,255,255,.45); }
+.ob-card-title { font-size:26px; font-weight:700; color:#fff; line-height:1.25; letter-spacing:-.5px; }
+.ob-card-sub { font-size:14px; color:rgba(255,255,255,.6); font-weight:400; line-height:1.55; margin-top:4px; }
+.ob-card-body {
+  flex:1; background:var(--bg);
+  border-radius:24px 24px 0 0;
+  padding:28px 24px 40px;
+  display:flex; flex-direction:column; gap:14px;
+  overflow-y:auto;
+}
+.ob-progress-dots { display:flex; gap:5px; margin-bottom:4px; }
+.ob-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,.25); transition:all .25s; }
+.ob-dot.on { background:#fff; width:20px; border-radius:3px; }
+
+/* Input del negocio */
+.ob-big-input {
+  background:#fff; border:2px solid var(--border);
+  border-radius:var(--r14); padding:16px 18px;
+  font-family:var(--font); font-size:20px;
+  font-weight:600; color:var(--t1); outline:none;
+  width:100%; transition:border-color .15s;
+  letter-spacing:-.3px;
+}
+.ob-big-input:focus { border-color:var(--bosque); }
+.ob-big-input::placeholder { color:var(--t5); font-weight:400; font-size:16px; }
+
+/* Opciones de rubro */
+.ob-rubros { display:flex; flex-direction:column; gap:8px; }
+.ob-rubro-item {
+  display:flex; align-items:center; gap:14px;
+  background:#fff; border:1.5px solid var(--border);
+  border-radius:var(--r14); padding:14px 16px;
+  cursor:pointer; transition:all .15s;
+  font-family:var(--font);
+}
+.ob-rubro-item:active { background:var(--green-bg); border-color:rgba(35,65,54,.3); }
+.ob-rubro-item.sel { background:var(--green-bg); border-color:var(--bosque); }
+.ob-rubro-emoji { font-size:24px; width:36px; text-align:center; }
+.ob-rubro-text { flex:1; }
+.ob-rubro-name { font-size:15px; font-weight:600; color:var(--t1); }
+.ob-rubro-desc { font-size:12px; color:var(--t3); margin-top:1px; }
+.ob-rubro-check { width:20px; height:20px; border-radius:50%; border:1.5px solid var(--border); display:flex; align-items:center; justify-content:center; flex-shrink:0; transition:all .15s; }
+.ob-rubro-item.sel .ob-rubro-check { background:var(--bosque); border-color:var(--bosque); }
+.ob-rubro-item.sel .ob-rubro-check::after { content:'✓'; font-size:11px; color:#fff; font-weight:700; }
+
+/* Botón continuar */
+.ob-continue {
+  background:var(--bosque); color:#fff; border:none;
+  border-radius:var(--rfull); padding:16px;
+  font-family:var(--font); font-size:15px; font-weight:600;
+  cursor:pointer; transition:all .15s;
+  box-shadow:0 4px 16px rgba(35,65,54,.3);
+  display:flex; align-items:center; justify-content:center; gap:8px;
+}
+.ob-continue:active { background:var(--bosque2); transform:scale(.99); }
+.ob-continue:disabled { opacity:.4; cursor:not-allowed; }
+
+/* Pantalla final: todo listo */
+.ob-done {
+  display:none; flex:1; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:40px 32px; text-align:center;
+  background:var(--bosque);
+}
+.ob-done.on { display:flex; }
+.ob-done-check { width:80px; height:80px; border-radius:50%; background:rgba(255,255,255,.15); display:flex; align-items:center; justify-content:center; margin-bottom:28px; animation:bounce .6s ease; }
+.ob-done-title { font-size:28px; font-weight:700; color:#fff; letter-spacing:-.6px; margin-bottom:12px; }
+.ob-done-sub { font-size:15px; color:rgba(255,255,255,.65); line-height:1.6; margin-bottom:48px; max-width:280px; }
 
 /* ── LOGIN ── */
 #loginScreen { position:fixed; inset:0; z-index:250; background:var(--bg); display:none; flex-direction:column; align-items:center; justify-content:center; padding:32px; }
@@ -943,6 +1039,98 @@ header {
 .toast.show { opacity:1; }
 .saving { position:fixed; top:56px; right:14px; background:var(--green-bg); color:var(--bosque); border:1px solid rgba(35,65,54,.2); padding:5px 11px; border-radius:var(--rfull); font-size:10px; font-weight:600; z-index:100; opacity:0; transition:opacity .25s; }
 .saving.show { opacity:1; }
+
+/* ── SHEETS 3 TOQUES ── */
+.quick-amounts {
+  display:flex; gap:8px; margin-bottom:4px; flex-wrap:wrap;
+}
+.quick-amt {
+  flex:1; min-width:60px;
+  background:var(--surface2); border:1.5px solid var(--border);
+  border-radius:var(--rfull); padding:8px 4px;
+  font-family:var(--font); font-size:13px; font-weight:600;
+  color:var(--t2); cursor:pointer; transition:all .12s;
+  text-align:center;
+}
+.quick-amt:active, .quick-amt.sel {
+  background:var(--green-bg); border-color:var(--bosque); color:var(--bosque);
+}
+.tipo-pill-row {
+  display:flex; gap:8px; margin-bottom:16px;
+}
+.tipo-pill {
+  flex:1; display:flex; align-items:center; justify-content:center; gap:6px;
+  padding:12px; border-radius:var(--r14);
+  border:2px solid var(--border); background:var(--surface2);
+  font-family:var(--font); font-size:14px; font-weight:600;
+  cursor:pointer; transition:all .15s; color:var(--t3);
+}
+.tipo-pill.ing.sel { background:var(--green-bg); border-color:var(--bosque); color:var(--bosque); }
+.tipo-pill.gas.sel { background:var(--red-bg); border-color:var(--red); color:var(--red); }
+.tipo-pill .material-icons-round { font-size:20px; }
+.monto-grande {
+  width:100%; background:transparent; border:none; border-bottom:2px solid var(--border);
+  font-family:var(--font); font-size:36px; font-weight:700;
+  color:var(--t1); outline:none; padding:8px 4px; letter-spacing:-1px;
+  transition:border-color .15s; text-align:center; margin-bottom:14px;
+}
+.monto-grande:focus { border-color:var(--bosque); }
+.monto-grande::placeholder { color:var(--t5); font-size:28px; font-weight:400; }
+.cat-chips-row {
+  display:flex; gap:7px; overflow-x:auto; padding-bottom:4px;
+  scrollbar-width:none; margin-bottom:12px;
+}
+.cat-chips-row::-webkit-scrollbar { display:none; }
+.cat-chip-q {
+  flex-shrink:0; padding:7px 14px; border-radius:var(--rfull);
+  border:1.5px solid var(--border); background:var(--surface2);
+  font-family:var(--font); font-size:12px; font-weight:500;
+  color:var(--t2); cursor:pointer; transition:all .12s; white-space:nowrap;
+}
+.cat-chip-q.sel { background:var(--green-bg); border-color:var(--bosque); color:var(--bosque); font-weight:600; }
+.cat-chip-q:active { background:var(--green-bg); }
+.quick-clientes {
+  display:flex; gap:7px; overflow-x:auto; padding-bottom:4px;
+  scrollbar-width:none; margin-bottom:8px;
+}
+.quick-clientes::-webkit-scrollbar { display:none; }
+.quick-cli-chip {
+  flex-shrink:0; padding:8px 14px; border-radius:var(--rfull);
+  border:1.5px solid var(--border); background:var(--surface2);
+  font-family:var(--font); font-size:13px; font-weight:500;
+  color:var(--t2); cursor:pointer; transition:all .12s; white-space:nowrap;
+  display:flex; align-items:center; gap:6px;
+}
+.quick-cli-chip:active, .quick-cli-chip.sel {
+  background:var(--green-bg); border-color:var(--bosque); color:var(--bosque);
+}
+.sheet-section-lbl {
+  font-size:10px; font-weight:700; text-transform:uppercase;
+  letter-spacing:.8px; color:var(--t4); margin-bottom:8px; margin-top:4px; display:block;
+}
+.prod-quick-row {
+  display:flex; gap:8px; align-items:center;
+  background:var(--surface2); border-radius:var(--r10);
+  padding:10px 12px; margin-bottom:8px;
+  border:1px solid var(--border2);
+}
+.prod-quick-name {
+  flex:1; font-size:13px; font-weight:500; color:var(--t1);
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.prod-quick-qty {
+  display:flex; align-items:center; gap:8px; flex-shrink:0;
+}
+.qty-btn-sm {
+  width:28px; height:28px; border-radius:50%;
+  border:1.5px solid var(--border); background:var(--surface);
+  font-size:16px; font-weight:600; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--t2); transition:all .1s; flex-shrink:0;
+}
+.qty-btn-sm:active { background:var(--green-bg); border-color:var(--bosque); color:var(--bosque); }
+.qty-num-sm { font-size:15px; font-weight:700; color:var(--t1); min-width:20px; text-align:center; }
+
 </style>
 </head>
 
@@ -980,52 +1168,136 @@ header {
 
 <!-- ONBOARDING -->
 <div id="onboarding">
-  <div class="ob-card">
-    <div class="ob-progress">
-      <div class="ob-dot on" id="obDot0"></div>
-      <div class="ob-dot" id="obDot1"></div>
-      <div class="ob-dot" id="obDot2"></div>
-    </div>
-    <div class="ob-step on" id="obStep0">
-      <div style="text-align:center;font-size:40px;margin-bottom:4px;">👋</div>
-      <div class="ob-title">¡Hola! Soy OTTO,<br>tu socio a toda hora</div>
-      <div class="ob-sub">Contame a qué te dedicás para personalizar tu experiencia</div>
-      <div class="ob-options" id="obRubroOpts">
-        <div class="ob-option" onclick="selectRubro('panaderia','🥐')"><span class="ob-option-icon">🥐</span>Panadería</div>
-        <div class="ob-option" onclick="selectRubro('gastronomia','🍽️')"><span class="ob-option-icon">🍽️</span>Gastronomía</div>
-        <div class="ob-option" onclick="selectRubro('fotografia','📸')"><span class="ob-option-icon">📸</span>Fotografía</div>
-        <div class="ob-option" onclick="selectRubro('construccion','🔨')"><span class="ob-option-icon">🔨</span>Construcción</div>
-        <div class="ob-option" onclick="selectRubro('comercio','🛍️')"><span class="ob-option-icon">🛍️</span>Comercio</div>
-        <div class="ob-option" onclick="selectRubro('otro','💼')"><span class="ob-option-icon">💼</span>Otro</div>
+
+  <!-- PASO 0: Bienvenida full screen verde -->
+  <div class="ob-welcome on" id="obWelcome">
+    <div class="ob-welcome-bg"></div>
+    <div class="ob-welcome-logo"><svg xmlns="http://www.w3.org/2000/svg" viewBox="3100 5050 6420 2500" style="width:100%;height:100%;">
+<g transform="translate(0,12540) scale(1,-1)" fill="rgba(255,255,255,.95)" stroke="none">
+<path d="M3155 7360 c-666 -140 -1067 -824 -859 -1465 56 -172 145 -316 279 -451 177 -177 396 -290 634 -324 133 -20 363 -8 486 25 196 52 372 154 515 299 221 223 330 490 330 807 0 196 -34 338 -123 515 -161 320 -471 546 -830 604 -103 16 -330 11 -432 -10z m458 -309 c164 -43 345 -163 448 -299 240 -316 228 -736 -29 -1050 -90 -110 -281 -228 -432 -266 -395 -100 -827 114 -981 486 -47 115 -62 212 -56 362 5 136 27 227 78 329 119 233 358 409 621 456 79 15 261 5 351 -18z"/>
+<path d="M3302 6423 c-107 -52 -142 -194 -72 -291 72 -100 226 -108 312 -16 66 71 65 192 -1 268 -47 53 -169 74 -239 39z"/>
+<path d="M8929 7364 c-141 -25 -322 -102 -449 -192 -89 -62 -225 -202 -285 -292 -247 -374 -254 -837 -18 -1234 59 -99 238 -283 338 -348 200 -129 398 -188 635 -188 382 0 706 161 935 465 68 90 151 265 181 380 36 138 44 340 19 486 -38 231 -146 439 -315 609 -165 167 -377 277 -614 319 -82 15 -335 12 -427 -5z m449 -313 c228 -66 427 -229 527 -436 59 -121 85 -232 85 -365 0 -231 -82 -429 -242 -588 -114 -112 -215 -173 -365 -218 -77 -23 -106 -27 -228 -27 -125 -1 -150 2 -228 26 -147 45 -261 113 -366 215 -246 242 -315 629 -167 937 117 244 326 410 591 469 97 22 294 15 393 -13z"/>
+<path d="M9065 6427 c-71 -33 -124 -131 -110 -206 19 -100 87 -162 183 -169 70 -4 131 24 176 81 64 80 41 217 -47 275 -48 32 -152 41 -202 19z"/>
+<path d="M4557 7346 c-68 -25 -97 -66 -97 -138 0 -58 30 -104 83 -128 39 -18 68 -20 368 -20 321 0 327 0 369 -23 30 -16 51 -37 67 -67 l23 -43 0 -757 c0 -835 -1 -818 63 -901 55 -72 206 -139 243 -108 12 10 14 153 14 889 l0 877 23 43 c16 30 37 51 67 67 l43 23 461 0 c449 0 462 -1 495 -21 46 -28 68 -56 80 -107 8 -28 11 -285 11 -795 -1 -850 -4 -810 76 -893 49 -50 106 -79 173 -90 36 -6 46 -4 58 11 11 16 13 177 13 900 l0 882 23 33 c12 19 38 43 57 54 33 20 55 21 377 26 325 5 343 6 369 26 50 37 69 72 69 124 0 52 -19 87 -69 124 -27 21 -28 21 -1724 23 -1402 2 -1704 0 -1735 -11z"/>
+</g>
+</svg></div>
+    <div class="ob-welcome-title">Tu nuevo socio<br>para crecer tranquilo.</div>
+    <div class="ob-welcome-sub">Más claridad. Menos caos.<br>Más tiempo para lo que importa.</div>
+    <button class="ob-welcome-btn" onclick="obGoStep(1)">
+      Empezar gratis →
+    </button>
+    <button class="ob-welcome-skip" onclick="skipOnboarding()">Ya tengo cuenta, saltar</button>
+  </div>
+
+  <!-- PASO 1: Nombre del negocio -->
+  <div class="ob-card-wrap" id="obStep1">
+    <div class="ob-card-top">
+      <div class="ob-progress-dots">
+        <div class="ob-dot on"></div>
+        <div class="ob-dot"></div>
+        <div class="ob-dot"></div>
       </div>
-      <input class="ob-inp" id="obRubroCustom" placeholder="O escribí tu rubro…" style="display:none">
-      <button class="ob-btn" onclick="obNext(1)">Continuar →</button>
-      <button class="ob-skip" onclick="skipOnboarding()">Saltar por ahora</button>
+      <div class="ob-card-step">Paso 1 de 3</div>
+      <div class="ob-card-title">¿Cómo se llama<br>tu negocio?</div>
+      <div class="ob-card-sub">Esto va a aparecer en tu dashboard y en tus reportes.</div>
     </div>
-    <div class="ob-step" id="obStep1">
-      <div style="text-align:center;font-size:40px;margin-bottom:4px;">👥</div>
-      <div class="ob-title">¿Trabajás solo o<br>con un equipo?</div>
-      <div class="ob-sub">Esto ayuda a OTTO a darte mejores consejos</div>
-      <div class="ob-options">
-        <div class="ob-option" onclick="selectEquipo('solo')" id="obEquipoSolo"><span class="ob-option-icon">🙋</span>Solo/a</div>
-        <div class="ob-option" onclick="selectEquipo('equipo')" id="obEquipoTeam"><span class="ob-option-icon">👨‍👩‍👧</span>Con equipo</div>
-      </div>
-      <button class="ob-btn" onclick="obNext(2)">Continuar →</button>
-      <button class="ob-skip" onclick="obNext(2)" style="color:var(--t3);background:transparent;border:none;font-family:'DM Sans',sans-serif;font-size:12px;cursor:pointer;text-decoration:underline;text-align:center;">Saltar</button>
-    </div>
-    <div class="ob-step" id="obStep2">
-      <div style="text-align:center;font-size:40px;margin-bottom:4px;">🚀</div>
-      <div class="ob-title">¿Qué querés gestionar<br>primero?</div>
-      <div class="ob-sub">Podés usar todo desde el día uno, pero empezar por algo ayuda</div>
-      <div class="ob-options">
-        <div class="ob-option" onclick="selectObjetivo('finanzas')" id="obObj0"><span class="ob-option-icon">💰</span>Finanzas</div>
-        <div class="ob-option" onclick="selectObjetivo('pedidos')" id="obObj1"><span class="ob-option-icon">📋</span>Pedidos</div>
-        <div class="ob-option" onclick="selectObjetivo('agenda')" id="obObj2"><span class="ob-option-icon">📅</span>Agenda</div>
-        <div class="ob-option" onclick="selectObjetivo('todo')" id="obObj3"><span class="ob-option-icon">⚡</span>Todo junto</div>
-      </div>
-      <button class="ob-btn" onclick="finishOnboarding()">¡Empezar con OTTO!</button>
+    <div class="ob-card-body">
+      <input class="ob-big-input" id="obNegocio" placeholder="Ej: La Panadería de Fede" maxlength="40"
+        oninput="document.getElementById('obContinue1').disabled=!this.value.trim()"
+        onkeydown="if(event.key==='Enter'&&this.value.trim())obGoStep(2)">
+      <button class="ob-continue" id="obContinue1" disabled onclick="obGoStep(2)">
+        <span>Continuar</span>
+        <span class="material-icons-round" style="font-size:18px">arrow_forward</span>
+      </button>
+      <button class="ob-welcome-skip" style="color:var(--t4);margin-top:0;" onclick="obGoStep(2)">Saltar por ahora</button>
     </div>
   </div>
+
+  <!-- PASO 2: Rubro -->
+  <div class="ob-card-wrap" id="obStep2">
+    <div class="ob-card-top">
+      <div class="ob-progress-dots">
+        <div class="ob-dot on"></div>
+        <div class="ob-dot on"></div>
+        <div class="ob-dot"></div>
+      </div>
+      <div class="ob-card-step">Paso 2 de 3</div>
+      <div class="ob-card-title">¿A qué se dedica<br>tu negocio?</div>
+      <div class="ob-card-sub">OTTO se adapta a tu rubro para darte mejores insights.</div>
+    </div>
+    <div class="ob-card-body">
+      <div class="ob-rubros">
+        <div class="ob-rubro-item" id="obR0" onclick="selectRubro('panaderia','🥐',this)">
+          <span class="ob-rubro-emoji">🥐</span>
+          <div class="ob-rubro-text">
+            <div class="ob-rubro-name">Panadería / Pastelería</div>
+            <div class="ob-rubro-desc">Producción y venta de alimentos</div>
+          </div>
+          <div class="ob-rubro-check"></div>
+        </div>
+        <div class="ob-rubro-item" id="obR1" onclick="selectRubro('gastronomia','🍽️',this)">
+          <span class="ob-rubro-emoji">🍽️</span>
+          <div class="ob-rubro-text">
+            <div class="ob-rubro-name">Gastronomía</div>
+            <div class="ob-rubro-desc">Restaurante, bar, delivery</div>
+          </div>
+          <div class="ob-rubro-check"></div>
+        </div>
+        <div class="ob-rubro-item" id="obR2" onclick="selectRubro('servicios','⚡',this)">
+          <span class="ob-rubro-emoji">⚡</span>
+          <div class="ob-rubro-text">
+            <div class="ob-rubro-name">Servicios</div>
+            <div class="ob-rubro-desc">Diseño, fotografía, consultoría</div>
+          </div>
+          <div class="ob-rubro-check"></div>
+        </div>
+        <div class="ob-rubro-item" id="obR3" onclick="selectRubro('comercio','🛍️',this)">
+          <span class="ob-rubro-emoji">🛍️</span>
+          <div class="ob-rubro-text">
+            <div class="ob-rubro-name">Comercio</div>
+            <div class="ob-rubro-desc">Tienda, ropa, productos</div>
+          </div>
+          <div class="ob-rubro-check"></div>
+        </div>
+        <div class="ob-rubro-item" id="obR4" onclick="selectRubro('construccion','🔨',this)">
+          <span class="ob-rubro-emoji">🔨</span>
+          <div class="ob-rubro-text">
+            <div class="ob-rubro-name">Construcción / Oficios</div>
+            <div class="ob-rubro-desc">Albañil, plomero, electricista</div>
+          </div>
+          <div class="ob-rubro-check"></div>
+        </div>
+        <div class="ob-rubro-item" id="obR5" onclick="selectRubro('otro','💼',this)">
+          <span class="ob-rubro-emoji">💼</span>
+          <div class="ob-rubro-text">
+            <div class="ob-rubro-name">Otro</div>
+            <div class="ob-rubro-desc">Cualquier otro negocio</div>
+          </div>
+          <div class="ob-rubro-check"></div>
+        </div>
+      </div>
+      <input class="ob-big-input" id="obRubroCustom" placeholder="O escribí tu rubro…"
+        style="display:none;font-size:15px;padding:13px 16px;"
+        oninput="document.getElementById('obContinue2').disabled=!this.value.trim()">
+      <button class="ob-continue" id="obContinue2" disabled onclick="obGoStep(3)">
+        <span>Continuar</span>
+        <span class="material-icons-round" style="font-size:18px">arrow_forward</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- PASO 3: Todo listo -->
+  <div class="ob-done" id="obStep3">
+    <div class="ob-done-check">
+      <span class="material-icons-round" style="font-size:40px;color:#fff;">check</span>
+    </div>
+    <div class="ob-done-title" id="obDoneTitle">¡Todo listo!</div>
+    <div class="ob-done-sub" id="obDoneSub">OTTO ya conoce tu negocio y está listo para ayudarte a crecer.</div>
+    <button class="ob-welcome-btn" onclick="finishOnboarding()" style="max-width:280px;">
+      Ir a mi dashboard →
+    </button>
+  </div>
+
 </div>
 
 <!-- LOADING -->
@@ -1502,156 +1774,6 @@ header {
   </div>
 </div>
 
-<!-- FORM SHEET OVERLAY -->
-<div class="form-sheet-overlay" id="formSheetOverlay" onclick="closeSheet()"></div>
-
-<!-- SHEET: NUEVA FINANZA -->
-<div class="form-sheet" id="sheet-fin">
-  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
-  <div class="form-sheet-header">
-    <div class="form-sheet-title">Nueva venta / gasto</div>
-    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
-  </div>
-  <div class="form-sheet-body">
-    <div class="type-seg">
-      <button class="seg-btn ing-on" id="sIng" onclick="setTipo('ingreso')"><span class="material-icons-round" style="font-size:16px">trending_up</span>Ingreso</button>
-      <button class="seg-btn" id="sGas" onclick="setTipo('gasto')"><span class="material-icons-round" style="font-size:16px">trending_down</span>Gasto</button>
-    </div>
-    <div class="inp-row">
-      <div class="m3-field"><input class="m3-inp" id="mMonto" type="number" placeholder=" " min="0"><label class="m3-lbl">Monto $</label></div>
-      <div class="m3-field"><input class="m3-inp" id="mFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-    </div>
-    <!-- Selector categoría con input manual -->
-    <div class="cat-selector-wrap" id="finCatWrap">
-      <div class="cat-sel-label">Categoría</div>
-      <div class="cat-sel-selected" id="finCatSelected" onclick="toggleCatPicker('fin')">
-        <span id="finCatSelectedLbl">Elegir categoría…</span>
-        <span class="material-icons-round" style="font-size:16px;color:var(--t4)">expand_more</span>
-      </div>
-      <div class="cat-sel-picker" id="finCatPicker" style="display:none;">
-        <div id="finCatList" class="cat-sel-list"></div>
-        <div class="cat-sel-custom">
-          <div class="m3-field" style="flex:1;margin-bottom:0">
-            <input class="m3-inp" id="finCatCustom" placeholder=" " onchange="setCustomCat('fin',this.value)">
-            <label class="m3-lbl">O escribí una categoría…</label>
-          </div>
-        </div>
-      </div>
-    </div>
-    <input type="hidden" id="mCat" value="">
-    <div class="m3-field" style="margin-top:10px;"><input class="m3-inp" id="mDesc" placeholder=" "><label class="m3-lbl">Nota (opcional)</label></div>
-    <button class="btn-arrow rpl" onclick="addMov()"><span>Guardar movimiento</span><span class="material-icons-round arrow-icon">arrow_forward</span></button>
-  </div>
-</div>
-
-<!-- SHEET: NUEVO PEDIDO -->
-<div class="form-sheet" id="sheet-ped">
-  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
-  <div class="form-sheet-header">
-    <div class="form-sheet-title">📋 Nuevo pedido</div>
-    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
-  </div>
-  <div class="form-sheet-body">
-    <div class="inp-row">
-      <div class="m3-field"><input class="m3-inp" id="pCli" placeholder=" "><label class="m3-lbl">Cliente</label></div>
-      <div class="m3-field"><input class="m3-inp" id="pFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha entrega</label></div>
-    </div>
-    <div class="inp-row">
-      <div class="m3-field"><input class="m3-inp" id="pHora" type="time" placeholder=" "><label class="m3-lbl">Hora entrega</label></div>
-      <div class="m3-field" style="visibility:hidden"></div>
-    </div>
-    <!-- Selector catálogo por categoría -->
-    <div class="sub-lbl" style="margin-bottom:8px;">Agregar productos</div>
-    <div id="catSelector">
-      <div id="catCategoryList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
-      <div id="catProductList" style="display:none;margin-bottom:10px;"></div>
-    </div>
-    <div id="prodBox">
-      <div class="prod-row">
-        <div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" placeholder=" "><label class="m3-lbl">Producto</label></div>
-        <div class="m3-field" style="flex:.8;margin-bottom:0"><input class="m3-inp" placeholder=" " type="number" min="1"><label class="m3-lbl">Cant.</label></div>
-        <button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button>
-      </div>
-    </div>
-    <button class="add-prod-btn" onclick="addProd()" style="margin-bottom:12px;">
-      <span class="material-icons-round" style="font-size:18px">add</span>Agregar producto manual
-    </button>
-    <button class="btn-arrow rpl" onclick="savePed()"><span>Guardar pedido</span><span class="material-icons-round arrow-icon">arrow_forward</span></button>
-  </div>
-</div>
-
-<!-- SHEET: NUEVO EVENTO -->
-<div class="form-sheet" id="sheet-age">
-  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
-  <div class="form-sheet-header">
-    <div class="form-sheet-title">📅 Nuevo evento</div>
-    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
-  </div>
-  <div class="form-sheet-body">
-    <div class="m3-field"><input class="m3-inp" id="evTit" placeholder=" "><label class="m3-lbl">Título del evento</label></div>
-    <div class="inp-row">
-      <div class="m3-field"><input class="m3-inp" id="evFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-      <div class="m3-field"><input class="m3-inp" id="evHora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
-    </div>
-    <!-- Selector cliente por categoría -->
-    <div class="cat-selector-wrap" id="ageCatWrap">
-      <div class="cat-sel-label">Cliente (opcional)</div>
-      <div class="cat-sel-selected" id="ageCatSelected" onclick="toggleCatPicker('age')">
-        <span id="ageCatSelectedLbl">Elegir cliente…</span>
-        <span class="material-icons-round" style="font-size:16px;color:var(--t4)">expand_more</span>
-      </div>
-      <div class="cat-sel-picker" id="ageCatPicker" style="display:none;">
-        <div id="ageCatList" class="cat-sel-list"></div>
-        <div class="cat-sel-custom">
-          <div class="m3-field" style="flex:1;margin-bottom:0">
-            <input class="m3-inp" id="evCliente" placeholder=" " oninput="ageCatSelectedLbl.textContent=this.value||'Elegir cliente…'">
-            <label class="m3-lbl">O escribí el nombre</label>
-          </div>
-        </div>
-      </div>
-    </div>
-    <select class="m3-select" id="evPrio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
-    <textarea class="m3-textarea" id="evDesc" rows="3" placeholder="Detalle del evento…"></textarea>
-    <button class="btn-arrow rpl" onclick="saveEv()"><span>Agendar evento</span><span class="material-icons-round arrow-icon">arrow_forward</span></button>
-  </div>
-</div>
-
-<!-- SHEET: NUEVA TAREA -->
-<div class="form-sheet" id="sheet-task">
-  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
-  <div class="form-sheet-header">
-    <div class="form-sheet-title">✅ Nueva tarea</div>
-    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
-  </div>
-  <div class="form-sheet-body">
-    <div class="m3-field"><input class="m3-inp" id="taskTit" placeholder=" "><label class="m3-lbl">Título de la tarea</label></div>
-    <div class="inp-row">
-      <div class="m3-field"><input class="m3-inp" id="taskFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha límite</label></div>
-      <select class="m3-select" id="taskPrio" style="margin-bottom:0">
-        <option value="normal">Normal</option>
-        <option value="urgente">🔴 Urgente</option>
-      </select>
-    </div>
-    <div class="m3-field"><input class="m3-inp" id="taskDesc" placeholder=" "><label class="m3-lbl">Descripción (opcional)</label></div>
-    <button class="btn-arrow rpl" onclick="saveTask()"><span>Guardar tarea</span><span class="material-icons-round arrow-icon">arrow_forward</span></button>
-  </div>
-</div>
-
-<!-- EDIT SHEET -->
-<div class="edit-overlay" id="editOverlay" onclick="closeEdit()"></div>
-<div class="edit-sheet" id="editSheet">
-  <div class="edit-sheet-handle"><div class="edit-sheet-bar"></div></div>
-  <div class="edit-sheet-header">
-    <div class="edit-sheet-title" id="editSheetTitle">Editar</div>
-    <button class="edit-close" onclick="closeEdit()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
-  </div>
-  <div class="edit-sheet-body" id="editSheetBody"></div>
-</div>
-
-<div class="toast" id="toast"></div>
-<div class="saving" id="saving">Guardando…</div>
-
-<!-- FIREBASE SDK -->
 <!-- FAB SELECTOR SHEET — debe estar ANTES del script -->
 <div class="fab-sel-overlay" id="fabSelOverlay"></div>
 <div class="fab-sel-sheet" id="fabSelSheet">
@@ -1680,6 +1802,171 @@ header {
     </button>
   </div>
 </div>
+
+
+<!-- FORM SHEET OVERLAY -->
+<div class="form-sheet-overlay" id="formSheetOverlay" onclick="closeSheet()"></div>
+
+<!-- SHEET: NUEVA FINANZA -->
+<!-- SHEET: FINANZA — 3 toques: tipo → monto → guardar -->
+<div class="form-sheet" id="sheet-fin">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title" id="finSheetTitle">💰 Nuevo ingreso</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <!-- Paso 1: Tipo (1 toque) -->
+    <div class="tipo-pill-row">
+      <button class="tipo-pill ing sel" id="pillIng" onclick="setTipoFin('ingreso')">
+        <span class="material-icons-round">trending_up</span>Ingreso
+      </button>
+      <button class="tipo-pill gas" id="pillGas" onclick="setTipoFin('gasto')">
+        <span class="material-icons-round">trending_down</span>Gasto
+      </button>
+    </div>
+    <!-- Paso 2: Monto grande (1 toque + número) -->
+    <input class="monto-grande" id="mMonto" type="number" min="0" placeholder="$0"
+      inputmode="decimal" onkeydown="if(event.key==='Enter')addMov()">
+    <!-- Atajos de montos frecuentes -->
+    <div class="quick-amounts" id="quickAmounts">
+      <button class="quick-amt" onclick="setMonto(500)">$500</button>
+      <button class="quick-amt" onclick="setMonto(1000)">$1.000</button>
+      <button class="quick-amt" onclick="setMonto(2000)">$2.000</button>
+      <button class="quick-amt" onclick="setMonto(5000)">$5.000</button>
+    </div>
+    <!-- Paso 3: Categoría como chips horizontales -->
+    <span class="sheet-section-lbl">Categoría</span>
+    <div class="cat-chips-row" id="finCatChips"></div>
+    <!-- Campos opcionales colapsables -->
+    <details style="margin-bottom:12px;">
+      <summary style="font-size:12px;color:var(--t3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;padding:4px 0;">
+        <span class="material-icons-round" style="font-size:16px">expand_more</span>Más opciones
+      </summary>
+      <div style="padding-top:10px;display:flex;flex-direction:column;gap:10px;">
+        <div class="m3-field"><input class="m3-inp" id="mFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+        <div class="m3-field"><input class="m3-inp" id="mDesc" placeholder=" "><label class="m3-lbl">Nota</label></div>
+      </div>
+    </details>
+    <input type="hidden" id="mCat" value="">
+    <button class="btn-arrow rpl" onclick="addMov()">
+      <span>Guardar</span>
+      <span class="material-icons-round arrow-icon">arrow_forward</span>
+    </button>
+  </div>
+</div>
+
+<!-- SHEET: PEDIDO — 3 toques: cliente → productos → guardar -->
+<div class="form-sheet" id="sheet-ped">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title">📋 Nuevo pedido</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <!-- Clientes frecuentes como chips -->
+    <span class="sheet-section-lbl">Cliente</span>
+    <div class="quick-clientes" id="quickClientes"></div>
+    <div class="m3-field"><input class="m3-inp" id="pCli" placeholder=" "><label class="m3-lbl">O escribí el nombre</label></div>
+    <!-- Productos del catálogo -->
+    <span class="sheet-section-lbl">Productos</span>
+    <div id="catCategoryList" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;"></div>
+    <div id="catProductList" style="margin-bottom:8px;"></div>
+    <div id="prodBox"></div>
+    <button class="add-prod-btn" onclick="addProd()">
+      <span class="material-icons-round" style="font-size:16px">add</span>Agregar producto
+    </button>
+    <!-- Fecha como campo opcional -->
+    <details style="margin-bottom:12px;">
+      <summary style="font-size:12px;color:var(--t3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;padding:4px 0;">
+        <span class="material-icons-round" style="font-size:16px">expand_more</span>Fecha y hora de entrega
+      </summary>
+      <div style="padding-top:10px;">
+        <div class="inp-row">
+          <div class="m3-field"><input class="m3-inp" id="pFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+          <div class="m3-field"><input class="m3-inp" id="pHora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
+        </div>
+      </div>
+    </details>
+    <button class="btn-arrow rpl" onclick="savePed()">
+      <span>Guardar pedido</span>
+      <span class="material-icons-round arrow-icon">arrow_forward</span>
+    </button>
+  </div>
+</div>
+
+<!-- SHEET: EVENTO — 3 toques: título → fecha → guardar -->
+<div class="form-sheet" id="sheet-age">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title">📅 Nuevo evento</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <div class="m3-field"><input class="m3-inp" id="evTit" placeholder=" " onkeydown="if(event.key==='Enter')this.nextElementSibling&&document.getElementById('evFecha').focus()"><label class="m3-lbl">¿Qué es?</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="evFecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+      <div class="m3-field"><input class="m3-inp" id="evHora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
+    </div>
+    <!-- Clientes frecuentes -->
+    <span class="sheet-section-lbl">Cliente (opcional)</span>
+    <div class="quick-clientes" id="quickClientesAge"></div>
+    <div class="m3-field"><input class="m3-inp" id="evCliente" placeholder=" "><label class="m3-lbl">O escribí el nombre</label></div>
+    <!-- Prioridad y nota colapsables -->
+    <details style="margin-bottom:12px;">
+      <summary style="font-size:12px;color:var(--t3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;padding:4px 0;">
+        <span class="material-icons-round" style="font-size:16px">expand_more</span>Más opciones
+      </summary>
+      <div style="padding-top:10px;display:flex;flex-direction:column;gap:10px;">
+        <select class="m3-select" id="evPrio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
+        <textarea class="m3-textarea" id="evDesc" rows="2" placeholder="Detalles…"></textarea>
+      </div>
+    </details>
+    <button class="btn-arrow rpl" onclick="saveEv()">
+      <span>Agendar</span>
+      <span class="material-icons-round arrow-icon">arrow_forward</span>
+    </button>
+  </div>
+</div>
+
+<!-- SHEET: TAREA — 3 toques: título → (fecha) → guardar -->
+<div class="form-sheet" id="sheet-task">
+  <div class="form-sheet-handle"><div class="form-sheet-bar"></div></div>
+  <div class="form-sheet-header">
+    <div class="form-sheet-title">✅ Nueva tarea</div>
+    <button class="form-sheet-close" onclick="closeSheet()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
+  </div>
+  <div class="form-sheet-body">
+    <div class="m3-field"><input class="m3-inp" id="taskTit" placeholder=" " onkeydown="if(event.key==='Enter')saveTask()"><label class="m3-lbl">¿Qué tenés que hacer?</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="taskFecha" type="date" placeholder=" "><label class="m3-lbl">Para cuándo</label></div>
+      <select class="m3-select" id="taskPrio" style="margin-bottom:0">
+        <option value="normal">Normal</option>
+        <option value="urgente">🔴 Urgente</option>
+      </select>
+    </div>
+    <div class="m3-field"><input class="m3-inp" id="taskDesc" placeholder=" "><label class="m3-lbl">Nota (opcional)</label></div>
+    <button class="btn-arrow rpl" onclick="saveTask()">
+      <span>Guardar tarea</span>
+      <span class="material-icons-round arrow-icon">arrow_forward</span>
+    </button>
+  </div>
+</div>
+
+<!-- EDIT SHEET -->
+<div class="edit-overlay" id="editOverlay" onclick="closeEdit()"></div>
+<div class="edit-sheet" id="editSheet">
+  <div class="edit-sheet-handle"><div class="edit-sheet-bar"></div></div>
+  <div class="edit-sheet-header">
+    <div class="edit-sheet-title" id="editSheetTitle">Editar</div>
+    <button class="edit-close" onclick="closeEdit()"><span class="material-icons-round" style="font-size:20px;color:var(--t3)">close</span></button>
+  </div>
+  <div class="edit-sheet-body" id="editSheetBody"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<div class="saving" id="saving">Guardando…</div>
+
 
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -1912,7 +2199,9 @@ async function addMov(){
     document.getElementById('mMonto').value='';
     document.getElementById('mDesc').value='';
     document.getElementById('mCat').value='';
-    S.selC=null;renderChips();renderMovs();renderMovsFin();renderHomeMovsRecientes();updateBanner();renderHomeBal();
+    S.selC=null;renderChips();renderMovs();renderMovsFin();renderHomeMovsRecientes();
+  ottoInsightsCache=[]; ottoLastFetch=0; // Invalidar cache OTTO
+  updateBanner();renderHomeBal();
     closeSheet();
     showToast('✅ Movimiento guardado');
   }catch(e){showToast('❌ Error al guardar. Revisá tu conexión.');}
@@ -2083,7 +2372,9 @@ async function savePed(){
     ped._id=ref.id;S.pedidos.unshift(ped);
     document.getElementById('pCli').value='';
     document.getElementById('prodBox').innerHTML=`<div class="prod-row"><div class="m3-field" style="flex:2;margin-bottom:0"><input class="m3-inp" placeholder=" "><label class="m3-lbl">Producto</label></div><div class="m3-field" style="flex:.8;margin-bottom:0"><input class="m3-inp" placeholder=" " type="number" min="1"><label class="m3-lbl">Cant.</label></div><button class="rm-btn" onclick="rmProd(this)"><span class="material-icons-round">close</span></button></div>`;
-    renderPeds();updateBanner();renderCals();renderPedWeek();renderHome();closeSheet();showToast('✅ Pedido guardado');
+    renderPeds();
+  ottoInsightsCache=[]; ottoLastFetch=0; // Invalidar cache OTTO
+  updateBanner();renderCals();renderPedWeek();renderHome();closeSheet();showToast('✅ Pedido guardado');
   }catch(e){showToast('❌ Error al guardar.');}
 }
 
@@ -2316,37 +2607,167 @@ function renderCal(which){
 }
 function renderCals(){renderCal('ped');renderCal('age');renderCal('task');}
 
-/* ── HOME ── */
-let sliderIdx=0;let sliderTimer=null;let notaGuardada='';
-function buildSlides(){
-  const ing=S.movs.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
-  const gas=S.movs.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
-  const bal=ing-gas;const hoy=new Date();hoy.setHours(0,0,0,0);const slides=[];
-  if(S.movs.length){const emoji=bal>=0?'📈':'⚠️';const msg=bal>=0?`${emoji} Tu balance este mes es <strong>+$${bal.toLocaleString()}</strong>. Los ingresos superan los gastos.`:`${emoji} Los gastos superan los ingresos en <strong>$${Math.abs(bal).toLocaleString()}</strong> este mes.`;slides.push(msg);}
-  const proxEv=S.eventos.filter(e=>{const fe=new Date(e.fecha+'T00:00:00');return fe>=hoy;}).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha))[0];
-  if(proxEv){const fe=new Date(proxEv.fecha+'T00:00:00');const diff=Math.ceil((fe-hoy)/86400000);const cuando=diff===0?'hoy':diff===1?'mañana':`en ${diff} días`;slides.push(`📅 Próximo evento <strong>${cuando}</strong>: ${proxEv.tit}${proxEv.cliente?' · '+proxEv.cliente:''}.`);}
+/* ── HOME — OTTO CON PERSONALIDAD ── */
+let sliderIdx=0; let sliderTimer=null; let notaGuardada='';
+let ottoInsightsCache=[]; let ottoLastFetch=0;
+
+// Construye el contexto completo para que Claude analice el negocio
+function buildOttoContext(){
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const mesActual=new Date().toISOString().slice(0,7);
+  const ing=S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mesActual)).reduce((s,m)=>s+m.monto,0);
+  const gas=S.movs.filter(m=>m.tipo==='gasto'&&m.fecha?.startsWith(mesActual)).reduce((s,m)=>s+m.monto,0);
+  const mesPrev=new Date(new Date().getFullYear(),new Date().getMonth()-1,1).toISOString().slice(0,7);
+  const ingPrev=S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mesPrev)).reduce((s,m)=>s+m.monto,0);
   const activos=S.pedidos.filter(p=>!p.archivado);
-  if(activos.length){const total=activos.reduce((s,p)=>s+p.items.reduce((ss,i)=>ss+i.q,0),0);slides.push(`📋 Tenés <strong>${activos.length} pedido(s)</strong> activos con ${total} unidades para producir.`);}
-  const pend=S.tareas.filter(t=>!t.done).length;
-  if(pend>0)slides.push(`✅ Tenés <strong>${pend} tarea(s) pendiente(s)</strong>. Revisá la sección Tareas.`);
-  if(notaGuardada)slides.push(`📝 Nota: <strong>${notaGuardada.substring(0,80)}${notaGuardada.length>80?'…':''}</strong>`);
-  if(!slides.length)slides.push(`Bienvenido, <strong>${S.nombre.split(' ')[0]}</strong>. Empezá cargando datos y te ayudo a gestionar tu negocio. 🚀`);
+  const proxPeds=activos.filter(p=>p.fecha).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)).slice(0,3);
+  const proxEvs=S.eventos.filter(e=>{const fe=new Date(e.fecha+'T00:00:00');return fe>=hoy;}).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha)).slice(0,3);
+  const pendTareas=S.tareas.filter(t=>!t.done);
+  const urgentes=pendTareas.filter(t=>t.prio==='urgente');
+  const hoyStr=new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'});
+
+  return `Sos OTTO, el socio inteligente de ${S.nombre?.split(' ')[0]||'emprendedor'}, dueño/a de "${S.perfil?.negocio||S.negocio||'su negocio'}".
+Rubro: ${S.perfil?.rubro||'negocio'}.
+Fecha de hoy: ${hoyStr}.
+
+Tu misión: generar exactamente 3 insights breves, concretos y útiles sobre su negocio.
+Cada insight debe:
+- Tener máximo 2 oraciones
+- Ser específico con los números reales
+- Tener tono de socio cercano, no de sistema
+- Empezar con un emoji relevante
+- NO usar asteriscos, NO usar markdown
+- Hablar en español rioplatense (vos, te, etc.)
+
+Respondé SOLO con un JSON array de 3 strings. Ejemplo:
+["insight 1", "insight 2", "insight 3"]
+
+DATOS DEL NEGOCIO:
+Finanzas este mes: Ingresos $${ing.toLocaleString()} / Gastos $${gas.toLocaleString()} / Balance ${ing-gas>=0?'+':''}$${(ing-gas).toLocaleString()}
+${ingPrev>0?`Mes anterior: Ingresos $${ingPrev.toLocaleString()} (${ing>ingPrev?'+'+(((ing-ingPrev)/ingPrev)*100).toFixed(0)+'% vs mes pasado':'-'+(((ingPrev-ing)/ingPrev)*100).toFixed(0)+'% vs mes pasado'})`:''} 
+Pedidos activos: ${activos.length}${proxPeds.length?'. Próximos: '+proxPeds.map(p=>`${p.cli} el ${p.fecha}`).join(', '):''}
+Agenda próxima: ${proxEvs.length?proxEvs.map(e=>`${e.tit} el ${e.fecha}`).join(', '):'sin eventos'}
+Tareas pendientes: ${pendTareas.length}${urgentes.length?' ('+urgentes.length+' urgentes)':''}
+Nota del dueño: ${notaGuardada||'sin nota'}
+Total movimientos registrados: ${S.movs.length}`;
+}
+
+// Fallback local — se usa cuando no hay conexión o error de API
+function buildSlidesFallback(){
+  const hoy=new Date(); hoy.setHours(0,0,0,0);
+  const mesActual=new Date().toISOString().slice(0,7);
+  const ing=S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mesActual)).reduce((s,m)=>s+m.monto,0);
+  const gas=S.movs.filter(m=>m.tipo==='gasto'&&m.fecha?.startsWith(mesActual)).reduce((s,m)=>s+m.monto,0);
+  const bal=ing-gas; const slides=[]; const nombre=S.nombre?.split(' ')[0]||'vos';
+  if(!S.movs.length){
+    slides.push(`Hola ${nombre} 👋 Empezá cargando tus ventas y te voy ayudando a ver cómo va el negocio.`);
+  } else {
+    const bal=ing-gas;
+    if(bal>=0) slides.push(`📈 Este mes llevás <strong>+$${ing.toLocaleString()}</strong> en ventas. El balance es positivo, bien ahí.`);
+    else slides.push(`⚠️ Los gastos superan los ingresos en <strong>$${Math.abs(bal).toLocaleString()}</strong> este mes. Revisemos juntos.`);
+  }
+  const activos=S.pedidos.filter(p=>!p.archivado);
+  if(activos.length){
+    const total=activos.reduce((s,p)=>s+p.items.reduce((ss,i)=>ss+i.q,0),0);
+    slides.push(`📋 Tenés <strong>${activos.length} pedido${activos.length>1?'s':''}</strong> activo${activos.length>1?'s':''} con <strong>${total} unidades</strong> para producir.`);
+  }
+  const proxEv=S.eventos.filter(e=>new Date(e.fecha+'T00:00:00')>=hoy).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha))[0];
+  if(proxEv){
+    const diff=Math.ceil((new Date(proxEv.fecha+'T00:00:00')-hoy)/86400000);
+    const cuando=diff===0?'hoy':diff===1?'mañana':`en ${diff} días`;
+    slides.push(`📅 <strong>${proxEv.tit}</strong> ${cuando}${proxEv.cliente?' · '+proxEv.cliente:''}.`);
+  }
+  const pend=S.tareas.filter(t=>!t.done);
+  if(pend.length) slides.push(`✅ Tenés <strong>${pend.length} tarea${pend.length>1?'s':''} pendiente${pend.length>1?'s':''}</strong>. ¿Las revisamos?`);
+  if(!slides.length) slides.push(`Todo tranquilo por acá 🌿 Cargá datos y te ayudo a ver cómo va tu negocio.`);
   return slides;
 }
-function renderSlider(){
-  const slides=buildSlides();const sliderEl=document.getElementById('ottoSlider');const dotsEl=document.getElementById('sliderDots');
-  sliderEl.innerHTML=slides.map(s=>`<div class="otto-slide"><div class="otto-slide-label"><span class="otto-dot"></span>OTTO dice</div><div class="otto-slide-text">${s}</div></div>`).join('');
-  dotsEl.innerHTML=slides.map((_,i)=>`<div class="slider-dot${i===sliderIdx?' on':''}" onclick="goSlide(${i})"></div>`).join('');
-  goSlide(0);
-  if(sliderTimer)clearInterval(sliderTimer);
-  sliderTimer=setInterval(()=>{sliderIdx=(sliderIdx+1)%slides.length;goSlide(sliderIdx);},4000);
-  let startX=0;
-  const wrap=sliderEl.parentElement;
-  wrap.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
-  wrap.addEventListener('touchend',e=>{const diff=startX-e.changedTouches[0].clientX;if(Math.abs(diff)>40){const total=slides.length;sliderIdx=diff>0?(sliderIdx+1)%total:(sliderIdx-1+total)%total;goSlide(sliderIdx);}},{passive:true});
+
+// Generar insights con Claude — cachea por 5 minutos
+async function generateOttoInsights(){
+  const now=Date.now();
+  // Si hay cache válido (5 min) y tenemos datos, usarlo
+  if(ottoInsightsCache.length && (now-ottoLastFetch)<300000) return ottoInsightsCache;
+  // Sin datos suficientes → fallback local
+  if(!S.movs.length && !S.pedidos.length && !S.eventos.length) return buildSlidesFallback();
+  try {
+    const ctx=buildOttoContext();
+    const res=await fetch('/.netlify/functions/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:400,
+        system:'Sos OTTO. Respondé ÚNICAMENTE con un JSON array de 3 strings. Sin ningún texto extra antes o después.',
+        messages:[{role:'user',content:ctx}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.[0]?.text||'[]';
+    // Parsear JSON — manejar posibles errores
+    const clean=text.replace(/```json|```/g,'').trim();
+    const parsed=JSON.parse(clean);
+    if(Array.isArray(parsed)&&parsed.length){
+      ottoInsightsCache=parsed;
+      ottoLastFetch=now;
+      return parsed;
+    }
+  } catch(e){ console.warn('OTTO insights fallback:', e.message); }
+  return buildSlidesFallback();
 }
-function goSlide(idx){sliderIdx=idx;document.getElementById('ottoSlider').style.transform=`translateX(-${idx*100}%)`;document.querySelectorAll('.slider-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));}
+
+function renderSliderWithSlides(slides){
+  const sliderEl=document.getElementById('ottoSlider');
+  const dotsEl=document.getElementById('sliderDots');
+  if(!sliderEl||!dotsEl) return;
+  sliderEl.innerHTML=slides.map(s=>
+    `<div class="otto-slide">
+      <div class="otto-slide-label"><span class="otto-dot"></span>OTTO dice</div>
+      <div class="otto-slide-text">${s}</div>
+    </div>`
+  ).join('');
+  dotsEl.innerHTML=slides.map((_,i)=>
+    `<div class="slider-dot${i===0?' on':''}" onclick="goSlide(${i})"></div>`
+  ).join('');
+  goSlide(0);
+  if(sliderTimer) clearInterval(sliderTimer);
+  sliderTimer=setInterval(()=>{
+    sliderIdx=(sliderIdx+1)%slides.length;
+    goSlide(sliderIdx);
+  },5000);
+  // Touch swipe
+  const wrap=sliderEl.parentElement;
+  wrap.ontouchstart=e=>{ wrap._sx=e.touches[0].clientX; };
+  wrap.ontouchend=e=>{
+    const diff=wrap._sx-e.changedTouches[0].clientX;
+    if(Math.abs(diff)>40){
+      const n=slides.length;
+      sliderIdx=diff>0?(sliderIdx+1)%n:(sliderIdx-1+n)%n;
+      goSlide(sliderIdx);
+    }
+  };
+}
+
+async function renderSlider(){
+  const sliderEl=document.getElementById('ottoSlider');
+  if(!sliderEl) return;
+  // Mostrar loading mientras carga
+  sliderEl.innerHTML=`<div class="otto-slide">
+    <div class="otto-slide-label"><span class="otto-dot"></span>OTTO</div>
+    <div class="otto-loading"><div class="typing"><span></span><span></span><span></span></div><span>Analizando tu negocio…</span></div>
+  </div>`;
+  const slides=await generateOttoInsights();
+  renderSliderWithSlides(slides);
+}
+
+function goSlide(idx){
+  sliderIdx=idx;
+  const el=document.getElementById('ottoSlider');
+  if(el) el.style.transform=`translateX(-${idx*100}%)`;
+  document.querySelectorAll('.slider-dot').forEach((d,i)=>d.classList.toggle('on',i===idx));
+}
 window.goSlide=goSlide;
+window.renderSlider=renderSlider;
 
 function renderWeek(){
   const hoy=new Date();hoy.setHours(0,0,0,0);
@@ -2645,199 +3066,111 @@ window.toggleHistorial=toggleHistorial;
 /* ── ONBOARDING ── */
 let obRubro=null;let obEquipo=null;let obObjetivo=null;
 
-function showOnboarding(){document.getElementById('onboarding').classList.add('visible');}
-function skipOnboarding(){document.getElementById('onboarding').classList.remove('visible');}
+function showOnboarding(){
+  document.getElementById('onboarding').classList.add('visible');
+}
+function skipOnboarding(){
+  document.getElementById('onboarding').classList.remove('visible');
+}
+window.showOnboarding=showOnboarding;
+window.skipOnboarding=skipOnboarding;
 
-function selectRubro(rubro,emoji){obRubro={rubro,emoji};document.querySelectorAll('#obRubroOpts .ob-option').forEach(el=>el.classList.remove('sel'));event.currentTarget.classList.add('sel');document.getElementById('obRubroCustom').style.display=rubro==='otro'?'block':'none';}
-function selectEquipo(tipo){obEquipo=tipo;document.getElementById('obEquipoSolo').classList.toggle('sel',tipo==='solo');document.getElementById('obEquipoTeam').classList.toggle('sel',tipo==='equipo');}
-function selectObjetivo(obj){obObjetivo=obj;['obObj0','obObj1','obObj2','obObj3'].forEach(id=>document.getElementById(id).classList.remove('sel'));const map={finanzas:'obObj0',pedidos:'obObj1',agenda:'obObj2',todo:'obObj3'};document.getElementById(map[obj]).classList.add('sel');}
-function obNext(step){document.querySelectorAll('.ob-step').forEach(s=>s.classList.remove('on'));document.querySelectorAll('.ob-dot').forEach((d,i)=>d.classList.toggle('on',i===step));document.getElementById('obStep'+step).classList.add('on');}
+// Navegación entre pasos
+let obRubroVal=''; let obRubroEmoji=''; let obNegocioVal='';
+function obGoStep(step){
+  // Ocultar todos
+  document.getElementById('obWelcome')?.classList.remove('on');
+  document.getElementById('obStep1')?.classList.remove('on');
+  document.getElementById('obStep2')?.classList.remove('on');
+  document.getElementById('obStep3')?.classList.remove('on');
+  // Mostrar el paso actual
+  if(step===0) document.getElementById('obWelcome')?.classList.add('on');
+  else if(step===1) { document.getElementById('obStep1')?.classList.add('on'); setTimeout(()=>document.getElementById('obNegocio')?.focus(),300); }
+  else if(step===2) document.getElementById('obStep2')?.classList.add('on');
+  else if(step===3) {
+    // Preparar pantalla final con nombre personalizado
+    obNegocioVal = document.getElementById('obNegocio')?.value.trim() || S.nombre || '';
+    const titulo = obNegocioVal ? `¡Listo, ${obNegocioVal}!` : '¡Todo listo!';
+    const sub = obNegocioVal
+      ? `OTTO ya conoce ${obNegocioVal} y está listo para ayudarte a crecer.`
+      : 'OTTO está listo para ayudarte a crecer.';
+    const el = document.getElementById('obDoneTitle');
+    const sub2 = document.getElementById('obDoneSub');
+    if(el) el.textContent = titulo;
+    if(sub2) sub2.textContent = sub;
+    document.getElementById('obStep3')?.classList.add('on');
+    // Auto-finish después de 2.5s si el usuario no toca nada
+    setTimeout(()=>{ if(document.getElementById('onboarding')?.classList.contains('visible')) finishOnboarding(); }, 2800);
+  }
+}
+window.obGoStep=obGoStep;
+
+function selectRubro(rubro, emoji, el){
+  obRubroVal=rubro; obRubroEmoji=emoji;
+  // Visual
+  document.querySelectorAll('.ob-rubro-item').forEach(i=>i.classList.remove('sel'));
+  if(el) el.classList.add('sel');
+  // Custom input
+  const customInp = document.getElementById('obRubroCustom');
+  if(rubro==='otro'){ if(customInp){ customInp.style.display='block'; customInp.focus(); } }
+  else { if(customInp) customInp.style.display='none'; }
+  // Habilitar continuar
+  const btn = document.getElementById('obContinue2');
+  if(btn) btn.disabled=false;
+}
+window.selectRubro=selectRubro;
+
+// Mantener compatibilidad con las funciones viejas que pueden llamarse desde otros lugares
+function selectEquipo(v){ /* legacy */ }
+function selectObjetivo(v){ /* legacy */ }
+window.selectEquipo=selectEquipo;
+window.selectObjetivo=selectObjetivo;
+
+// Mantener obNext para compatibilidad
+function obNext(step){ obGoStep(step); }
+window.obNext=obNext;
 
 async function finishOnboarding(){
-  const customRubro=document.getElementById('obRubroCustom').value.trim();
-  const rubroFinal=customRubro||(obRubro?obRubro.rubro:'otro');const emojiFinal=obRubro?obRubro.emoji:'💼';
-  S.perfil={rubro:rubroFinal,emoji:emojiFinal,equipo:obEquipo||'solo',objetivo:obObjetivo||'todo',onboardingDone:true,negocio:S.nombre};
-  try{await addDoc(col('perfil'),{...S.perfil,creadoEn:new Date().toISOString()});}catch(e){}
-  document.getElementById('onboarding').classList.remove('visible');renderPerfil();
-  const tabMap={finanzas:'fin',pedidos:'ped',agenda:'age',todo:'home'};
-  menuNav(tabMap[obObjetivo||'todo']);
-  showToast(`¡Bienvenido a OTTO, ${S.nombre.split(' ')[0]}! 🎉`);
-}
-window.skipOnboarding=skipOnboarding;window.selectRubro=selectRubro;window.selectEquipo=selectEquipo;window.selectObjetivo=selectObjetivo;window.obNext=obNext;window.finishOnboarding=finishOnboarding;
+  const negocio = document.getElementById('obNegocio')?.value.trim() || obNegocioVal || S.nombre || '';
+  let rubro = obRubroVal;
+  if(rubro==='otro'){
+    const custom = document.getElementById('obRubroCustom')?.value.trim();
+    if(custom) rubro=custom;
+  }
+  const rubroLabels={panaderia:'Panadería',gastronomia:'Gastronomía',servicios:'Servicios',comercio:'Comercio',construccion:'Construcción'};
+  const rubroLabel = rubroLabels[rubro] || rubro || 'Mi negocio';
+  const emoji = obRubroEmoji || '💼';
 
-function renderPerfil(){
-  if(!S.perfil)return;
-  const p=S.perfil;
-  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v||'';};
-  // Perfil card
-  setEl('perfilRubro',(p.rubroIcon||'💼')+' '+(p.rubro||'Mi negocio'));
-  setEl('perfilNombre',p.nombre||S.nombre||'—');
-  setEl('perfilDesc',p.descripcion||'');
-  // Header y menú
-  setEl('headerNegocio', p.negocio||p.nombre||S.nombre||'');
-  setEl('menuNegocio', p.negocio||p.nombre||S.nombre||'');
-  // Mi negocio panel
-  setEl('mnNombreNegocio', p.negocio||p.nombre||S.nombre||'—');
-  setEl('mnRubroNegocio', p.rubro||p.descripcion||'');
-}
+  S.perfil = {
+    rubro: rubroLabel, emoji, negocio: negocio||S.nombre,
+    nombre: S.nombre, onboardingDone: true,
+    creadoEn: new Date().toISOString(),
+    _meta:{ version:1, completado:true }
+  };
 
-function editPerfil(){
-  openEdit('Editar perfil',`<div class="m3-field"><input class="m3-inp" id="epNegocio" value="${S.negocio||''}" placeholder=" "><label class="m3-lbl">Nombre del negocio</label></div><select class="m3-select" id="epRubro"><option value="panaderia" ${S.perfil?.rubro==='panaderia'?'selected':''}>🥐 Panadería</option><option value="gastronomia" ${S.perfil?.rubro==='gastronomia'?'selected':''}>🍽️ Gastronomía</option><option value="fotografia" ${S.perfil?.rubro==='fotografia'?'selected':''}>📸 Fotografía</option><option value="construccion" ${S.perfil?.rubro==='construccion'?'selected':''}>🔨 Construcción</option><option value="comercio" ${S.perfil?.rubro==='comercio'?'selected':''}>🛍️ Comercio</option><option value="otro" ${S.perfil?.rubro==='otro'?'selected':''}>💼 Otro</option></select><div class="m3-field"><input class="m3-inp" id="epDesc" value="${S.perfil?.descripcion||''}" placeholder=" "><label class="m3-lbl">Descripción del negocio</label></div><div class="m3-field"><input class="m3-inp" id="epCuit" value="${S.perfil?.cuit||''}" placeholder=" "><label class="m3-lbl">CUIT / ID fiscal (opcional)</label></div><button class="m3-btn rpl" onclick="savePerfil()"><span class="material-icons-round">save</span>Guardar perfil</button>`);
-}
-window.editPerfil=editPerfil;
+  // Actualizar nombre del negocio en el header inmediatamente
+  if(negocio){
+    S.negocio = negocio;
+    ['headerNegocio','menuNegocio','mnNombreNegocio'].forEach(id=>{
+      const e=document.getElementById(id);
+      if(e) e.textContent=negocio;
+    });
+  }
 
-async function savePerfil(){
-  const negocio=document.getElementById('epNegocio').value.trim();const rubro=document.getElementById('epRubro').value;const desc=document.getElementById('epDesc').value.trim();const cuit=document.getElementById('epCuit').value.trim();
-  S.negocio=negocio||S.negocio;if(!S.perfil)S.perfil={};S.perfil={...S.perfil,rubro,descripcion:desc,cuit,negocio};
-  try{const snap=await getDocs(col('perfil'));if(!snap.empty){await updateDoc(doc(db,`usuarios/${S.uid}/perfil`,snap.docs[0].id),{negocio,rubro,descripcion:desc,cuit});}else{await addDoc(col('perfil'),{negocio,rubro,descripcion:desc,cuit,creadoEn:new Date().toISOString()});} document.getElementById('uName').textContent=negocio.split(' ')[0]||S.nombre.split(' ')[0];}catch(e){}
-  renderPerfil();closeEdit();showToast('✅ Perfil actualizado');
-}
-window.savePerfil=savePerfil;
-
-/* ── MI NEGOCIO ── */
-let mnTabActual='productos';
-function switchMnTab(tab,el){mnTabActual=tab;document.querySelectorAll('.mn-tab').forEach(t=>t.classList.remove('on'));if(el)el.classList.add('on');renderMnContent();}
-window.switchMnTab=switchMnTab;
-
-function renderMnContent(){
-  const cfg=MN_CONFIG[mnTabActual];const items=S.miNegocio[mnTabActual]||[];const el=document.getElementById('mnContent');if(!el)return;
-  const lista=items.length?items.map(item=>`<div class="mn-item"><div class="mn-item-icon" style="background:${cfg.bg}">${cfg.icon}</div><div class="mn-item-info"><div class="mn-item-name">${item.nombre||'—'}</div><div class="mn-item-sub">${getMnSubtitle(mnTabActual,item)}</div></div><div class="mn-item-actions"><button class="mn-btn-edit" onclick="editMnItem('${mnTabActual}','${item._id}')">✏️</button><button class="mn-btn-del" onclick="delMnItem('${mnTabActual}','${item._id}')">🗑️</button></div></div>`).join(''):`<div class="empty"><span>${cfg.icon}</span>Sin ${mnTabActual} aún.<br><small style="font-size:11px;opacity:.6">Agregá tu primer ${cfg.label.toLowerCase()}</small></div>`;
-  el.innerHTML=`<div class="mn-section"><div class="mn-section-title">${cfg.icon} ${cfg.label}s<button class="mn-add-btn" onclick="addMnItem('${mnTabActual}')">+ Agregar</button></div><div class="mn-list">${lista}</div></div>`;
-  // Si algún collapse está abierto, re-renderizarlo
-  ['productos','clientes','proveedores','equipo','servicios','impositiva'].forEach(tab => {
-    const b = document.getElementById('mnb-' + tab);
-    if (b && b.style.display !== 'none') renderMnCollapseBody(tab);
-  });
-}
-
-function getMnSubtitle(tab,item){const parts=[];if(tab==='productos'){if(item.precio)parts.push('$'+Number(item.precio).toLocaleString());if(item.categoria)parts.push(item.categoria);}else if(tab==='clientes'){if(item.telefono)parts.push('📱 '+item.telefono);if(item.email)parts.push(item.email);}else if(tab==='proveedores'){if(item.queProvee)parts.push(item.queProvee);if(item.telefono)parts.push('📱 '+item.telefono);}else if(tab==='equipo'){if(item.rol)parts.push(item.rol);if(item.sueldo)parts.push('$'+Number(item.sueldo).toLocaleString());}else if(tab==='servicios'){if(item.costo)parts.push('$'+Number(item.costo).toLocaleString()+'/mes');if(item.vencimiento)parts.push('Vence: '+fmt(item.vencimiento));}else if(tab==='impositiva'){if(item.vencimiento)parts.push('Vence: '+fmt(item.vencimiento));if(item.monto)parts.push('$'+Number(item.monto).toLocaleString());}return parts.join(' · ')||item.notas||item.descripcion||'';}
-
-function addMnItem(tab){const cfg=MN_CONFIG[tab];const campos=cfg.campos.map(c=>`<div class="m3-field"><input class="m3-inp" id="mnf_${c.id}" type="${c.type||'text'}" placeholder=" " ${c.required?'required':''}><label class="m3-lbl">${c.label}${c.required?' *':''}</label></div>`).join('');openEdit(`Nuevo ${cfg.label}`,`${campos}<button class="m3-btn rpl" onclick="saveMnItem('${tab}',null)"><span class="material-icons-round">save</span>Guardar</button>`);}
-window.addMnItem=addMnItem;
-function openMnAdd(tab){addMnItem(tab);}
-window.openMnAdd=openMnAdd;
-
-function editMnItem(tab,id){const cfg=MN_CONFIG[tab];const item=(S.miNegocio[tab]||[]).find(x=>x._id===id);if(!item)return;const campos=cfg.campos.map(c=>`<div class="m3-field"><input class="m3-inp" id="mnf_${c.id}" type="${c.type||'text'}" value="${item[c.id]||''}" placeholder=" "><label class="m3-lbl">${c.label}</label></div>`).join('');openEdit(`Editar ${cfg.label}`,`${campos}<button class="m3-btn rpl" onclick="saveMnItem('${tab}','${id}')"><span class="material-icons-round">save</span>Guardar cambios</button>`);}
-window.editMnItem=editMnItem;
-
-async function saveMnItem(tab,id){
-  const cfg=MN_CONFIG[tab];const data={};cfg.campos.forEach(c=>{const el=document.getElementById('mnf_'+c.id);if(el)data[c.id]=el.value.trim();});
-  if(!data.nombre){alert('El nombre es obligatorio.');return;}showSaving();
-  try{if(id){await updateDoc(doc(db,`usuarios/${S.uid}/mn_${tab}`,id),data);const idx=S.miNegocio[tab].findIndex(x=>x._id===id);if(idx>-1)S.miNegocio[tab][idx]={...S.miNegocio[tab][idx],...data};}else{const ref=await addDoc(col('mn_'+tab),{...data,creadoEn:new Date().toISOString()});if(!S.miNegocio[tab])S.miNegocio[tab]=[];S.miNegocio[tab].push({...data,_id:ref.id});}renderMnContent();renderMnCollapseBody(tab);closeEdit();showToast('✅ Guardado correctamente');}catch(e){showToast('❌ Error al guardar.');}
-}
-window.saveMnItem=saveMnItem;
-
-async function delMnItem(tab,id){
-  if(!confirm('¿Eliminar este elemento?'))return;
-  try{await deleteDoc(doc(db,`usuarios/${S.uid}/mn_${tab}`,id));S.miNegocio[tab]=S.miNegocio[tab].filter(x=>x._id!==id);renderMnContent();renderMnCollapseBody(tab);showToast('🗑️ Eliminado');}catch(e){showToast('❌ Error.');}
-}
-window.delMnItem=delMnItem;
-
-window.goTab=goTab;window.setTipo=setTipo;window.calNav=calNav;
-
-/* ── BOTTOM SHEETS DE FORMULARIOS ── */
-function openSheet(tipo){
-  // Cerrar FAB
-  if(window.closeFab) window.closeFab();
-  // Cerrar todos los sheets — solo clases, sin style inline
-  document.querySelectorAll('.form-sheet').forEach(s=>{
-    s.classList.remove('open');
-    s.removeAttribute('style');
-  });
-  const hoy=new Date().toISOString().split('T')[0];
-  const g=id=>document.getElementById(id);
-  if(tipo==='fin' && g('mFecha')) g('mFecha').value=hoy;
-  if(tipo==='ped' && g('pFecha')){ g('pFecha').value=hoy; renderCatSelectorSheet(); }
-  if(tipo==='age' && g('evFecha')){ g('evFecha').value=hoy; renderClienteSelectorSheet(); }
-  if(tipo==='task' && g('taskFecha')) g('taskFecha').value=hoy;
-  const ov=g('formSheetOverlay');
-  if(ov) ov.classList.add('visible');
-  const sh=g('sheet-'+tipo);
-  if(sh) sh.classList.add('open');
-}
-function closeSheet(){
-  const ov=document.getElementById('formSheetOverlay');
-  if(ov) ov.classList.remove('visible');
-  document.querySelectorAll('.form-sheet').forEach(s=>{
-    s.classList.remove('open');
-    s.removeAttribute('style');
-  });
-}
-window.openSheet=openSheet;
-window.closeSheet=closeSheet;
-
-/* ── CATÁLOGO POR CATEGORÍA ── */
-let catSelectedCategory=null;
-
-function getCategorias(){
-  // Obtiene categorías únicas de Mi Negocio → Productos
-  const cats=new Set();
-  (S.miNegocio.productos||[]).forEach(p=>{if(p.categoria&&p.categoria.trim())cats.add(p.categoria.trim());});
-  (S.catalogo||[]).forEach(p=>{if(p.categoria&&p.categoria.trim())cats.add(p.categoria.trim());});
-  if(!cats.size)cats.add('General');
-  return [...cats];
-}
-
-function getProductosPorCategoria(cat){
-  const todos=[];
-  const nombresSet=new Set();
-  (S.miNegocio.productos||[]).forEach(p=>{
-    if(p.nombre&&!nombresSet.has(p.nombre.toLowerCase())){
-      const pCat=p.categoria||'General';
-      if(pCat===cat||(!p.categoria&&cat==='General')){
-        nombresSet.add(p.nombre.toLowerCase());
-        todos.push({nombre:p.nombre,precio:p.precio});
-      }
+  // Guardar en Firestore
+  try {
+    if(S.uid){
+      await setDoc(doc(db,`usuarios/${S.uid}/perfil/datos`), S.perfil);
     }
-  });
-  (S.catalogo||[]).forEach(p=>{
-    if(p.nombre&&!nombresSet.has(p.nombre.toLowerCase())){
-      const pCat=p.categoria||'General';
-      if(pCat===cat||(!p.categoria&&cat==='General')){
-        nombresSet.add(p.nombre.toLowerCase());
-        todos.push({nombre:p.nombre});
-      }
-    }
-  });
-  return todos;
-}
+  } catch(e){ console.warn('onboarding save:',e); }
 
-function renderCatSelectorSheet(){
-  const catList=document.getElementById('catCategoryList');
-  const prodList=document.getElementById('catProductList');
-  if(!catList)return;
-  catSelectedCategory=null;
-  prodList.style.display='none';
-  const cats=getCategorias();
-  if(!cats.length){catList.innerHTML='<span style="font-size:12px;color:var(--t3)">Sin productos. Agregá en Mi negocio → Productos 🛍️</span>';return;}
-  catList.innerHTML=cats.map(c=>`
-    <button class="m3-chip" onclick="selectCatCategory('${c}')" id="catcat_${c.replace(/\s/g,'_')}">${c}</button>
-  `).join('');
-  // Si solo hay una categoría, seleccionarla automáticamente
-  if(cats.length===1)selectCatCategory(cats[0]);
+  document.getElementById('onboarding').classList.remove('visible');
+  renderPerfil();
+  showToast('¡Bienvenido a OTTO! 🚀');
 }
+window.finishOnboarding=finishOnboarding;
 
-function selectCatCategory(cat){
-  catSelectedCategory=cat;
-  document.querySelectorAll('#catCategoryList .m3-chip').forEach(b=>b.classList.remove('sel'));
-  const btn=document.getElementById('catcat_'+cat.replace(/\s/g,'_'));
-  if(btn)btn.classList.add('sel');
-  const productos=getProductosPorCategoria(cat);
-  const prodList=document.getElementById('catProductList');
-  if(!productos.length){prodList.innerHTML='<div style="font-size:12px;color:var(--t3);padding:6px 0">Sin productos en esta categoría</div>';prodList.style.display='block';return;}
-  prodList.style.display='block';
-  prodList.innerHTML='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t4);margin-bottom:8px;">'+cat+'</div>'+productos.map(p=>{
-    const qty=catalogoSeleccionado[p.nombre]||0;
-    return `<div style="display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:var(--r10);padding:8px 12px;margin-bottom:6px;">
-      <span style="flex:1;font-size:13px;font-weight:700">${p.nombre}${p.precio?` <span style="font-size:11px;color:var(--t3);font-weight:500">$${Number(p.precio).toLocaleString()}</span>`:''}</span>
-      <div class="qty-selector">
-        <button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button>
-        <span class="qty-num" id="qty_${p.nombre.replace(/[\s']/g,'_')}">${qty}</span>
-        <button class="qty-btn" onclick="changeCatQty('${p.nombre}',1)">+</button>
-      </div>
-    </div>`;
-  }).join('')+'<button class="m3-btn rpl" onclick="addFromCatalogo()" style="margin-top:6px;"><span class="material-icons-round">add</span>Agregar al pedido</button>';
-}
+
 window.selectCatCategory=selectCatCategory;
 
 /* ── CLIENTES POR CATEGORÍA ── */
@@ -2933,22 +3266,32 @@ window.toggleQuickChat=toggleQuickChat;
 
 async function sendQuickMsg(){
   const inp=document.getElementById('quickChatInp');
-  const msg=inp.value.trim();if(!msg)return;
+  const msg=inp.value.trim(); if(!msg) return;
   inp.value='';
   addQuickBub(msg,'me');
   const tid='qt'+Date.now();
   const box=document.getElementById('quickChatMsgs');
-  box.innerHTML+=`<div class="msg" id="${tid}"><div class="msg-av">O</div><div class="msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-  box.scrollTop=99999;
-  const ing=S.movs.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
-  const gas=S.movs.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
-  const ctx=`Sos OTTO, el socio de ${S.nombre} de "${S.negocio}". Muy conciso, máximo 2 oraciones. Español rioplatense. Sin markdown.
-Ingresos:$${ing} Gastos:$${gas} Balance:$${ing-gas}. Pedidos activos:${S.pedidos.filter(p=>!p.archivado).length}. Eventos:${S.eventos.length}. Tareas pendientes:${S.tareas.filter(t=>!t.done).length}.`;
+  if(box){
+    box.innerHTML+=`<div class="msg" id="${tid}"><div class="msg-av">O</div><div class="msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+    box.scrollTop=99999;
+  }
+  const ctxQ=buildOttoContext()+'
+
+Respondé en máximo 2 oraciones. Sin markdown. Sin asteriscos.';
   try{
-    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,system:ctx,messages:[{role:'user',content:msg}]})});
-    const data=await res.json();const reply=data.content?.[0]?.text||'Sin respuesta';
-    document.getElementById(tid)?.remove();addQuickBub(reply,'otto');
-  }catch(e){document.getElementById(tid)?.remove();addQuickBub('No pude conectarme. Intentá de nuevo.','otto');}
+    const res=await fetch('/.netlify/functions/chat',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,system:ctxQ,messages:[{role:'user',content:msg}]})
+    });
+    const data=await res.json();
+    const reply=data.content?.[0]?.text||'Sin respuesta';
+    document.getElementById(tid)?.remove();
+    addQuickBub(reply,'otto');
+  }catch(e){
+    document.getElementById(tid)?.remove();
+    addQuickBub('No pude conectarme. Intentá de nuevo.','otto');
+  }
 }
 function addQuickBub(text,who){
   const box=document.getElementById('quickChatMsgs');
@@ -3503,6 +3846,112 @@ document.addEventListener('click', function(e) {
     }
   });
 });
+
+// ── HELPERS SHEETS 3 TOQUES ──
+
+// Finanza: tipo pill
+function setTipoFin(tipo){
+  S.tipo = tipo;
+  const pillIng = document.getElementById('pillIng');
+  const pillGas = document.getElementById('pillGas');
+  const title = document.getElementById('finSheetTitle');
+  if(tipo==='ingreso'){
+    pillIng?.classList.add('sel'); pillGas?.classList.remove('sel');
+    if(title) title.textContent = '💰 Nuevo ingreso';
+  } else {
+    pillGas?.classList.add('sel'); pillIng?.classList.remove('sel');
+    if(title) title.textContent = '💸 Nuevo gasto';
+  }
+}
+window.setTipoFin = setTipoFin;
+
+// Atajo de montos
+function setMonto(val){
+  const inp = document.getElementById('mMonto');
+  if(inp){ inp.value = val; inp.focus(); }
+  document.querySelectorAll('.quick-amt').forEach(b=>{
+    b.classList.toggle('sel', parseInt(b.textContent.replace(/\D/g,'')) === val);
+  });
+}
+window.setMonto = setMonto;
+
+// Categorías de finanza como chips horizontales
+function renderFinCatChips(){
+  const wrap = document.getElementById('finCatChips');
+  if(!wrap) return;
+  const cats = ['Ventas','Materiales','Sueldos','Servicios','Alquiler','Otros'];
+  // Agregar categorías propias del negocio
+  (S.miNegocio?.productos||[]).forEach(p=>{ if(p.categoria && !cats.includes(p.categoria)) cats.push(p.categoria); });
+  const selVal = document.getElementById('mCat')?.value || '';
+  wrap.innerHTML = cats.map(c=>`
+    <button class="cat-chip-q${selVal===c?' sel':''}" onclick="selFinCat('${c.replace(/'/g,"\'")}',this)">${c}</button>
+  `).join('');
+}
+window.renderFinCatChips = renderFinCatChips;
+
+function selFinCat(cat, el){
+  const mCat = document.getElementById('mCat');
+  if(mCat) mCat.value = cat;
+  document.querySelectorAll('.cat-chip-q').forEach(b=>b.classList.remove('sel'));
+  if(el) el.classList.add('sel');
+}
+window.selFinCat = selFinCat;
+
+// Clientes frecuentes para pedidos y agenda
+function renderQuickClientes(containerId, inputId){
+  const wrap = document.getElementById(containerId);
+  if(!wrap) return;
+  const clientes = (S.miNegocio?.clientes||[]).slice(0,6);
+  if(!clientes.length){ wrap.style.display='none'; return; }
+  wrap.style.display='flex';
+  const inp = document.getElementById(inputId);
+  wrap.innerHTML = clientes.map(c=>`
+    <button class="quick-cli-chip" onclick="selCliente('${c.nombre?.replace(/'/g,"\'")||''}','${inputId}',this)">
+      <span style="font-size:14px;">👤</span>${c.nombre||''}
+    </button>
+  `).join('');
+}
+window.renderQuickClientes = renderQuickClientes;
+
+function selCliente(nombre, inputId, el){
+  const inp = document.getElementById(inputId);
+  if(inp) inp.value = nombre;
+  const parent = el?.closest('.quick-clientes');
+  parent?.querySelectorAll('.quick-cli-chip').forEach(b=>b.classList.remove('sel'));
+  if(el) el.classList.add('sel');
+}
+window.selCliente = selCliente;
+
+// Sobreescribir openSheet para inicializar los nuevos helpers
+const _origOpenSheetFull = window.openSheet;
+window.openSheet = function(tipo){
+  _origOpenSheetFull(tipo);
+  // Post-init según tipo
+  if(tipo==='fin'){
+    setTipoFin('ingreso');
+    const inp = document.getElementById('mMonto');
+    if(inp){ inp.value=''; setTimeout(()=>inp.focus(),300); }
+    document.querySelectorAll('.quick-amt').forEach(b=>b.classList.remove('sel'));
+    renderFinCatChips();
+    const mCat = document.getElementById('mCat'); if(mCat) mCat.value='';
+  }
+  if(tipo==='ped'){
+    renderQuickClientes('quickClientes','pCli');
+    // Resetear prodBox
+    const pb = document.getElementById('prodBox');
+    if(pb) pb.innerHTML = '';
+    renderCatSelectorSheet();
+    const cli = document.getElementById('pCli'); if(cli) cli.value='';
+    setTimeout(()=>document.querySelector('#sheet-ped .quick-cli-chip, #pCli')?.focus(),300);
+  }
+  if(tipo==='age'){
+    renderQuickClientes('quickClientesAge','evCliente');
+    setTimeout(()=>document.getElementById('evTit')?.focus(),300);
+  }
+  if(tipo==='task'){
+    setTimeout(()=>document.getElementById('taskTit')?.focus(),300);
+  }
+};
 
 </script>
 
