@@ -970,7 +970,7 @@ header {
   </div>
   <div class="login-card">
     <div class="login-title">Entrá con tu cuenta Google</div>
-    <button class="btn-google rpl" id="btnGoogle">
+    <button class="btn-google rpl" id="btnGoogle" onclick="window.loginGoogle && window.loginGoogle()">
       <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google">
       Continuar con Google
     </button>
@@ -1122,18 +1122,18 @@ header {
   <!-- NAV INFERIOR — 3 botones -->
   <nav class="bottom-bar" id="bottomNav">
     <!-- Izquierda: Menú hamburguesa -->
-    <button class="nav-side-btn" id="navMenuBtn">
+    <button class="nav-side-btn" id="navMenuBtn" onclick="window.toggleMenu && window.toggleMenu()">
       <span class="material-icons-round">menu</span>
       <span class="nav-side-lbl">Menú</span>
     </button>
 
     <!-- Centro: FAB + -->
-    <button class="nav-fab-btn" id="fabBtn">
+    <button class="nav-fab-btn" id="fabBtn" onclick="window.toggleFab && window.toggleFab()">
       <span class="material-icons-round">add</span>
     </button>
 
     <!-- Derecha: OTTO -->
-    <button class="nav-otto-btn" id="nav-chat">
+    <button class="nav-otto-btn" id="nav-chat" onclick="window.menuNav && window.menuNav('chat')">
       <span class="material-icons-round">smart_toy</span>
       <span class="nav-otto-lbl">OTTO</span>
     </button>
@@ -1658,22 +1658,22 @@ header {
   <div class="fab-sel-handle"><div class="fab-sel-bar"></div></div>
   <div class="fab-sel-title">¿Qué querés agregar?</div>
   <div class="fab-sel-grid">
-    <button class="fab-sel-btn" id="fabBtnFin">
+    <button class="fab-sel-btn" id="fabBtnFin" onclick="window.closeFab();setTimeout(()=>window.openSheet&&window.openSheet('fin'),50)">
       <div class="fab-sel-icon" style="background:var(--green-bg)"><span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span></div>
       <div class="fab-sel-name">Finanza</div>
       <div class="fab-sel-sub">Ingreso o gasto</div>
     </button>
-    <button class="fab-sel-btn" id="fabBtnPed">
+    <button class="fab-sel-btn" id="fabBtnPed" onclick="window.closeFab();setTimeout(()=>window.openSheet&&window.openSheet('ped'),50)">
       <div class="fab-sel-icon" style="background:var(--teal-t)"><span class="material-icons-round" style="color:var(--teal)">receipt_long</span></div>
       <div class="fab-sel-name">Pedido</div>
       <div class="fab-sel-sub">Cliente y entrega</div>
     </button>
-    <button class="fab-sel-btn" id="fabBtnAge">
+    <button class="fab-sel-btn" id="fabBtnAge" onclick="window.closeFab();setTimeout(()=>window.openSheet&&window.openSheet('age'),50)">
       <div class="fab-sel-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">calendar_month</span></div>
       <div class="fab-sel-name">Evento</div>
       <div class="fab-sel-sub">Agenda y citas</div>
     </button>
-    <button class="fab-sel-btn" id="fabBtnTask">
+    <button class="fab-sel-btn" id="fabBtnTask" onclick="window.closeFab();setTimeout(()=>window.openSheet&&window.openSheet('task'),50)">
       <div class="fab-sel-icon" style="background:var(--purple-t)"><span class="material-icons-round" style="color:var(--purple)">check_circle</span></div>
       <div class="fab-sel-name">Tarea</div>
       <div class="fab-sel-sub">Recordatorio</div>
@@ -2737,31 +2737,34 @@ window.goTab=goTab;window.setTipo=setTipo;window.calNav=calNav;
 
 /* ── BOTTOM SHEETS DE FORMULARIOS ── */
 function openSheet(tipo){
+  // Cerrar FAB
   if(window.closeFab) window.closeFab();
-  // Cerrar todos — SOLO con clases, nunca style.display
+  // Cerrar todos los sheets — solo clases, sin style inline
   document.querySelectorAll('.form-sheet').forEach(s=>{
     s.classList.remove('open');
     s.removeAttribute('style');
   });
   const hoy=new Date().toISOString().split('T')[0];
-  if(tipo==='fin'){const mf=document.getElementById('mFecha');if(mf)mf.value=hoy;}
-  if(tipo==='ped'){const pf=document.getElementById('pFecha');if(pf)pf.value=hoy;renderCatSelectorSheet();}
-  if(tipo==='age'){const ef=document.getElementById('evFecha');if(ef)ef.value=hoy;renderClienteSelectorSheet();}
-  if(tipo==='task'){const tf=document.getElementById('taskFecha');if(tf)tf.value=hoy;}
-  const ov=document.getElementById('formSheetOverlay');
-  if(ov)ov.classList.add('visible');
-  const sh=document.getElementById('sheet-'+tipo);
+  const g=id=>document.getElementById(id);
+  if(tipo==='fin' && g('mFecha')) g('mFecha').value=hoy;
+  if(tipo==='ped' && g('pFecha')){ g('pFecha').value=hoy; renderCatSelectorSheet(); }
+  if(tipo==='age' && g('evFecha')){ g('evFecha').value=hoy; renderClienteSelectorSheet(); }
+  if(tipo==='task' && g('taskFecha')) g('taskFecha').value=hoy;
+  const ov=g('formSheetOverlay');
+  if(ov) ov.classList.add('visible');
+  const sh=g('sheet-'+tipo);
   if(sh) sh.classList.add('open');
 }
 function closeSheet(){
   const ov=document.getElementById('formSheetOverlay');
-  if(ov)ov.classList.remove('visible');
+  if(ov) ov.classList.remove('visible');
   document.querySelectorAll('.form-sheet').forEach(s=>{
     s.classList.remove('open');
     s.removeAttribute('style');
   });
 }
-window.openSheet=openSheet;window.closeSheet=closeSheet;
+window.openSheet=openSheet;
+window.closeSheet=closeSheet;
 
 /* ── CATÁLOGO POR CATEGORÍA ── */
 let catSelectedCategory=null;
@@ -3316,46 +3319,23 @@ window.renderProd = renderProd;
 
 
 // ── FAB SELECTOR ──
-window.toggleFab = function() {
-  const sheet   = document.getElementById('fabSelSheet');
-  const overlay = document.getElementById('fabSelOverlay');
-  const btn     = document.getElementById('fabBtn');
-  if (!sheet) return;
-  const opening = !sheet.classList.contains('open');
-  sheet.classList.toggle('open', opening);
-  if(overlay) overlay.classList.toggle('open', opening);
-  if(btn) btn.classList.toggle('open', opening);
-};
-
-window.closeFab = function() {
-  document.getElementById('fabSelSheet')  ?.classList.remove('open');
+function toggleFab(){
+  const sh=document.getElementById('fabSelSheet');
+  const ov=document.getElementById('fabSelOverlay');
+  const btn=document.getElementById('fabBtn');
+  if(!sh) return;
+  const opening=!sh.classList.contains('open');
+  sh.classList.toggle('open',opening);
+  if(ov) ov.classList.toggle('open',opening);
+  if(btn) btn.classList.toggle('open',opening);
+}
+function closeFab(){
+  document.getElementById('fabSelSheet')?.classList.remove('open');
   document.getElementById('fabSelOverlay')?.classList.remove('open');
-  document.getElementById('fabBtn')       ?.classList.remove('open');
-};
-
-// Conectar botones — el módulo corre con DOM ya listo
-// ── Conectar TODOS los botones via addEventListener (sin onclick inline) ──
-const _btnFab  = document.getElementById('fabBtn');
-const _btnMenu = document.getElementById('navMenuBtn');
-const _btnOtto = document.getElementById('nav-chat');
-const _btnGoogle = document.getElementById('btnGoogle');
-const _fabOv   = document.getElementById('fabSelOverlay');
-const _fabFin  = document.getElementById('fabBtnFin');
-const _fabPed  = document.getElementById('fabBtnPed');
-const _fabAge  = document.getElementById('fabBtnAge');
-const _fabTask = document.getElementById('fabBtnTask');
-
-if(_btnFab)  _btnFab.addEventListener('click',  function(){ window.toggleFab(); });
-if(_btnMenu) _btnMenu.addEventListener('click', function(){ toggleMenu(); });
-if(_btnOtto) _btnOtto.addEventListener('click', function(){ menuNav('chat'); });
-if(_btnGoogle) _btnGoogle.addEventListener('click', function(){ loginGoogle(); });
-if(_fabOv)   _fabOv.addEventListener('click',   function(){ window.closeFab(); });
-if(_fabFin)  _fabFin.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('fin'),  50); });
-if(_fabPed)  _fabPed.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('ped'),  50); });
-if(_fabAge)  _fabAge.addEventListener('click',  function(){ window.closeFab(); setTimeout(()=>openSheet('age'),  50); });
-if(_fabTask) _fabTask.addEventListener('click', function(){ window.closeFab(); setTimeout(()=>openSheet('task'), 50); });
-
-console.log('OTTO: botones conectados', {fab:!!_btnFab, fin:!!_fabFin, ped:!!_fabPed});
+  document.getElementById('fabBtn')?.classList.remove('open');
+}
+window.toggleFab=toggleFab;
+window.closeFab=closeFab;
 
 
 // ── FILTRO TIPO FINANZAS ──
