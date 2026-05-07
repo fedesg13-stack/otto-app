@@ -601,9 +601,12 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
 
     <!-- PEDIDOS -->
     <div class="panel" id="p-ped">
-      <div class="section-hdr"><span class="section-title">Pedidos</span></div>
+      <div class="section-hdr">
+        <span class="section-title">Pedidos</span>
+        <button class="rpl" id="ped-semana-btn" style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--rfull);padding:6px 12px;font-family:var(--font);font-size:12px;font-weight:600;color:var(--t3);cursor:pointer;">Ver semana</button>
+      </div>
       <div class="ped-cal-strip"><div class="ped-week" id="ped-week"></div></div>
-      <div id="ped-produce" style="margin:0 12px 10px;"></div>
+      <div id="ped-produce" style="margin:0 12px 10px;display:none;"></div>
       <div class="peds-list" id="ped-list"></div>
     </div>
 
@@ -854,7 +857,7 @@ const provider = new GoogleAuthProvider();
 let S = {
   uid:null, nombre:'', negocio:'', perfil:null,
   tipo:'ingreso', finFiltro:'todos', finMes:new Date().toISOString().slice(0,7),
-  pedFecha:null, ageFecha:null,
+  pedFecha:null, ageFecha:null, pedModoSemana:false,
   movs:[], pedidos:[], eventos:[], tareas:[], catalogo:[], contactos:[], nota:'',
   miNegocio:{productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},
   ottoCache:[], ottoCacheTime:0
@@ -1019,10 +1022,17 @@ function renderFinCatChips(){}  // legacy — se usa el picker
 window.renderFinCatChips=renderFinCatChips;
 
 function getFinCats(){
+  // Base siempre disponible
   const base=['Ventas','Materiales','Sueldos','Servicios','Alquiler','Marketing','Equipamiento','Transporte','Impuestos','Otros'];
-  const extra=[];
-  (S.miNegocio.productos||[]).forEach(p=>{if(p.categoria&&!base.includes(p.categoria)&&!extra.includes(p.categoria))extra.push(p.categoria);});
-  return [...base,...extra];
+  // Categorías únicas de los productos de Mi Negocio
+  const deMiNegocio=[...new Set((S.miNegocio.productos||[]).map(p=>p.categoria).filter(Boolean))];
+  // Nombres de productos como categorías de venta rápida
+  const nombresProds=(S.miNegocio.productos||[]).map(p=>p.nombre).filter(Boolean).slice(0,8);
+  // Unir todo sin duplicados, con las de Mi Negocio primero si existen
+  const todas=deMiNegocio.length
+    ? [...deMiNegocio, ...base.filter(b=>!deMiNegocio.includes(b))]
+    : base;
+  return todas;
 }
 
 function openFinCatPicker(){
@@ -1373,6 +1383,8 @@ window.cambiarMesFin=cambiarMesFin;
 function renderPedWeek(){
   const wrap=g('ped-week');if(!wrap)return;
   const today=new Date();today.setHours(0,0,0,0);
+  // Si no hay fecha seleccionada, seleccionar hoy por defecto
+  if(!S.pedFecha) S.pedFecha=today.toISOString().split('T')[0];
   const mon=new Date(today);mon.setDate(today.getDate()-(today.getDay()||7)+1);
   const days=Array.from({length:7},(_,i)=>{const d=new Date(mon);d.setDate(mon.getDate()+i);return d;});
   const DIAS=['L','M','X','J','V','S','D'];
@@ -1382,49 +1394,123 @@ function renderPedWeek(){
     const isToday=d.getTime()===today.getTime();
     const isSel=ds===sel;
     const hasDot=S.pedidos.some(p=>p.fecha===ds&&!p.archivado);
-    return `<div class="ped-day rpl${isToday&&!isSel?' today':''}${isSel?' sel':''}" data-fecha="${ds}"><span class="ped-day-lbl">${DIAS[i]}</span><span class="ped-day-num">${d.getDate()}</span><span class="ped-dot${hasDot?' on':''}"></span></div>`;
+    return `<div class="ped-day rpl${isToday&&!isSel?' today':''}${isSel?' sel':''}" data-fecha="${ds}">
+      <span class="ped-day-lbl">${DIAS[i]}</span>
+      <span class="ped-day-num">${d.getDate()}</span>
+      <span class="ped-dot${hasDot?' on':''}"></span>
+    </div>`;
   }).join('');
   wrap.querySelectorAll('.ped-day').forEach(d=>{
-    d.addEventListener('click',()=>{S.pedFecha=d.dataset.fecha;renderPedWeek();renderPeds();});
+    d.addEventListener('click',()=>{
+      S.pedFecha=d.dataset.fecha;
+      // Al elegir un día específico, desactivar modo semana
+      S.pedModoSemana=false;
+      actualizarBtnSemana();
+      renderPedWeek();
+      renderPeds();
+      renderProduceDia();
+    });
   });
 }
 window.renderPedWeek=renderPedWeek;
+
+function actualizarBtnSemana(){
+  const btn=g('ped-semana-btn');if(!btn)return;
+  if(S.pedModoSemana){
+    btn.textContent='Ver día';
+    btn.style.background='var(--bosque)';
+    btn.style.color='#fff';
+    btn.style.borderColor='var(--bosque)';
+  } else {
+    btn.textContent='Ver semana';
+    btn.style.background='var(--surface2)';
+    btn.style.color='var(--t3)';
+    btn.style.borderColor='var(--border)';
+  }
+}
 
 function renderPeds(){
   const list=g('ped-list');if(!list)return;
   const today=hoy();
   let peds=S.pedidos.filter(p=>!p.archivado);
-  if(S.pedFecha)peds=peds.filter(p=>p.fecha===S.pedFecha);
-  peds=peds.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
-  if(!peds.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Sin pedidos</div><div class="empty-sub">Tocá + para agregar tu primer pedido.</div></div>`;return;}
-  list.innerHTML=peds.map(p=>{
-    const diff=p.fecha?Math.ceil((new Date(p.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
-    const badge=diff===0?'<span class="ticket-badge hoy">Hoy</span>':diff===1?'<span class="ticket-badge manana">Mañana</span>':'';
-    return `<div class="ticket"><div class="ticket-top"><div><div class="ticket-cli">${p.cli||'Sin cliente'}</div><div style="font-size:12px;color:var(--t4);margin-top:2px;">${p.fecha?fmt(p.fecha):'Sin fecha'}${p.hora?' · '+p.hora:''}</div></div>${badge}</div>
+  // Siempre filtrar por día seleccionado (modo semana no afecta la lista de pedidos)
+  if(S.pedFecha) peds=peds.filter(p=>p.fecha===S.pedFecha);
+  peds=peds.sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+  // Header con fecha seleccionada
+  const fechaLabel=S.pedFecha?new Date(S.pedFecha+'T00:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}):'';
+  const diff=S.pedFecha?Math.ceil((new Date(S.pedFecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
+  const cuando=diff===0?'Hoy':diff===1?'Mañana':diff!=null&&diff<0?fechaLabel:fechaLabel;
+  if(!peds.length){
+    list.innerHTML=`<div style="padding:8px 16px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">${cuando}</div><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Sin pedidos</div><div class="empty-sub">No hay pedidos para este día.</div></div>`;
+    return;
+  }
+  list.innerHTML=`<div style="padding:8px 16px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">${cuando} · ${peds.length} pedido${peds.length>1?'s':''}</div>`+
+  peds.map(p=>{
+    const diffT=p.fecha?Math.ceil((new Date(p.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
+    const badge=diffT===0?'<span class="ticket-badge hoy">Hoy</span>':diffT===1?'<span class="ticket-badge manana">Mañana</span>':'';
+    return `<div class="ticket">
+      <div class="ticket-top">
+        <div>
+          <div class="ticket-cli">${p.cli||'Sin cliente'}</div>
+          <div style="font-size:12px;color:var(--t4);margin-top:2px;">${p.hora||'Sin hora'}${p.notas?` · ${p.notas}`:''}</div>
+        </div>${badge}
+      </div>
       <div class="ticket-prods">${(p.items||[]).map(i=>`${i.q}× ${i.p}`).join(' · ')||'Sin productos'}</div>
       <div class="ticket-footer">
-        <button class="ticket-btn rpl" data-id="${p._id}" data-a="arch">✓ Entregado</button>
-        <button class="ticket-btn rpl" data-id="${p._id}" data-a="del" style="color:var(--red)">🗑️ Borrar</button>
-      </div></div>`;
+        <button class="ticket-btn done rpl" data-id="${p._id}" data-a="arch">✓ Entregado</button>
+        <button class="ticket-btn rpl" data-id="${p._id}" data-a="del" style="color:var(--red)">🗑️</button>
+      </div>
+    </div>`;
   }).join('');
   list.querySelectorAll('[data-a]').forEach(btn=>{
     btn.addEventListener('click',()=>{
       if(btn.dataset.a==='arch')archivarPed(btn.dataset.id);
-      else if(btn.dataset.a==='del'&&confirm('¿Eliminar?'))delPed(btn.dataset.id);
+      else if(btn.dataset.a==='del'&&confirm('¿Eliminar pedido?'))delPed(btn.dataset.id);
     });
   });
 }
 window.renderPeds=renderPeds;
 
-function renderProduceSemana(){
+// Producción del día seleccionado (modo normal)
+// o de toda la semana (modo semana)
+function renderProduceDia(){
   const wrap=g('ped-produce');if(!wrap)return;
+  if(!S.pedModoSemana){
+    wrap.style.display='none';
+    wrap.innerHTML='';
+    return;
+  }
+  // Modo semana: producción de toda la semana
   const today=new Date();today.setHours(0,0,0,0);
-  const sun=new Date(today);sun.setDate(today.getDate()+(7-(today.getDay()||7)));
-  const activos=S.pedidos.filter(p=>!p.archivado&&p.fecha&&new Date(p.fecha+'T00:00:00')<=sun&&new Date(p.fecha+'T00:00:00')>=today);
-  if(!activos.length){wrap.innerHTML='';return;}
-  const tots={};activos.forEach(p=>(p.items||[]).forEach(i=>{tots[i.p]=(tots[i.p]||0)+i.q;}));
-  wrap.innerHTML=`<div class="card"><div style="padding:12px 16px;"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);margin-bottom:8px;">Producir esta semana</div>${Object.entries(tots).map(([n,q])=>`<div style="display:flex;justify-content:space-between;padding:4px 0;font-size:13px;color:var(--t2);border-bottom:1px solid var(--border2);"><span>${n}</span><strong style="color:var(--bosque)">${q}</strong></div>`).join('')}</div></div>`;
+  const mon=new Date(today);mon.setDate(today.getDate()-(today.getDay()||7)+1);
+  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+  const activos=S.pedidos.filter(p=>{
+    if(p.archivado||!p.fecha)return false;
+    const fd=new Date(p.fecha+'T00:00:00');
+    return fd>=mon&&fd<=sun;
+  });
+  if(!activos.length){wrap.style.display='none';wrap.innerHTML='';return;}
+  const tots={};
+  activos.forEach(p=>(p.items||[]).forEach(i=>{tots[i.p]=(tots[i.p]||0)+i.q;}));
+  wrap.style.display='block';
+  wrap.innerHTML=`<div class="card" style="margin:0 0 8px;">
+    <div style="padding:12px 16px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción semanal</div>
+        <div style="font-size:11px;color:var(--t3);">${activos.length} pedido${activos.length>1?'s':''}</div>
+      </div>
+      ${Object.entries(tots).map(([n,q])=>`
+        <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
+          <span style="font-size:13px;color:var(--t1);">${n}</span>
+          <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
+        </div>`).join('')}
+    </div>
+  </div>`;
 }
+window.renderProduceDia=renderProduceDia;
+
+// Mantener por compatibilidad
+function renderProduceSemana(){ renderProduceDia(); }
 window.renderProduceSemana=renderProduceSemana;
 
 function renderAgeWeek(){
@@ -1729,6 +1815,11 @@ g('menu-overlay')?.addEventListener('click',closeMenu);
 document.querySelectorAll('.menu-item[data-nav]').forEach(btn=>{btn.addEventListener('click',()=>navTo(btn.dataset.nav));});
 g('menu-logout')?.addEventListener('click',logoutOtto);
 g('fab-overlay')?.addEventListener('click',closeFab);
+g('ped-semana-btn')?.addEventListener('click',()=>{
+  S.pedModoSemana=!S.pedModoSemana;
+  actualizarBtnSemana();
+  renderProduceDia();
+});
 document.querySelectorAll('.fab-btn[data-sheet]').forEach(btn=>{btn.addEventListener('click',()=>{closeFab();setTimeout(()=>openSheet(btn.dataset.sheet),60);});});
 g('sheet-overlay')?.addEventListener('click',closeSheet);
 ['fin','ped','age','task'].forEach(t=>{g('s-'+t+'-close')?.addEventListener('click',closeSheet);});
