@@ -3935,36 +3935,47 @@ function selCliente(nombre, inputId, el){
 }
 window.selCliente = selCliente;
 
-// Sobreescribir openSheet para inicializar los nuevos helpers
-const _origOpenSheetFull = window.openSheet;
-window.openSheet = function(tipo){
-  _origOpenSheetFull(tipo);
-  // Post-init según tipo
+// ── OPENSHEET COMPLETO (lógica base + post-init) ──
+function openSheet(tipo){
+  if(window.closeFab) window.closeFab();
+  document.querySelectorAll('.form-sheet').forEach(s=>{
+    s.classList.remove('open');
+    s.removeAttribute('style');
+  });
+  const hoy=new Date().toISOString().split('T')[0];
+  const g=id=>document.getElementById(id);
+  if(tipo==='fin' && g('mFecha')) g('mFecha').value=hoy;
+  if(tipo==='ped' && g('pFecha')) g('pFecha').value=hoy;
+  if(tipo==='age' && g('evFecha')) g('evFecha').value=hoy;
+  if(tipo==='task' && g('taskFecha')) g('taskFecha').value=hoy;
+  const ov=g('formSheetOverlay');
+  if(ov) ov.classList.add('visible');
+  const sh=g('sheet-'+tipo);
+  if(sh) sh.classList.add('open');
+  // Post-init por tipo
   if(tipo==='fin'){
     setTipoFin('ingreso');
-    const inp = document.getElementById('mMonto');
-    if(inp){ inp.value=''; setTimeout(()=>inp.focus(),300); }
+    if(g('mMonto')){ g('mMonto').value=''; setTimeout(()=>g('mMonto').focus(),300); }
     document.querySelectorAll('.quick-amt').forEach(b=>b.classList.remove('sel'));
     renderFinCatChips();
-    const mCat = document.getElementById('mCat'); if(mCat) mCat.value='';
+    if(g('mCat')) g('mCat').value='';
   }
   if(tipo==='ped'){
     renderQuickClientes('quickClientes','pCli');
-    // Resetear prodBox
-    const pb = document.getElementById('prodBox');
-    if(pb) pb.innerHTML = '';
+    const pb=g('prodBox'); if(pb) pb.innerHTML='';
     renderCatSelectorSheet();
-    const cli = document.getElementById('pCli'); if(cli) cli.value='';
-    setTimeout(()=>document.querySelector('#sheet-ped .quick-cli-chip, #pCli')?.focus(),300);
+    if(g('pCli')) g('pCli').value='';
+    setTimeout(()=>g('pCli')?.focus(),300);
   }
   if(tipo==='age'){
     renderQuickClientes('quickClientesAge','evCliente');
-    setTimeout(()=>document.getElementById('evTit')?.focus(),300);
+    setTimeout(()=>g('evTit')?.focus(),300);
   }
   if(tipo==='task'){
-    setTimeout(()=>document.getElementById('taskTit')?.focus(),300);
+    setTimeout(()=>g('taskTit')?.focus(),300);
   }
-};
+}
+window.openSheet=openSheet;
 
 </script>
 
