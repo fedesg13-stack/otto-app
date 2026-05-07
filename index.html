@@ -445,6 +445,29 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
 .ticket.archivado{opacity:.6;}
 .ticket.archivado .ticket-cli{text-decoration:line-through;}
 
+
+/* ── PANEL USUARIO ── */
+.user-hero{background:var(--bosque);padding:48px 20px 28px;position:relative;overflow:hidden;}
+.user-hero::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);}
+.user-avatar-wrap{position:relative;width:72px;height:72px;margin-bottom:14px;}
+.user-avatar{width:72px;height:72px;border-radius:50%;background:rgba(255,255,255,.15);border:3px solid rgba(255,255,255,.3);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;overflow:hidden;}
+.user-avatar img{width:100%;height:100%;object-fit:cover;}
+.user-hero-name{font-size:20px;font-weight:700;color:#fff;letter-spacing:-.3px;}
+.user-hero-email{font-size:13px;color:rgba(255,255,255,.6);margin-top:2px;}
+.user-plan-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.2);border-radius:var(--rfull);padding:4px 10px;font-size:11px;font-weight:700;color:rgba(255,255,255,.9);margin-top:10px;letter-spacing:.3px;}
+.user-section{margin:0 12px 8px;background:var(--surface);border-radius:var(--r18);border:1px solid var(--border2);overflow:hidden;}
+.user-section-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t4);padding:14px 16px 6px;}
+.user-field{display:flex;align-items:center;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--border2);}
+.user-field:last-child{border-bottom:none;}
+.user-field-lbl{font-size:13px;color:var(--t3);flex-shrink:0;width:110px;}
+.user-field-val{font-size:13px;font-weight:500;color:var(--t1);flex:1;text-align:right;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-field-edit{background:transparent;border:none;cursor:pointer;color:var(--t4);padding:4px;display:flex;-webkit-tap-highlight-color:transparent;}
+.user-edit-row{padding:10px 16px;border-bottom:1px solid var(--border2);}
+.user-edit-row:last-child{border-bottom:none;}
+.btn-danger{background:var(--red-bg);color:var(--red);border:1.5px solid rgba(192,57,43,.2);border-radius:var(--rfull);padding:13px 20px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;width:100%;display:flex;align-items:center;justify-content:center;gap:8px;-webkit-tap-highlight-color:transparent;}
+.btn-danger:active{background:rgba(192,57,43,.15);}
+.btn-danger .material-icons-round{font-size:18px;}
+
 </style>
 </head>
 <body>
@@ -663,6 +686,106 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
       <div id="mn-sections"></div>
     </div>
 
+    <!-- MI USUARIO -->
+    <div class="panel" id="p-user">
+      <div class="user-hero">
+        <div class="user-avatar-wrap">
+          <div class="user-avatar" id="user-av-big">?</div>
+        </div>
+        <div class="user-hero-name" id="user-hero-name">—</div>
+        <div class="user-hero-email" id="user-hero-email">—</div>
+        <div class="user-plan-badge">⭐ Plan Gratis</div>
+      </div>
+
+      <!-- Perfil del negocio -->
+      <div class="user-section">
+        <div class="user-section-title">Mi negocio</div>
+        <div class="user-field">
+          <span class="user-field-lbl">Nombre</span>
+          <span class="user-field-val" id="uf-negocio">—</span>
+          <button class="user-field-edit rpl" data-field="negocio"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Rubro</span>
+          <span class="user-field-val" id="uf-rubro">—</span>
+          <button class="user-field-edit rpl" data-field="rubro"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Descripción</span>
+          <span class="user-field-val" id="uf-desc">—</span>
+          <button class="user-field-edit rpl" data-field="desc"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Dirección</span>
+          <span class="user-field-val" id="uf-direccion">—</span>
+          <button class="user-field-edit rpl" data-field="direccion"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+      </div>
+
+      <!-- Datos de contacto -->
+      <div class="user-section">
+        <div class="user-section-title">Contacto</div>
+        <div class="user-field">
+          <span class="user-field-lbl">WhatsApp</span>
+          <span class="user-field-val" id="uf-wsp">—</span>
+          <button class="user-field-edit rpl" data-field="wsp"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Instagram</span>
+          <span class="user-field-val" id="uf-ig">—</span>
+          <button class="user-field-edit rpl" data-field="ig"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Web / tienda</span>
+          <span class="user-field-val" id="uf-web">—</span>
+          <button class="user-field-edit rpl" data-field="web"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+      </div>
+
+      <!-- Preferencias -->
+      <div class="user-section">
+        <div class="user-section-title">Preferencias</div>
+        <div class="user-field">
+          <span class="user-field-lbl">País</span>
+          <span class="user-field-val" id="uf-pais">Uruguay</span>
+          <button class="user-field-edit rpl" data-field="pais"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Moneda</span>
+          <span class="user-field-val" id="uf-moneda">UYU $</span>
+          <button class="user-field-edit rpl" data-field="moneda"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Zona horaria</span>
+          <span class="user-field-val" id="uf-tz">América/Montevideo</span>
+          <button class="user-field-edit rpl" data-field="tz"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+        </div>
+      </div>
+
+      <!-- Cuenta -->
+      <div class="user-section">
+        <div class="user-section-title">Cuenta</div>
+        <div class="user-field">
+          <span class="user-field-lbl">Email</span>
+          <span class="user-field-val" id="uf-email">—</span>
+        </div>
+        <div class="user-field">
+          <span class="user-field-lbl">Miembro desde</span>
+          <span class="user-field-val" id="uf-desde">—</span>
+        </div>
+      </div>
+
+      <!-- Zona de peligro -->
+      <div style="padding:16px 12px 48px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--red);margin-bottom:10px;padding:0 4px;">Zona de peligro</div>
+        <button class="btn-danger rpl" id="btn-delete-account">
+          <span class="material-icons-round">delete_forever</span>
+          Eliminar mi cuenta y todos mis datos
+        </button>
+        <div style="font-size:11px;color:var(--t4);text-align:center;margin-top:8px;padding:0 8px;line-height:1.5;">Esta acción es irreversible. Se eliminarán todos tus datos, pedidos, finanzas y configuración.</div>
+      </div>
+    </div>
+
     <!-- OTTO CHAT -->
     <div class="panel" id="p-otto">
       <div class="section-hdr"><span class="section-title">OTTO</span></div>
@@ -842,6 +965,8 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
     <button class="menu-item rpl" data-nav="mn"><span class="material-icons-round">store</span>Mi Negocio</button>
     <button class="menu-item rpl" data-nav="otto"><span class="material-icons-round">smart_toy</span>OTTO</button>
     <div class="menu-divider"></div>
+    <button class="menu-item rpl" data-nav="user"><span class="material-icons-round">account_circle</span>Mi usuario</button>
+    <div class="menu-divider"></div>
     <button class="menu-item menu-logout rpl" id="menu-logout"><span class="material-icons-round">logout</span>Cerrar sesión</button>
   </div>
 </div>
@@ -913,6 +1038,7 @@ function navTo(panel){
   document.querySelectorAll('.menu-item').forEach(b=>b.classList.remove('on'));
   const p=g('p-'+panel); if(p) p.classList.add('on');
   const btn=document.querySelector(`.menu-item[data-nav="${panel}"]`); if(btn) btn.classList.add('on');
+  if(panel==='user') renderUserPanel();
   closeMenu();
 }
 window.navTo=navTo;
@@ -2076,6 +2202,123 @@ async function logoutOtto(){
 }
 window.logoutOtto=logoutOtto;
 
+// ── PANEL USUARIO ──
+function renderUserPanel(){
+  const p=S.perfil||{};
+  const user=auth.currentUser;
+  // Avatar
+  const av=g('user-av-big');
+  if(av){
+    if(user?.photoURL){
+      av.innerHTML=`<img src="${user.photoURL}" alt="">`;
+    } else {
+      av.textContent=(S.nombre?.[0]||'?').toUpperCase();
+    }
+  }
+  if(g('user-hero-name')) g('user-hero-name').textContent=S.nombre||'—';
+  if(g('user-hero-email')) g('user-hero-email').textContent=user?.email||'—';
+  // Campos negocio
+  const campos={
+    negocio: p.negocio||S.negocio||'—',
+    rubro:   p.rubro||'—',
+    desc:    p.descripcion||'—',
+    direccion:p.direccion||'—',
+    wsp:     p.wsp||'—',
+    ig:      p.instagram||'—',
+    web:     p.web||'—',
+    pais:    p.pais||'Uruguay',
+    moneda:  p.moneda||'UYU $',
+    tz:      p.tz||'América/Montevideo',
+    email:   user?.email||'—',
+    desde:   p.creadoEn?new Date(p.creadoEn).toLocaleDateString('es-AR',{day:'numeric',month:'long',year:'numeric'}):'—'
+  };
+  Object.entries(campos).forEach(([k,v])=>{
+    const el=g('uf-'+k); if(el) el.textContent=v;
+  });
+}
+window.renderUserPanel=renderUserPanel;
+
+// Editar campo del perfil
+function editUserField(field){
+  const LABELS={
+    negocio:'Nombre del negocio',rubro:'Rubro',desc:'Descripción',
+    direccion:'Dirección',wsp:'WhatsApp',ig:'Instagram',web:'Sitio web',
+    pais:'País',moneda:'Moneda (ej: UYU $, USD $, ARS $)',tz:'Zona horaria'
+  };
+  const p=S.perfil||{};
+  const MAP={negocio:p.negocio,rubro:p.rubro,desc:p.descripcion,direccion:p.direccion,
+    wsp:p.wsp,ig:p.instagram,web:p.web,pais:p.pais,moneda:p.moneda,tz:p.tz};
+  const actual=MAP[field]||'';
+  const label=LABELS[field]||field;
+  const body=`
+    <div class="m3-field">
+      <input class="m3-inp" id="uf-edit-inp" value="${actual.replace(/"/g,'&quot;')}" placeholder=" " type="text">
+      <label class="m3-lbl">${label}</label>
+    </div>
+    <button class="btn-save rpl" id="uf-edit-save">Guardar</button>
+  `;
+  openEdit(`Editar ${label}`,body);
+  setTimeout(()=>g('uf-edit-inp')?.select(),200);
+  g('uf-edit-save').addEventListener('click',async()=>{
+    const val=g('uf-edit-inp')?.value.trim()||'';
+    const KEY_MAP={negocio:'negocio',rubro:'rubro',desc:'descripcion',
+      direccion:'direccion',wsp:'wsp',ig:'instagram',web:'web',
+      pais:'pais',moneda:'moneda',tz:'tz'};
+    const key=KEY_MAP[field];
+    if(!S.perfil) S.perfil={};
+    S.perfil[key]=val;
+    // Si es negocio o rubro, actualizar también el estado principal
+    if(field==='negocio'){S.negocio=val;renderMnSections();}
+    saving();
+    try{
+      await setDoc(doc(db,`usuarios/${S.uid}/perfil/datos`),S.perfil,{merge:true});
+      closeEdit();
+      renderUserPanel();
+      // Actualizar header si cambió el negocio
+      if(field==='negocio'&&g('hd-negocio')) g('hd-negocio').textContent=val;
+      toast('✅ Guardado');
+    }catch(e){console.error(e);toast('Error al guardar');}
+  });
+}
+window.editUserField=editUserField;
+
+// Eliminar cuenta — doble confirmación
+async function deleteAccount(){
+  // Primera confirmación
+  const conf1=confirm('¿Estás seguro de que querés eliminar tu cuenta?\n\nSe borrarán TODOS tus datos: pedidos, finanzas, clientes, agenda y configuración.\n\nEsta acción es IRREVERSIBLE.');
+  if(!conf1) return;
+  // Segunda confirmación — escribir "ELIMINAR"
+  const conf2=prompt('Para confirmar, escribí exactamente: ELIMINAR');
+  if(conf2!=='ELIMINAR'){toast('Cancelado — el texto no coincide');return;}
+  saving();
+  try{
+    // Borrar todas las colecciones del usuario
+    const colecciones=['movimientos','pedidos','eventos','tareas','catalogo','contactos','notas','perfil',
+      'mn_productos','mn_clientes','mn_proveedores','mn_equipo','mn_servicios','mn_impositiva'];
+    for(const c of colecciones){
+      const snap=await getDocs(collection(db,`usuarios/${S.uid}/${c}`));
+      for(const d of snap.docs){ try{await deleteDoc(d.ref);}catch(e){} }
+    }
+    // Borrar usuario de Firebase Auth
+    const user=auth.currentUser;
+    if(user) await user.delete();
+    toast('Cuenta eliminada. Hasta pronto.');
+    setTimeout(()=>{
+      g('app').classList.remove('on');
+      g('login').classList.add('on');
+    },1500);
+  }catch(e){
+    console.error(e);
+    // Si falla el delete del usuario (requiere re-auth reciente)
+    if(e.code==='auth/requires-recent-login'){
+      toast('Por seguridad, cerrá sesión, volvé a iniciar y repetí el proceso.');
+    } else {
+      toast('Error al eliminar. Intentá de nuevo.');
+    }
+  }
+}
+window.deleteAccount=deleteAccount;
+
 onAuthStateChanged(auth,async(user)=>{
   if(user){
     S.uid=user.uid; S.nombre=user.displayName||user.email.split('@')[0];
@@ -2159,6 +2402,11 @@ g('ped-hist-btn')?.addEventListener('click',()=>{
   if(arrow)arrow.textContent=open?'expand_less':'expand_more';
   if(open) renderHistorialPeds();
 });
+// Panel usuario
+document.querySelectorAll('.user-field-edit[data-field]').forEach(btn=>{
+  btn.addEventListener('click',()=>editUserField(btn.dataset.field));
+});
+g('btn-delete-account')?.addEventListener('click',deleteAccount);
 g('ob-start-btn')?.addEventListener('click',()=>showOb('ob1'));
 g('ob-skip-btn')?.addEventListener('click',()=>g('onboarding').classList.remove('on'));
 g('obNegocio')?.addEventListener('input',()=>{const btn=g('ob1-btn');if(btn)btn.disabled=!g('obNegocio').value.trim();});
