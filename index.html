@@ -394,6 +394,38 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
 .cat-sel-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:var(--r10);cursor:pointer;font-size:14px;font-weight:500;color:var(--t1);transition:all .1s;}
 .cat-sel-item:active{background:var(--surface2);}
 .cli-sel-list{display:flex;flex-direction:column;gap:2px;max-height:200px;overflow-y:auto;}
+
+/* ── PICKER LISTA (clientes, categorías, productos) ── */
+.picker-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(26,31,28,.5);backdrop-filter:blur(4px);}
+.picker-overlay.on{display:block;}
+.picker-sheet{display:none;position:fixed;bottom:0;left:0;right:0;z-index:501;background:var(--surface);border-radius:20px 20px 0 0;max-height:72vh;display:none;flex-direction:column;}
+.picker-sheet.on{display:flex;animation:slideUp .25s cubic-bezier(.32,0,.2,1);}
+.picker-handle{display:flex;justify-content:center;padding:10px 0 0;flex-shrink:0;}
+.picker-bar{width:32px;height:3px;border-radius:2px;background:var(--border);}
+.picker-header{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 8px;flex-shrink:0;border-bottom:1px solid var(--border2);}
+.picker-title{font-size:15px;font-weight:600;color:var(--t1);}
+.picker-close{background:transparent;border:none;cursor:pointer;color:var(--t4);padding:4px;display:flex;}
+.picker-search-wrap{padding:10px 16px;flex-shrink:0;border-bottom:1px solid var(--border2);}
+.picker-search{width:100%;background:var(--surface2);border:1.5px solid transparent;border-radius:var(--rfull);padding:9px 14px;font-family:var(--font);font-size:14px;color:var(--t1);outline:none;transition:border-color .15s;}
+.picker-search:focus{border-color:var(--bosque);}
+.picker-list{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 0;}
+.picker-add-item{display:flex;align-items:center;gap:10px;padding:13px 20px;cursor:pointer;border-bottom:1px solid var(--border2);}
+.picker-add-item .material-icons-round{font-size:20px;color:var(--bosque);}
+.picker-add-lbl{font-size:14px;font-weight:600;color:var(--bosque);}
+.picker-item{display:flex;align-items:center;justify-content:space-between;padding:13px 20px;cursor:pointer;transition:background .1s;-webkit-tap-highlight-color:transparent;}
+.picker-item:active{background:var(--surface2);}
+.picker-item.sel{background:var(--green-bg);}
+.picker-item-name{font-size:14px;font-weight:500;color:var(--t1);}
+.picker-item-sub{font-size:12px;color:var(--t3);margin-top:1px;}
+.picker-item-check{font-size:18px;color:var(--bosque);opacity:0;}
+.picker-item.sel .picker-item-check{opacity:1;}
+/* Campo con trigger */
+.field-trigger{width:100%;background:var(--surface2);border:1.5px solid transparent;border-radius:var(--r10);padding:13px 12px;font-family:var(--font);font-size:14px;color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:space-between;transition:border-color .15s;-webkit-tap-highlight-color:transparent;text-align:left;}
+.field-trigger:active{border-color:var(--bosque);}
+.field-trigger .material-icons-round{font-size:18px;color:var(--t4);}
+.field-trigger.filled{color:var(--t1);border-color:var(--border);}
+.field-trigger-lbl{font-size:12px;color:var(--t4);display:block;margin-bottom:4px;}
+
 </style>
 </head>
 <body>
@@ -647,16 +679,16 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
 <div class="sheet" id="s-fin">
   <div class="sheet-handle"><div class="sheet-bar"></div></div>
   <div class="sheet-header">
-    <div class="sheet-title" id="s-fin-title">💰 Nuevo ingreso</div>
+    <div class="sheet-title" id="s-fin-title">💸 Nuevo gasto</div>
     <button class="sheet-close rpl" id="s-fin-close"><span class="material-icons-round">close</span></button>
   </div>
   <div class="sheet-body">
     <div class="tipo-pills">
-      <button class="tipo-pill ing sel rpl" id="pill-ing">
-        <span class="material-icons-round">trending_up</span>Ingreso
-      </button>
-      <button class="tipo-pill gas rpl" id="pill-gas">
+      <button class="tipo-pill gas sel rpl" id="pill-gas">
         <span class="material-icons-round">trending_down</span>Gasto
+      </button>
+      <button class="tipo-pill ing rpl" id="pill-ing">
+        <span class="material-icons-round">trending_up</span>Ingreso
       </button>
     </div>
     <input class="monto-inp" id="s-fin-monto" type="number" min="0" placeholder="$0" inputmode="decimal">
@@ -666,15 +698,14 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
       <button class="quick-amt rpl" data-val="2000">$2.000</button>
       <button class="quick-amt rpl" data-val="5000">$5.000</button>
     </div>
-    <label class="sec-lbl">Categoría</label>
-    <div class="cat-chips" id="fin-cat-chips"></div>
+    <span class="field-trigger-lbl">Categoría</span>
+    <button class="field-trigger rpl" id="fin-cat-trigger">
+      <span id="fin-cat-trigger-lbl" style="color:var(--t4)">Seleccionar categoría…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
     <input type="hidden" id="s-fin-cat">
-    <details><summary style="font-size:12px;color:var(--t3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;padding:4px 0;"><span class="material-icons-round" style="font-size:15px">expand_more</span>Más opciones</summary>
-      <div style="padding-top:10px;display:flex;flex-direction:column;gap:10px;">
-        <div class="m3-field"><input class="m3-inp" id="s-fin-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-        <div class="m3-field"><input class="m3-inp" id="s-fin-desc" placeholder=" "><label class="m3-lbl">Nota</label></div>
-      </div>
-    </details>
+    <div class="m3-field"><input class="m3-inp" id="s-fin-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+    <div class="m3-field"><input class="m3-inp" id="s-fin-desc" placeholder=" "><label class="m3-lbl">Nota</label></div>
     <button class="btn-save rpl" id="s-fin-save">Guardar <span class="material-icons-round" style="font-size:18px">arrow_forward</span></button>
   </div>
 </div>
@@ -686,22 +717,29 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
     <button class="sheet-close rpl" id="s-ped-close"><span class="material-icons-round">close</span></button>
   </div>
   <div class="sheet-body">
-    <label class="sec-lbl">Cliente</label>
-    <div class="cli-chips" id="ped-cli-chips"></div>
-    <div class="m3-field"><input class="m3-inp" id="s-ped-cli" placeholder=" "><label class="m3-lbl">Nombre del cliente</label></div>
-    <label class="sec-lbl">Productos</label>
-    <div id="s-ped-cat-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;"></div>
-    <div id="s-ped-prod-list" style="margin-bottom:6px;"></div>
-    <div id="s-ped-prods"></div>
-    <button class="add-prod-btn rpl" id="s-ped-add-prod"><span class="material-icons-round" style="font-size:16px">add</span>Agregar producto</button>
-    <details><summary style="font-size:12px;color:var(--t3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;padding:4px 0;"><span class="material-icons-round" style="font-size:15px">expand_more</span>Fecha y hora</summary>
-      <div style="padding-top:10px;">
-        <div class="inp-row">
-          <div class="m3-field"><input class="m3-inp" id="s-ped-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-          <div class="m3-field"><input class="m3-inp" id="s-ped-hora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
-        </div>
-      </div>
-    </details>
+    <span class="field-trigger-lbl">Cliente</span>
+    <button class="field-trigger rpl" id="ped-cli-trigger">
+      <span id="ped-cli-trigger-lbl" style="color:var(--t4)">Seleccionar cliente…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="s-ped-cli">
+    <span class="field-trigger-lbl" style="margin-top:4px;">Categoría de producto</span>
+    <button class="field-trigger rpl" id="ped-cat-trigger">
+      <span id="ped-cat-trigger-lbl" style="color:var(--t4)">Seleccionar categoría…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="s-ped-cat">
+    <span class="field-trigger-lbl" style="margin-top:4px;">Producto</span>
+    <button class="field-trigger rpl" id="ped-prod-trigger">
+      <span id="ped-prod-trigger-lbl" style="color:var(--t4)">Seleccionar producto…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <div id="s-ped-prods" style="margin-top:4px;"></div>
+    <div class="inp-row" style="margin-top:4px;">
+      <div class="m3-field"><input class="m3-inp" id="s-ped-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha entrega</label></div>
+      <div class="m3-field"><input class="m3-inp" id="s-ped-hora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
+    </div>
+    <div class="m3-field"><textarea class="m3-select" id="s-ped-notas" rows="2" placeholder="Notas del pedido…" style="resize:none;padding-top:10px;"></textarea></div>
     <button class="btn-save rpl" id="s-ped-save">Guardar pedido <span class="material-icons-round" style="font-size:18px">arrow_forward</span></button>
   </div>
 </div>
@@ -718,15 +756,14 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
       <div class="m3-field"><input class="m3-inp" id="s-age-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
       <div class="m3-field"><input class="m3-inp" id="s-age-hora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
     </div>
-    <label class="sec-lbl">Cliente (opcional)</label>
-    <div class="cli-chips" id="age-cli-chips"></div>
-    <div class="m3-field"><input class="m3-inp" id="s-age-cli" placeholder=" "><label class="m3-lbl">O escribí el nombre</label></div>
-    <details><summary style="font-size:12px;color:var(--t3);cursor:pointer;list-style:none;display:flex;align-items:center;gap:4px;padding:4px 0;"><span class="material-icons-round" style="font-size:15px">expand_more</span>Más opciones</summary>
-      <div style="padding-top:10px;display:flex;flex-direction:column;gap:10px;">
-        <select class="m3-select" id="s-age-prio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
-        <textarea class="m3-textarea" id="s-age-desc" rows="2" placeholder="Detalles…"></textarea>
-      </div>
-    </details>
+    <span class="field-trigger-lbl">Cliente (opcional)</span>
+    <button class="field-trigger rpl" id="age-cli-trigger">
+      <span id="age-cli-trigger-lbl" style="color:var(--t4)">Seleccionar cliente…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="s-age-cli">
+    <select class="m3-select" id="s-age-prio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
+    <textarea class="m3-select" id="s-age-desc" rows="2" placeholder="Detalles…" style="resize:none;padding-top:10px;"></textarea>
     <button class="btn-save rpl" id="s-age-save">Agendar <span class="material-icons-round" style="font-size:18px">arrow_forward</span></button>
   </div>
 </div>
@@ -777,6 +814,20 @@ header{display:flex;align-items:center;height:56px;padding:0 6px 0 8px;backgroun
     <div class="menu-divider"></div>
     <button class="menu-item menu-logout rpl" id="menu-logout"><span class="material-icons-round">logout</span>Cerrar sesión</button>
   </div>
+</div>
+
+<!-- PICKER GLOBAL DE LISTA -->
+<div id="picker-overlay" class="picker-overlay"></div>
+<div id="picker-sheet" class="picker-sheet">
+  <div class="picker-handle"><div class="picker-bar"></div></div>
+  <div class="picker-header">
+    <span class="picker-title" id="picker-title">Seleccionar</span>
+    <button class="picker-close rpl" id="picker-close"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="picker-search-wrap">
+    <input class="picker-search" id="picker-search" placeholder="Buscar…">
+  </div>
+  <div class="picker-list" id="picker-list"></div>
 </div>
 
 <!-- TOAST + SAVING -->
@@ -856,21 +907,26 @@ function openSheet(tipo){
   sheet.classList.add('on');
   const today=hoy();
   if(tipo==='fin'){
-    setTipo('ingreso');
+    setTipo('gasto');
     const mi=g('s-fin-monto'); if(mi){mi.value=''; setTimeout(()=>mi.focus(),300);}
     document.querySelectorAll('.quick-amt').forEach(b=>b.classList.remove('sel'));
     g('s-fin-cat').value=''; g('s-fin-fecha').value=today; g('s-fin-desc').value='';
-    renderFinCatChips();
+    const fl=g('fin-cat-trigger-lbl'); if(fl){fl.textContent='Seleccionar categoría…';fl.style.color='var(--t4)';}
+    g('fin-cat-trigger')?.classList.remove('filled');
   }
   if(tipo==='ped'){
-    g('s-ped-cli').value=''; g('s-ped-fecha').value=today; g('s-ped-hora').value='';
+    g('s-ped-cli').value=''; g('s-ped-cat').value=''; g('s-ped-fecha').value=today; g('s-ped-hora').value='';
     g('s-ped-prods').innerHTML='';
-    renderCliChips('ped-cli-chips','s-ped-cli'); renderCatChips();
-    setTimeout(()=>g('s-ped-cli')?.focus(),300);
+    if(g('s-ped-notas'))g('s-ped-notas').value='';
+    ['ped-cli-trigger-lbl','ped-cat-trigger-lbl','ped-prod-trigger-lbl'].forEach((id,i)=>{
+      const el=g(id); if(el){el.textContent=['Seleccionar cliente…','Seleccionar categoría…','Seleccionar producto…'][i];el.style.color='var(--t4)';}
+    });
+    ['ped-cli-trigger','ped-cat-trigger','ped-prod-trigger'].forEach(id=>g(id)?.classList.remove('filled'));
   }
   if(tipo==='age'){
     g('s-age-tit').value=''; g('s-age-fecha').value=today; g('s-age-hora').value=''; g('s-age-cli').value=''; g('s-age-desc').value='';
-    renderCliChips('age-cli-chips','s-age-cli');
+    const al=g('age-cli-trigger-lbl'); if(al){al.textContent='Seleccionar cliente…';al.style.color='var(--t4)';}
+    g('age-cli-trigger')?.classList.remove('filled');
     setTimeout(()=>g('s-age-tit')?.focus(),300);
   }
   if(tipo==='task'){
@@ -892,57 +948,205 @@ function setTipo(tipo){
 }
 window.setTipo=setTipo;
 
-function renderFinCatChips(){
-  const wrap=g('fin-cat-chips'); if(!wrap) return;
-  const cats=['Ventas','Materiales','Sueldos','Servicios','Alquiler','Marketing','Otros'];
-  (S.miNegocio.productos||[]).forEach(p=>{if(p.categoria&&!cats.includes(p.categoria))cats.push(p.categoria);});
-  const sel=g('s-fin-cat')?.value||'';
-  wrap.innerHTML=cats.map(c=>`<button class="cat-chip rpl${sel===c?' sel':''}" data-cat="${c}">${c}</button>`).join('');
-  wrap.querySelectorAll('.cat-chip').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      wrap.querySelectorAll('.cat-chip').forEach(b=>b.classList.remove('sel'));
-      btn.classList.add('sel'); g('s-fin-cat').value=btn.dataset.cat;
+// ── PICKER UNIVERSAL ──
+// cb(valor, etiqueta) — callback al seleccionar
+let _pickerCb = null;
+
+function openPicker({title, items, selected, onSelect, onAdd}){
+  // items: [{id, name, sub?}]
+  _pickerCb = onSelect;
+  g('picker-title').textContent = title;
+  g('picker-search').value = '';
+  renderPickerList(items, selected, onAdd);
+  g('picker-overlay').classList.add('on');
+  g('picker-sheet').classList.add('on');
+  setTimeout(()=>g('picker-search')?.focus(), 300);
+  g('picker-search').oninput = () => {
+    const q = g('picker-search').value.toLowerCase();
+    const filtered = items.filter(i => i.name.toLowerCase().includes(q));
+    renderPickerList(filtered, selected, onAdd, q);
+  };
+}
+window.openPicker=openPicker;
+
+function renderPickerList(items, selected, onAdd, query=''){
+  const list = g('picker-list'); if(!list) return;
+  let html = '';
+  // Botón agregar arriba del todo
+  if(onAdd){
+    const addLbl = query ? `Agregar "${query}"` : (onAdd.label||'Agregar nuevo');
+    html += `<div class="picker-add-item" id="picker-add-btn">
+      <span class="material-icons-round">add_circle</span>
+      <span class="picker-add-lbl">${addLbl}</span>
+    </div>`;
+  }
+  if(!items.length){
+    html += `<div style="padding:24px;text-align:center;color:var(--t4);font-size:13px;">Sin resultados</div>`;
+  } else {
+    html += items.map(item =>
+      `<div class="picker-item rpl${item.id===selected?' sel':''}" data-id="${item.id}" data-name="${(item.name||'').replace(/"/g,'&quot;')}">
+        <div><div class="picker-item-name">${item.name}</div>${item.sub?`<div class="picker-item-sub">${item.sub}</div>`:''}</div>
+        <span class="material-icons-round picker-item-check">check_circle</span>
+      </div>`
+    ).join('');
+  }
+  list.innerHTML = html;
+  // Listeners
+  list.querySelectorAll('.picker-item').forEach(el => {
+    el.addEventListener('click', () => {
+      if(_pickerCb) _pickerCb(el.dataset.id, el.dataset.name);
+      closePicker();
     });
   });
+  const addBtn = g('picker-add-btn');
+  if(addBtn && onAdd){
+    addBtn.addEventListener('click', () => {
+      const val = g('picker-search').value.trim() || '';
+      if(onAdd.fn) onAdd.fn(val);
+      closePicker();
+    });
+  }
 }
+
+function closePicker(){
+  g('picker-overlay').classList.remove('on');
+  g('picker-sheet').classList.remove('on');
+  _pickerCb = null;
+}
+window.closePicker=closePicker;
+
+function renderFinCatChips(){}  // legacy — se usa el picker
 window.renderFinCatChips=renderFinCatChips;
 
-function renderCliChips(containerId,inputId){
-  const wrap=g(containerId); if(!wrap) return;
-  const clientes=(S.miNegocio.clientes||[]).slice(0,6);
-  if(!clientes.length){wrap.style.display='none';return;}
-  wrap.style.display='flex';
-  wrap.innerHTML=clientes.map(c=>`<button class="cli-chip rpl" data-nombre="${(c.nombre||'').replace(/"/g,'&quot;')}">${c.nombre||''}</button>`).join('');
-  wrap.querySelectorAll('.cli-chip').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      wrap.querySelectorAll('.cli-chip').forEach(b=>b.classList.remove('sel'));
-      btn.classList.add('sel');
-      const inp=g(inputId); if(inp) inp.value=btn.dataset.nombre;
-    });
+function getFinCats(){
+  const base=['Ventas','Materiales','Sueldos','Servicios','Alquiler','Marketing','Equipamiento','Transporte','Impuestos','Otros'];
+  const extra=[];
+  (S.miNegocio.productos||[]).forEach(p=>{if(p.categoria&&!base.includes(p.categoria)&&!extra.includes(p.categoria))extra.push(p.categoria);});
+  return [...base,...extra];
+}
+
+function openFinCatPicker(){
+  const cats = getFinCats();
+  const sel = g('s-fin-cat')?.value||'';
+  openPicker({
+    title: 'Categoría',
+    items: cats.map(c=>({id:c, name:c})),
+    selected: sel,
+    onSelect: (id, name) => {
+      g('s-fin-cat').value = name;
+      const lbl = g('fin-cat-trigger-lbl');
+      if(lbl){ lbl.textContent=name; lbl.style.color='var(--t1)'; }
+      g('fin-cat-trigger').classList.add('filled');
+    },
+    onAdd: {
+      label: 'Agregar categoría nueva',
+      fn: async (val) => {
+        const nombre = val || prompt('Nombre de la categoría:');
+        if(!nombre) return;
+        g('s-fin-cat').value = nombre;
+        const lbl = g('fin-cat-trigger-lbl');
+        if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
+      }
+    }
   });
 }
+window.openFinCatPicker=openFinCatPicker;
+
+function renderCliChips(){}  // legacy — se usa el picker
 window.renderCliChips=renderCliChips;
 
-function renderCatChips(){
-  const catList=g('s-ped-cat-list'); if(!catList) return;
+function openCliPicker(hiddenId, triggerId, triggerLblId, titulo){
+  const clientes = S.miNegocio.clientes||[];
+  const sel = g(hiddenId)?.value||'';
+  openPicker({
+    title: titulo||'Cliente',
+    items: clientes.map(c=>({id:c.nombre||'', name:c.nombre||'', sub:c.telefono||''})),
+    selected: sel,
+    onSelect: (id, name) => {
+      if(g(hiddenId)) g(hiddenId).value = name;
+      const lbl = g(triggerLblId);
+      if(lbl){ lbl.textContent=name; lbl.style.color='var(--t1)'; }
+      if(triggerId) g(triggerId)?.classList.add('filled');
+    },
+    onAdd: {
+      label: 'Agregar cliente nuevo',
+      fn: async (val) => {
+        const nombre = val || prompt('Nombre del cliente:');
+        if(!nombre) return;
+        // Guardar en Mi Negocio automáticamente
+        const data={nombre,creadoEn:new Date().toISOString()};
+        try{
+          const {addDoc,collection:col2}=await import('https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js');
+          const ref=await addDoc(collection(db,`usuarios/${S.uid}/mn_clientes`),data);
+          S.miNegocio.clientes.push({...data,_id:ref.id});
+        }catch(e){S.miNegocio.clientes.push({...data,_id:'tmp_'+Date.now()});}
+        if(g(hiddenId)) g(hiddenId).value=nombre;
+        const lbl=g(triggerLblId);
+        if(lbl){lbl.textContent=nombre;lbl.style.color='var(--t1)';}
+        toast('✅ Cliente guardado en Mi Negocio');
+      }
+    }
+  });
+}
+window.openCliPicker=openCliPicker;
+
+function renderCatChips(){}  // legacy
+function renderProdList(){}  // legacy
+
+function openPedCatPicker(){
   const cats=[...new Set((S.miNegocio.productos||[]).map(p=>p.categoria||'General'))];
-  catList.innerHTML=cats.map(c=>`<button class="cat-chip rpl" data-cat="${c}">${c}</button>`).join('');
-  catList.querySelectorAll('.cat-chip').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      catList.querySelectorAll('.cat-chip').forEach(b=>b.classList.remove('sel'));
-      btn.classList.add('sel'); renderProdList(btn.dataset.cat);
-    });
+  if(!cats.length){toast('Primero agregá productos en Mi Negocio');return;}
+  const sel=g('s-ped-cat')?.value||'';
+  openPicker({
+    title:'Categoría de producto',
+    items:cats.map(c=>({id:c,name:c})),
+    selected:sel,
+    onSelect:(id,name)=>{
+      g('s-ped-cat').value=name;
+      const lbl=g('ped-cat-trigger-lbl');
+      if(lbl){lbl.textContent=name;lbl.style.color='var(--t1)';}
+      g('ped-cat-trigger').classList.add('filled');
+      // Resetear producto al cambiar categoría
+      g('s-ped-prod-trigger-lbl').textContent='Seleccionar producto…';
+      g('s-ped-prod-trigger-lbl').style.color='var(--t4)';
+    },
+    onAdd:{
+      label:'Agregar categoría nueva',
+      fn:(val)=>{
+        const nombre=val||prompt('Nombre de la categoría:');
+        if(!nombre)return;
+        g('s-ped-cat').value=nombre;
+        const lbl=g('ped-cat-trigger-lbl');
+        if(lbl){lbl.textContent=nombre;lbl.style.color='var(--t1)';}
+      }
+    }
   });
-  if(cats.length){catList.querySelector('.cat-chip')?.classList.add('sel');renderProdList(cats[0]);}
 }
-function renderProdList(cat){
-  const list=g('s-ped-prod-list'); if(!list) return;
-  const prods=(S.miNegocio.productos||[]).filter(p=>(p.categoria||'General')===cat);
-  list.innerHTML=prods.map(p=>`<button class="cat-chip rpl" style="margin-bottom:4px;" data-prod="${(p.nombre||'').replace(/"/g,'&quot;')}">${p.nombre||''}${p.precio?' — '+fmtARS(p.precio):''}</button>`).join('');
-  list.querySelectorAll('[data-prod]').forEach(btn=>{
-    btn.addEventListener('click',()=>addPedProd(btn.dataset.prod));
+window.openPedCatPicker=openPedCatPicker;
+
+function openPedProdPicker(){
+  const cat=g('s-ped-cat')?.value||'';
+  const prods=(S.miNegocio.productos||[]).filter(p=>!cat||(p.categoria||'General')===cat);
+  if(!prods.length&&!cat){toast('Primero seleccioná una categoría o agregá productos');return;}
+  openPicker({
+    title:'Producto',
+    items:prods.map(p=>({id:p.nombre||'',name:p.nombre||'',sub:p.precio?fmtARS(p.precio):''})),
+    selected:'',
+    onSelect:(id,name)=>{
+      addPedProd(name);
+      const lbl=g('ped-prod-trigger-lbl');
+      if(lbl){lbl.textContent='+ Agregar otro producto';lbl.style.color='var(--bosque)';}
+    },
+    onAdd:{
+      label:'Agregar producto personalizado',
+      fn:(val)=>{
+        const nombre=val||prompt('Nombre del producto:');
+        if(nombre)addPedProd(nombre);
+      }
+    }
   });
 }
+window.openPedProdPicker=openPedProdPicker;
 function addPedProd(nombre){
   const box=g('s-ped-prods');
   const div=document.createElement('div'); div.className='prod-row';
@@ -993,15 +1197,20 @@ async function delMov(id){
 window.delMov=delMov;
 
 async function savePed(){
-  const cli=g('s-ped-cli')?.value.trim();
-  if(!cli){toast('Ingresá el nombre del cliente');return;}
+  const cli=(g('s-ped-cli')?.value||'').trim();
+  if(!cli){toast('Seleccioná un cliente');return;}
   const items=[];
   g('s-ped-prods')?.querySelectorAll('.prod-row').forEach(row=>{
     const n=row.querySelector('.prod-row-name')?.textContent||'';
     const q=parseInt(row.querySelector('.qty-num')?.textContent||'1');
-    if(n)items.push({p:n,q});
+    if(n)items.push({p:n,q,cat:g('s-ped-cat')?.value||''});
   });
-  const data={cli,fecha:g('s-ped-fecha')?.value||hoy(),hora:g('s-ped-hora')?.value||'',items,archivado:false,creadoEn:new Date().toISOString()};
+  const data={
+    cli, fecha:g('s-ped-fecha')?.value||hoy(), hora:g('s-ped-hora')?.value||'',
+    items, notas:g('s-ped-notas')?.value.trim()||'',
+    catProducto:g('s-ped-cat')?.value||'',
+    archivado:false, creadoEn:new Date().toISOString()
+  };
   saving();
   try{const ref=await addDoc(col('pedidos'),data);S.pedidos.push({...data,_id:ref.id});S.ottoCache=[];closeSheet();toast('✅ Pedido guardado');renderPeds();renderPedWeek();renderProduceSemana();}
   catch(e){console.error(e);toast('Error al guardar');}
@@ -1023,7 +1232,7 @@ window.delPed=delPed;
 async function saveEv(){
   const tit=g('s-age-tit')?.value.trim();
   if(!tit){toast('Ingresá un título');return;}
-  const data={tit,fecha:g('s-age-fecha')?.value||hoy(),hora:g('s-age-hora')?.value||'',cliente:g('s-age-cli')?.value.trim()||'',prio:g('s-age-prio')?.value||'normal',desc:g('s-age-desc')?.value.trim()||'',creadoEn:new Date().toISOString()};
+  const data={tit,fecha:g('s-age-fecha')?.value||hoy(),hora:g('s-age-hora')?.value||'',cliente:(g('s-age-cli')?.value||'').trim(),prio:g('s-age-prio')?.value||'normal',desc:(g('s-age-desc')?.value||'').trim(),creadoEn:new Date().toISOString()};
   saving();
   try{const ref=await addDoc(col('eventos'),data);S.eventos.push({...data,_id:ref.id});S.ottoCache=[];closeSheet();toast('✅ Agendado');renderEvs();renderAgeWeek();}
   catch(e){console.error(e);toast('Error');}
@@ -1313,18 +1522,41 @@ let sliderIdx=0; let sliderTimer=null;
 
 function buildOttoContext(){
   const mes=new Date().toISOString().slice(0,7);
-  const ing=S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mes)).reduce((s,m)=>s+m.monto,0);
-  const gas=S.movs.filter(m=>m.tipo==='gasto'&&m.fecha?.startsWith(mes)).reduce((s,m)=>s+m.monto,0);
-  const activos=S.pedidos.filter(p=>!p.archivado).slice(0,5);
+  const mesPrev=new Date(new Date().getFullYear(),new Date().getMonth()-1,1).toISOString().slice(0,7);
+  // Finanzas detalladas por categoría
+  const movsMes=S.movs.filter(m=>m.fecha?.startsWith(mes));
+  const ing=movsMes.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
+  const gas=movsMes.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
+  const ingPrev=S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mesPrev)).reduce((s,m)=>s+m.monto,0);
+  // Top categorías
+  const catTotals={};
+  movsMes.forEach(m=>{const c=m.cat||'Sin cat';catTotals[c]=(catTotals[c]||0)+m.monto;});
+  const topCats=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([c,v])=>`${c}:${fmtARS(v)}`).join(', ');
+  // Pedidos con detalle
+  const activos=S.pedidos.filter(p=>!p.archivado);
+  const pedDet=activos.slice(0,5).map(p=>`${p.cli}(${(p.items||[]).map(i=>`${i.q}x${i.p}`).join(',')||'?'})el ${p.fecha||'?'}${p.notas?' nota:'+p.notas:''}`).join(' | ');
+  // Clientes únicos
+  const clientesUnicos=[...new Set(S.pedidos.map(p=>p.cli).filter(Boolean))];
+  const clientesFrecuentes=clientesUnicos.slice(0,5);
+  // Agenda
   const proxEvs=S.eventos.filter(e=>e.fecha>=hoy()).sort((a,b)=>a.fecha.localeCompare(b.fecha)).slice(0,3);
+  const evDet=proxEvs.map(e=>`${e.tit} el ${e.fecha}${e.cliente?' con '+e.cliente:''}${e.prio==='urgente'?' [URGENTE]':''}`).join(' | ');
+  // Tareas
   const pend=S.tareas.filter(t=>!t.done);
-  return `Sos OTTO, el socio de ${S.nombre?.split(' ')[0]||'emprendedor'}, dueño de "${S.perfil?.negocio||S.negocio||'su negocio'}". Rubro: ${S.perfil?.rubro||'negocio'}.
-Fecha: ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})}.
-Finanzas ${mes}: Ingresos ${fmtARS(ing)} | Gastos ${fmtARS(gas)} | Balance ${ing-gas>=0?'+':''}${fmtARS(ing-gas)}.
-Pedidos activos (${activos.length}): ${activos.map(p=>`${p.cli} el ${p.fecha}`).join(', ')||'ninguno'}.
-Agenda: ${proxEvs.map(e=>`${e.tit} el ${e.fecha}`).join(', ')||'ninguno'}.
-Tareas pendientes: ${pend.length} (${pend.filter(t=>t.prio==='urgente').length} urgentes).
-Nota: ${S.nota||'—'}.`;
+  const taskDet=pend.slice(0,5).map(t=>`${t.tit}${t.fecha?' para '+t.fecha:''}${t.prio==='urgente'?' [URGENTE]':''}`).join(' | ');
+  // Catálogo
+  const prods=(S.miNegocio.productos||[]).slice(0,10).map(p=>`${p.nombre}${p.precio?' '+fmtARS(p.precio):''}`).join(', ');
+  return `NEGOCIO: "${S.perfil?.negocio||S.negocio||'—'}" | Rubro: ${S.perfil?.rubro||'—'} | Dueño: ${S.nombre?.split(' ')[0]||'—'}
+FECHA: ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+FINANZAS ${mes}: Ingresos ${fmtARS(ing)} | Gastos ${fmtARS(gas)} | Balance ${ing-gas>=0?'+':''}${fmtARS(ing-gas)} | Mes anterior: ${fmtARS(ingPrev)}
+TOP CATEGORÍAS: ${topCats||'—'}
+PEDIDOS ACTIVOS (${activos.length}): ${pedDet||'ninguno'}
+CLIENTES (${clientesUnicos.length} únicos): ${clientesFrecuentes.join(', ')||'ninguno'}
+AGENDA (${proxEvs.length} próximos): ${evDet||'ninguno'}
+TAREAS (${pend.length} pendientes, ${pend.filter(t=>t.prio==='urgente').length} urgentes): ${taskDet||'ninguna'}
+CATÁLOGO (${(S.miNegocio.productos||[]).length} productos): ${prods||'—'}
+CLIENTES REGISTRADOS: ${(S.miNegocio.clientes||[]).map(c=>c.nombre).join(', ')||'—'}
+NOTA DEL DUEÑO: ${S.nota||'—'}`;
 }
 window.buildOttoContext=buildOttoContext;
 
@@ -1505,6 +1737,14 @@ g('pill-gas')?.addEventListener('click',()=>setTipo('gasto'));
 document.querySelectorAll('.quick-amt').forEach(btn=>{btn.addEventListener('click',()=>{document.querySelectorAll('.quick-amt').forEach(b=>b.classList.remove('sel'));btn.classList.add('sel');const mi=g('s-fin-monto');if(mi)mi.value=btn.dataset.val;});});
 g('s-fin-save')?.addEventListener('click',saveMov);
 g('s-fin-monto')?.addEventListener('keydown',e=>{if(e.key==='Enter')saveMov();});
+// Pickers
+g('fin-cat-trigger')?.addEventListener('click',openFinCatPicker);
+g('ped-cli-trigger')?.addEventListener('click',()=>openCliPicker('s-ped-cli','ped-cli-trigger','ped-cli-trigger-lbl','Cliente'));
+g('ped-cat-trigger')?.addEventListener('click',openPedCatPicker);
+g('ped-prod-trigger')?.addEventListener('click',openPedProdPicker);
+g('age-cli-trigger')?.addEventListener('click',()=>openCliPicker('s-age-cli','age-cli-trigger','age-cli-trigger-lbl','Cliente (opcional)'));
+g('picker-overlay')?.addEventListener('click',closePicker);
+g('picker-close')?.addEventListener('click',closePicker);
 g('s-ped-save')?.addEventListener('click',savePed);
 g('s-age-save')?.addEventListener('click',saveEv);
 g('s-task-save')?.addEventListener('click',saveTask);
