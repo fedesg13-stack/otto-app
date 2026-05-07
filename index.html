@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="OTTO">
 <title>OTTO</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
 <style>
 /* ═══════════════════════════════════════════════════
@@ -130,16 +130,18 @@ body {
   position:fixed; inset:0; z-index:200;
   background:var(--bg);
   display:none; flex-direction:column;
-  align-items:center; justify-content:center; gap:16px;
+  align-items:center; justify-content:center; gap:0;
+  padding:32px;
 }
 .loading-spinner {
-  width:32px; height:32px;
-  border:2.5px solid var(--border);
+  width:28px; height:28px;
+  border:2px solid rgba(35,65,54,.15);
   border-top-color:var(--bosque);
   border-radius:50%;
-  animation:spin .7s linear infinite;
+  animation:spin .8s linear infinite;
+  margin-top:8px;
 }
-.loading-text { font-size:13px; font-weight:500; color:var(--t4); }
+.loading-text { font-size:12px; font-weight:400; color:var(--t5); margin-top:10px; letter-spacing:.3px; }
 
 /* ── APP ── */
 #app { display:none; min-height:100vh; padding-bottom:92px; }
@@ -412,7 +414,7 @@ header {
 /* ── PANELS ── */
 .panel { display:none; padding:0 0 24px; }
 .panel.on { display:block; }
-.sec-title { font-size:22px; font-weight:800; color:var(--t1); margin-bottom:16px; letter-spacing:-.4px; font-family:var(--font-serif); padding:18px 16px 0; }
+.sec-title { font-size:22px; font-weight:600; color:var(--t1); margin-bottom:16px; letter-spacing:-.3px; font-family:var(--font); padding:18px 16px 0; }
 .sec-title-row { display:flex; align-items:center; justify-content:space-between; padding:18px 16px 0; margin-bottom:16px; }
 .sec-title-row .sec-title { margin-bottom:0; padding:0; }
 
@@ -429,7 +431,7 @@ header {
   box-shadow:0 8px 24px rgba(35,65,54,.25);
 }
 .home-hero-lbl { font-size:10px; font-weight:600; letter-spacing:.8px; text-transform:uppercase; color:rgba(255,255,255,.55); margin-bottom:6px; }
-.home-hero-amt { font-size:36px; font-weight:800; color:#fff; letter-spacing:-1.5px; margin-bottom:18px; font-family:var(--font-serif); }
+/* home-hero-amt definido abajo */
 .home-hero-row { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 .home-hero-stat { background:rgba(255,255,255,.1); border-radius:var(--r10); padding:12px; }
 .home-hero-stat-lbl { font-size:9px; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:rgba(255,255,255,.5); margin-bottom:4px; }
@@ -506,7 +508,7 @@ header {
 .home-bal { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin:0 12px 10px; }
 .home-bal-card { border-radius:var(--r14); padding:14px 10px; text-align:center; background:var(--surface); border:1px solid var(--border2); box-shadow:var(--s1); }
 .home-bal-lbl { font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.7px; color:var(--t4); margin-bottom:5px; }
-.home-bal-num { font-size:16px; font-weight:800; font-family:var(--font-serif); }
+.home-bal-num { font-size:16px; font-weight:800; font-family:var(--font); }
 .home-bal-card.ing .home-bal-num { color:var(--green); }
 .home-bal-card.gas .home-bal-num { color:var(--red); }
 .home-bal-card.net .home-bal-num { color:var(--bosque); }
@@ -520,7 +522,7 @@ header {
 .bal-card.ing .bal-lbl { color:var(--green); }
 .bal-card.gas .bal-lbl { color:var(--red); }
 .bal-card.net .bal-lbl { color:var(--bosque); }
-.bal-num { font-size:17px; font-weight:800; font-family:var(--font-serif); }
+.bal-num { font-size:17px; font-weight:800; font-family:var(--font); }
 .bal-card.ing .bal-num { color:var(--green); }
 .bal-card.gas .bal-num { color:var(--red); }
 .bal-card.net .bal-num { color:var(--bosque); }
@@ -542,9 +544,9 @@ header {
 .mov-icon.ing span { color:var(--green); }
 .mov-icon.gas span { color:var(--red); }
 .mov-icon span { font-size:17px; }
-.mov-cat { font-size:13px; font-weight:600; color:var(--t1); }
+.mov-cat { font-size:13px; font-weight:500; color:var(--t1); }
 .mov-meta { font-size:11px; color:var(--t3); margin-top:1px; }
-.mov-amt { font-size:15px; font-weight:700; text-align:right; font-family:var(--font-serif); }
+.mov-amt { font-size:15px; font-weight:700; text-align:right; font-family:var(--font); }
 .mov-amt.ing { color:var(--green); }
 .mov-amt.gas { color:var(--red); }
 .mov-date-small { font-size:10px; color:var(--t5); text-align:right; margin-top:2px; }
@@ -553,7 +555,7 @@ header {
 .cat-card { border-radius:var(--r14); padding:14px 16px; background:var(--surface); }
 .cat-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
 .cat-name { font-size:13px; font-weight:600; color:var(--t1); }
-.cat-total { font-size:14px; font-weight:700; font-family:var(--font-serif); }
+.cat-total { font-size:14px; font-weight:700; font-family:var(--font); }
 .cat-bar-bg { background:var(--surface3); border-radius:3px; height:3px; margin-bottom:8px; overflow:hidden; }
 .cat-bar-fill { height:100%; border-radius:3px; transition:width .4s cubic-bezier(.4,0,.2,1); }
 .cat-pct { font-size:10px; color:var(--t5); font-weight:500; margin-bottom:8px; }
@@ -561,7 +563,7 @@ header {
 .cat-mov:last-child { border-bottom:none; }
 .cat-mov-name { font-size:12px; font-weight:500; color:var(--t2); }
 .cat-mov-date { font-size:11px; color:var(--t5); }
-.cat-mov-amt { font-size:13px; font-weight:700; font-family:var(--font-serif); }
+.cat-mov-amt { font-size:13px; font-weight:700; font-family:var(--font); }
 
 /* ── PEDIDOS PRODUCE ── */
 .produce-week { margin:0 12px 10px; background:var(--amber-bg); border-radius:var(--r14); border:1px solid rgba(122,92,30,.15); padding:14px; }
@@ -569,7 +571,7 @@ header {
 .produce-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .produce-item { background:var(--surface); border-radius:var(--r10); padding:10px 12px; display:flex; justify-content:space-between; align-items:center; border:1px solid var(--border2); box-shadow:var(--s1); }
 .prod-name { font-size:11px; color:var(--t3); font-weight:500; }
-.prod-qty { font-size:20px; font-weight:800; color:var(--amber); font-family:var(--font-serif); }
+.prod-qty { font-size:20px; font-weight:800; color:var(--amber); font-family:var(--font); }
 
 /* ── CALENDARIO SEMANA ── */
 .week-cal-wrap { margin:0 12px 10px; background:var(--surface); border-radius:var(--r14); border:1px solid var(--border2); padding:14px; box-shadow:var(--s1); overflow:hidden; }
@@ -659,7 +661,7 @@ header {
 /* ── CALENDARIO ── */
 .cal-wrap { margin:0 12px 10px; background:var(--surface); border-radius:var(--r14); border:1px solid var(--border2); padding:14px 10px; box-shadow:var(--s1); overflow:hidden; }
 .cal-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; padding:0 4px; }
-.cal-title { font-size:13px; font-weight:600; color:var(--t1); font-family:var(--font-serif); }
+.cal-title { font-size:13px; font-weight:600; color:var(--t1); font-family:var(--font); }
 .cal-nav { display:flex; gap:4px; }
 .cal-nav-btn { background:var(--surface2); border:1px solid var(--border); border-radius:var(--r6); width:28px; height:28px; cursor:pointer; display:flex; align-items:center; justify-content:center; color:var(--t3); transition:all .1s; }
 .cal-nav-btn:active { background:var(--surface3); color:var(--bosque); }
@@ -742,7 +744,7 @@ header {
 .mn-collapse-body { padding:12px 14px 14px; background:var(--surface); border-top:1px solid var(--border2); }
 .perfil-card { margin:0 12px 14px; background:var(--bosque); border-radius:var(--r18); padding:22px; box-shadow:0 8px 24px rgba(35,65,54,.2); }
 .perfil-rubro { display:inline-flex; align-items:center; gap:6px; background:rgba(255,255,255,.15); color:rgba(255,255,255,.85); border-radius:var(--rfull); padding:4px 11px; font-size:10px; font-weight:700; letter-spacing:.5px; text-transform:uppercase; margin-bottom:8px; }
-.perfil-nombre { font-size:20px; font-weight:800; color:#fff; margin-bottom:4px; font-family:var(--font-serif); }
+.perfil-nombre { font-size:20px; font-weight:700; color:#fff; margin-bottom:4px; font-family:var(--font); letter-spacing:-.3px; }
 .perfil-desc { font-size:12px; color:rgba(255,255,255,.6); font-weight:400; }
 
 /* ── ITEM ACTIONS ── */
@@ -816,7 +818,7 @@ header {
 .ob-progress { display:flex; gap:5px; justify-content:center; margin-bottom:10px; }
 .ob-dot { width:6px; height:6px; border-radius:50%; background:var(--border); transition:all .25s; }
 .ob-dot.on { background:var(--bosque); width:18px; border-radius:3px; }
-.ob-title { font-size:20px; font-weight:800; color:var(--t1); text-align:center; line-height:1.3; font-family:var(--font-serif); }
+.ob-title { font-size:20px; font-weight:700; color:var(--t1); text-align:center; line-height:1.3; font-family:var(--font); letter-spacing:-.3px; }
 .ob-sub { font-size:13px; color:var(--t3); text-align:center; font-weight:400; line-height:1.55; }
 .ob-options { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
 .ob-option { background:var(--surface2); border:1.5px solid var(--border); border-radius:var(--r14); padding:14px 10px; text-align:center; cursor:pointer; transition:all .15s; font-family:var(--font); font-size:13px; font-weight:500; color:var(--t2); }
@@ -850,7 +852,7 @@ header {
   display:flex; flex-direction:column; align-items:center; gap:8px;
 }
 .empty-state-icon { font-size:40px; margin-bottom:4px; opacity:.6; }
-.empty-state-title { font-size:16px; font-weight:700; color:var(--t2); font-family:var(--font-serif); }
+.empty-state-title { font-size:16px; font-weight:600; color:var(--t2); font-family:var(--font); }
 .empty-state-sub { font-size:13px; color:var(--t4); line-height:1.55; }
 .empty-state-btn {
   margin-top:8px;
@@ -866,13 +868,13 @@ header {
 .mov-item:first-child { border-radius:0; }
 
 /* ── HOME HERO polish ── */
-.home-hero-amt { font-size:38px; font-weight:800; color:#fff; letter-spacing:-2px; margin-bottom:2px; line-height:1; }
+.home-hero-amt { font-size:34px; font-weight:700; color:#fff; letter-spacing:-1px; margin-bottom:6px; line-height:1.1; font-family:var(--font); }
 
 /* ── FORM SHEET: título más limpio ── */
-.form-sheet-title { font-size:17px; font-weight:700; color:var(--t1); font-family:var(--font-serif); }
+.form-sheet-title { font-size:16px; font-weight:600; color:var(--t1); font-family:var(--font); }
 
 /* ── SEC TITLE en Finanzas ── */
-.sec-title { font-family:var(--font-serif); }
+.sec-title { font-family:var(--font); }
 
 /* ── BOTÓN FAB en formularios — igual que mockup ── */
 .fab-add { background:var(--green-bg); color:var(--bosque); border:none; font-weight:600; }
@@ -883,7 +885,7 @@ header {
 .ticket::before { border-radius:0 2px 2px 0; }
 
 /* ── PERFIL CARD ── */
-.perfil-nombre { font-family:var(--font-serif); font-size:22px; font-weight:400; }
+.perfil-nombre { font-family:var(--font); font-size:20px; font-weight:700; letter-spacing:-.3px; }
 
 /* ── SEMANA header ── */
 .week-header { font-size:11px; font-weight:700; }
@@ -943,7 +945,7 @@ header {
 <!-- LOGIN SCREEN -->
 <div id="loginScreen">
   <div style="text-align:center;margin-bottom:36px;">
-    <div style="font-family:'DM Serif Display',serif;font-size:42px;font-weight:400;color:var(--bosque);margin:0 auto 16px;letter-spacing:2px;">OTTO</div>
+    <div style="width:200px;height:58px;color:var(--bosque);margin:0 auto 20px;"><svg viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" fill="none"><circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="40" cy="40" r="5.5" fill="currentColor"/><line x1="82" y1="9" x2="198" y2="9" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="110" y1="9" x2="110" y2="75" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="170" y1="9" x2="170" y2="75" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="240" cy="40" r="32" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="240" cy="40" r="5.5" fill="currentColor"/></svg></div>
     <div style="font-size:18px;font-weight:600;color:var(--t1);line-height:1.4;">Tu nuevo socio<br>para crecer tranquilo.</div>
     <div style="font-size:13px;color:var(--t3);margin-top:8px;">Más claridad. Menos caos.</div>
   </div>
@@ -1009,7 +1011,8 @@ header {
 
 <!-- LOADING -->
 <div id="loadingScreen">
-  <div style="font-family:'DM Serif Display',serif;font-size:28px;font-weight:400;color:var(--bosque);margin-bottom:20px;letter-spacing:1px;">OTTO</div>
+  <div style="width:180px;height:52px;color:var(--bosque);margin-bottom:24px;"><svg viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" fill="none"><circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="40" cy="40" r="5.5" fill="currentColor"/><line x1="82" y1="9" x2="198" y2="9" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="110" y1="9" x2="110" y2="75" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="170" y1="9" x2="170" y2="75" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="240" cy="40" r="32" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="240" cy="40" r="5.5" fill="currentColor"/></svg></div>
+  <div style="font-size:15px;font-weight:400;color:var(--t2);margin-bottom:32px;text-align:center;line-height:1.5;">Tu nuevo socio<br>para crecer tranquilo.</div>
   <div class="loading-spinner"></div>
   <div class="loading-text">Cargando tus datos…</div>
 </div>
@@ -1017,18 +1020,15 @@ header {
 <!-- APP -->
 <div id="app">
   <header>
-    <button onclick="menuNav('home')" style="background:transparent;border:none;cursor:pointer;padding:6px 10px;border-radius:var(--r6);">
-      <span style="font-family:'DM Serif Display',serif;font-size:20px;font-weight:400;color:var(--bosque);">OTTO</span>
+    <button onclick="menuNav('home')" style="background:transparent;border:none;cursor:pointer;padding:4px 6px;border-radius:var(--r6);color:var(--bosque);" title="Inicio">
+      <div style="width:68px;height:20px;color:var(--bosque);"><svg viewBox="0 0 280 80" xmlns="http://www.w3.org/2000/svg" fill="none"><circle cx="40" cy="40" r="32" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="40" cy="40" r="5.5" fill="currentColor"/><line x1="82" y1="9" x2="198" y2="9" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="110" y1="9" x2="110" y2="75" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><line x1="170" y1="9" x2="170" y2="75" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="240" cy="40" r="32" stroke="currentColor" stroke-width="9" stroke-linecap="round"/><circle cx="240" cy="40" r="5.5" fill="currentColor"/></svg></div>
     </button>
-    <div style="display:flex;align-items:center;gap:8px;">
-      <div class="user-chip">
-        <div class="user-av" id="uAv">?</div>
-        <div class="user-name" id="uName">—</div>
-      </div>
-      <button class="btn-menu rpl" onclick="toggleMenu()" id="btnMenu" aria-label="Menú">
-        <span class="material-icons-round" id="menuIcon">menu</span>
-      </button>
+    <div style="flex:1;text-align:center;padding:0 8px;overflow:hidden;">
+      <div id="headerNegocio" style="font-size:13px;font-weight:600;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"></div>
     </div>
+    <button class="btn-menu rpl" onclick="toggleMenu()" id="btnMenu" aria-label="Menú">
+      <span class="material-icons-round" id="menuIcon">menu</span>
+    </button>
   </header>
 
   <!-- MENÚ LATERAL DESPLEGABLE -->
@@ -1144,7 +1144,7 @@ header {
     </button>
 
     <!-- Derecha: OTTO -->
-    <button class="nav-otto-btn" id="nav-chat" onclick="goSection('chat',this)">
+    <button class="nav-otto-btn" id="nav-chat" onclick="menuNav('chat')">
       <span class="material-icons-round">smart_toy</span>
       <span class="nav-otto-lbl">OTTO</span>
     </button>
@@ -1192,17 +1192,6 @@ header {
       <div id="homePendientes" style="margin-top:14px;padding-top:14px;border-top:1px solid rgba(255,255,255,.12);font-size:12px;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:6px;">
         <span class="material-icons-round" style="font-size:15px;">pending_actions</span>
         <span id="homePendientesLbl">Sin tareas pendientes esta semana</span>
-      </div>
-    </div>
-
-    <!-- Movimientos recientes — como en mockup -->
-    <div style="margin:0 12px 10px;">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-        <div style="font-size:13px;font-weight:700;color:var(--t2);">Últimos movimientos</div>
-        <button onclick="menuNav('fin')" style="font-size:12px;color:var(--bosque);font-weight:600;background:none;border:none;cursor:pointer;font-family:var(--font);">Ver todos →</button>
-      </div>
-      <div id="homeMovsRecientes">
-        <div class="empty" style="padding:20px 0;"><span>💸</span>Sin movimientos aún.</div>
       </div>
     </div>
 
@@ -1432,6 +1421,11 @@ header {
       <div class="sec-title">Mi negocio</div>
       <button class="fab-add rpl" onclick="editPerfil()"><span class="material-icons-round">edit</span> Editar</button>
     </div>
+    <!-- Nombre del negocio destacado -->
+    <div style="padding:0 12px 14px;">
+      <div id="mnNombreNegocio" style="font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-.5px;line-height:1.2;">—</div>
+      <div id="mnRubroNegocio" style="font-size:13px;color:var(--t3);margin-top:4px;font-weight:400;">Completá tu perfil en Editar</div>
+    </div>
     <!-- Perfil del local -->
     <div class="perfil-card" id="perfilCard">
       <div class="perfil-rubro" id="perfilRubro">💼 Mi negocio</div>
@@ -1649,24 +1643,7 @@ header {
         <option value="urgente">🔴 Urgente</option>
       </select>
     </div>
-    <!-- Categoría de tarea -->
-    <div class="cat-selector-wrap">
-      <div class="cat-sel-label">Categoría (opcional)</div>
-      <div class="cat-sel-selected" id="taskCatSelected" onclick="toggleCatPicker('task')">
-        <span id="taskCatSelectedLbl">Elegir categoría…</span>
-        <span class="material-icons-round" style="font-size:16px;color:var(--t4)">expand_more</span>
-      </div>
-      <div class="cat-sel-picker" id="taskCatPicker" style="display:none;">
-        <div id="taskCatList" class="cat-sel-list"></div>
-        <div class="cat-sel-custom">
-          <div class="m3-field" style="flex:1;margin-bottom:0">
-            <input class="m3-inp" id="taskCat" placeholder=" " oninput="taskCatSelectedLbl.textContent=this.value||'Elegir categoría…'">
-            <label class="m3-lbl">O escribí una categoría</label>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="m3-field" style="margin-top:8px;"><input class="m3-inp" id="taskDesc" placeholder=" "><label class="m3-lbl">Descripción (opcional)</label></div>
+    <div class="m3-field"><input class="m3-inp" id="taskDesc" placeholder=" "><label class="m3-lbl">Descripción (opcional)</label></div>
     <button class="btn-arrow rpl" onclick="saveTask()"><span>Guardar tarea</span><span class="material-icons-round arrow-icon">arrow_forward</span></button>
   </div>
 </div>
@@ -1817,6 +1794,8 @@ onAuthStateChanged(auth, async (user) => {
 
     document.getElementById('uAv').textContent = S.nombre[0].toUpperCase();
     document.getElementById('uName').textContent = S.nombre.split(' ')[0];
+    const hn = document.getElementById('headerNegocio');
+    if (hn) hn.textContent = S.negocio || S.nombre || '';
     // Menú lateral
     document.getElementById('menuAv').textContent = S.nombre[0].toUpperCase();
     document.getElementById('menuName').textContent = S.nombre;
@@ -2604,7 +2583,7 @@ function renderCatalogoSelector(){
   const el=document.getElementById('catalogoSelChips');if(!el)return;
   const productos=getCatalogoUnificado();
   if(!productos.length){el.innerHTML='<span style="font-size:12px;color:var(--t3)">Sin productos. Agregá en Mi negocio → Productos 🛍️</span>';return;}
-  el.innerHTML=productos.map(p=>{const qty=catalogoSeleccionado[p.nombre]||0;return `<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:var(--r10);padding:8px 12px;margin-bottom:6px;"><span style="flex:1;font-size:13px;font-weight:700">${p.nombre}${p.fuente==='negocio'?'':' <span style="font-size:10px;opacity:.5">★</span>'}</span><div class="qty-selector"><button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button><span class="qty-num" id="qty_${p.nombre.replace(/[\s']/g,'_')}">${qty}</span><button class="qty-btn" onclick="changeCatQty('${p.nombre}',1)">+</button></div></div>`;}).join('');
+  el.innerHTML=productos.map(p=>{const qty=catalogoSeleccionado[p.nombre]||0;return `<div style="display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:var(--r10);padding:8px 12px;margin-bottom:6px;"><span style="flex:1;font-size:13px;font-weight:700">${p.nombre}${p.fuente==='negocio'?'':' <span style="font-size:10px;opacity:.5">★</span>'}</span><div class="qty-selector"><button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button><span class="qty-num" id="qty_${p.nombre.replace(/[\s']/g,'_')}">${qty}</span><button class="qty-btn" onclick="changeCatQty('${p.nombre}',1)">+</button></div></div>`;}).join('');
 }
 function changeCatQty(nombre,delta){const current=catalogoSeleccionado[nombre]||0;const nuevo=Math.max(0,current+delta);if(nuevo===0)delete catalogoSeleccionado[nombre];else catalogoSeleccionado[nombre]=nuevo;const id='qty_'+nombre.replace(/[\s']/g,'_');const el=document.getElementById(id);if(el)el.textContent=nuevo;}
 window.changeCatQty=changeCatQty;
@@ -2663,13 +2642,19 @@ async function finishOnboarding(){
 window.skipOnboarding=skipOnboarding;window.selectRubro=selectRubro;window.selectEquipo=selectEquipo;window.selectObjetivo=selectObjetivo;window.obNext=obNext;window.finishOnboarding=finishOnboarding;
 
 function renderPerfil(){
-  const p=S.perfil;if(!p)return;
-  const rubroLabels={panaderia:'Panadería',gastronomia:'Gastronomía',fotografia:'Fotografía',construccion:'Construcción',comercio:'Comercio',otro:'Emprendimiento'};
-  const label=rubroLabels[p.rubro]||p.rubro;
-  const el=document.getElementById('perfilRubro');const nombre=document.getElementById('perfilNombre');const desc=document.getElementById('perfilDesc');
-  if(el)el.textContent=(p.emoji||'💼')+' '+label;
-  if(nombre)nombre.textContent=S.negocio||S.nombre||'—';
-  if(desc)desc.textContent=p.equipo==='solo'?'Emprendedor individual':'Negocio con equipo';
+  if(!S.perfil)return;
+  const p=S.perfil;
+  const setEl=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v||'';};
+  // Perfil card
+  setEl('perfilRubro',(p.rubroIcon||'💼')+' '+(p.rubro||'Mi negocio'));
+  setEl('perfilNombre',p.nombre||S.nombre||'—');
+  setEl('perfilDesc',p.descripcion||'');
+  // Header y menú
+  setEl('headerNegocio', p.negocio||p.nombre||S.nombre||'');
+  setEl('menuNegocio', p.negocio||p.nombre||S.nombre||'');
+  // Mi negocio panel
+  setEl('mnNombreNegocio', p.negocio||p.nombre||S.nombre||'—');
+  setEl('mnRubroNegocio', p.rubro||p.descripcion||'');
 }
 
 function editPerfil(){
@@ -2812,7 +2797,7 @@ function selectCatCategory(cat){
   prodList.style.display='block';
   prodList.innerHTML='<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--t4);margin-bottom:8px;">'+cat+'</div>'+productos.map(p=>{
     const qty=catalogoSeleccionado[p.nombre]||0;
-    return `<div style="display:flex;align-items:center;gap:8px;background:var(--bg3);border-radius:var(--r10);padding:8px 12px;margin-bottom:6px;">
+    return `<div style="display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:var(--r10);padding:8px 12px;margin-bottom:6px;">
       <span style="flex:1;font-size:13px;font-weight:700">${p.nombre}${p.precio?` <span style="font-size:11px;color:var(--t3);font-weight:500">$${Number(p.precio).toLocaleString()}</span>`:''}</span>
       <div class="qty-selector">
         <button class="qty-btn" onclick="changeCatQty('${p.nombre}',-1)">−</button>
@@ -2971,30 +2956,58 @@ function renderMnCollapseBody(tab) {
   if (!cfg) return;
   const items = S.miNegocio[tab] || [];
   const addBtn = `<button class="mn-add-btn" onclick="openMnAdd('${tab}')"><span class="material-icons-round" style="font-size:14px">add</span> Agregar</button>`;
+
   if (!items.length) {
     body.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;"><span style="font-size:12px;color:var(--t4)">Sin elementos aún</span>${addBtn}</div>`;
     return;
   }
-  body.innerHTML = `
-    <div style="display:flex;justify-content:flex-end;margin-bottom:10px;">${addBtn}</div>
-    <div class="mn-list" style="padding:0;">
-      ${items.map(it => `
-        <div class="mn-item">
-          <div class="mn-item-icon" style="background:${cfg.bg||'var(--bg3)'};">${cfg.icon}</div>
+
+  let itemsHtml = '';
+  if (tab === 'productos') {
+    // Agrupar por categoría
+    const grupos = {};
+    items.forEach(it => {
+      const cat = it.categoria || 'Sin categoría';
+      if (!grupos[cat]) grupos[cat] = [];
+      grupos[cat].push(it);
+    });
+    Object.entries(grupos).forEach(([cat, prods]) => {
+      itemsHtml += `<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t4);padding:10px 0 6px;">${cat}</div>`;
+      prods.forEach(it => {
+        itemsHtml += `<div class="mn-item">
+          <div class="mn-item-icon" style="background:${cfg.bg||'var(--surface2)'};">${cfg.icon}</div>
           <div class="mn-item-info">
             <div class="mn-item-name">${it.nombre||'—'}</div>
             ${it.precio ? `<div class="mn-item-sub">$${Number(it.precio).toLocaleString('es-AR')}</div>` : ''}
-            ${it.categoria ? `<div class="mn-item-sub" style="color:var(--bosque)">${it.categoria}</div>` : ''}
-            ${it.contacto ? `<div class="mn-item-sub">${it.contacto}</div>` : ''}
           </div>
           <div class="mn-item-actions">
             <button class="mn-btn-edit" onclick="editMnItem('${tab}','${it._id}')">✏️</button>
             <button class="mn-btn-del" onclick="delMnItem('${tab}','${it._id}')">🗑️</button>
           </div>
-        </div>`).join('')}
-    </div>`;
+        </div>`;
+      });
+    });
+  } else {
+    items.forEach(it => {
+      itemsHtml += `<div class="mn-item">
+        <div class="mn-item-icon" style="background:${cfg.bg||'var(--surface2)'};">${cfg.icon}</div>
+        <div class="mn-item-info">
+          <div class="mn-item-name">${it.nombre||'—'}</div>
+          ${it.precio ? `<div class="mn-item-sub">$${Number(it.precio).toLocaleString('es-AR')}</div>` : ''}
+          ${it.categoria ? `<div class="mn-item-sub" style="color:var(--bosque)">${it.categoria}</div>` : ''}
+          ${it.contacto ? `<div class="mn-item-sub">${it.contacto}</div>` : ''}
+        </div>
+        <div class="mn-item-actions">
+          <button class="mn-btn-edit" onclick="editMnItem('${tab}','${it._id}')">✏️</button>
+          <button class="mn-btn-del" onclick="delMnItem('${tab}','${it._id}')">🗑️</button>
+        </div>
+      </div>`;
+    });
+  }
+
+  body.innerHTML = `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">${addBtn}</div><div class="mn-list" style="padding:0;">${itemsHtml}</div>`;
 }
-window.renderMnCollapseBody = renderMnCollapseBody;
+indow.renderMnCollapseBody = renderMnCollapseBody;
 
 // ── SELECTOR DE MES EN FINANZAS ──
 let finMesOffset = 0; // 0 = mes actual, -1 = mes anterior, etc.
@@ -3319,6 +3332,152 @@ function setFinTipo(tipo, el) {
   renderMovsFin();
 }
 window.setFinTipo = setFinTipo;
+
+
+// ── SELECTOR DE CATEGORÍAS (toggleCatPicker) ──
+// Funciona para: fin (finanzas), age (agenda-cliente)
+
+function getCategoriasFin() {
+  // Categorías de finanzas: de Mi Negocio productos + defaults
+  const cats = new Set();
+  // Defaults útiles
+  ['Ventas', 'Servicios', 'Materias primas', 'Sueldos', 'Alquiler', 'Servicios públicos', 'Transporte', 'Marketing', 'Otros'].forEach(c => cats.add(c));
+  // De Mi Negocio productos (categorías propias)
+  (S.miNegocio.productos || []).forEach(p => { if (p.categoria) cats.add(p.categoria); });
+  return [...cats];
+}
+
+function getClientesAge() {
+  // Lista de clientes de Mi Negocio
+  const clients = [];
+  (S.miNegocio.clientes || []).forEach(c => {
+    if (c.nombre) clients.push(c.nombre);
+  });
+  // También de contactos tipo cliente
+  (S.contactos || []).filter(c => c.tipo === 'cliente').forEach(c => {
+    if (c.nombre && !clients.includes(c.nombre)) clients.push(c.nombre);
+  });
+  return clients;
+}
+
+let catPickerState = {}; // {fin: {open, nivel}, age: {open}}
+
+function toggleCatPicker(tipo) {
+  const pickerId = tipo + 'CatPicker';
+  const selectedId = tipo + 'CatSelected';
+  const picker = document.getElementById(pickerId);
+  const selected = document.getElementById(selectedId);
+  if (!picker) return;
+
+  const isOpen = picker.style.display !== 'none';
+  if (isOpen) {
+    picker.style.display = 'none';
+    if (selected) selected.classList.remove('open');
+    return;
+  }
+
+  // Abrir y poblar
+  picker.style.display = 'block';
+  if (selected) selected.classList.add('open');
+
+  if (tipo === 'fin') {
+    renderFinCatList();
+  } else if (tipo === 'age') {
+    renderAgeCatList();
+  }
+}
+window.toggleCatPicker = toggleCatPicker;
+
+function renderFinCatList() {
+  const list = document.getElementById('finCatList');
+  if (!list) return;
+  const cats = getCategoriasFin();
+  list.innerHTML = cats.map(c => {
+    const isSel = document.getElementById('mCat') && document.getElementById('mCat').value === c;
+    return `<div class="cat-sel-item${isSel ? ' sel' : ''}" onclick="selectFinCat('${c.replace(/'/g,"\'")}')">
+      <span class="material-icons-round" style="font-size:16px;color:var(--t4)">label</span>
+      ${c}
+    </div>`;
+  }).join('') + `<div class="cat-sel-item" style="color:var(--t3);border-top:1px solid var(--border2);margin-top:4px;" onclick="focusFinCatCustom()">
+    <span class="material-icons-round" style="font-size:16px">add</span>
+    Escribir categoría nueva…
+  </div>`;
+}
+
+function selectFinCat(cat) {
+  const mCat = document.getElementById('mCat');
+  const lbl = document.getElementById('finCatSelectedLbl');
+  const sel = document.getElementById('finCatSelected');
+  if (mCat) mCat.value = cat;
+  if (lbl) lbl.textContent = cat;
+  if (sel) { sel.classList.remove('open'); sel.classList.add('has-val'); }
+  const picker = document.getElementById('finCatPicker');
+  if (picker) picker.style.display = 'none';
+}
+window.selectFinCat = selectFinCat;
+
+function focusFinCatCustom() {
+  const input = document.getElementById('finCatCustom');
+  if (input) { input.focus(); input.scrollIntoView({behavior:'smooth'}); }
+}
+window.focusFinCatCustom = focusFinCatCustom;
+
+function setCustomCat(tipo, value) {
+  if (!value.trim()) return;
+  if (tipo === 'fin') {
+    const mCat = document.getElementById('mCat');
+    const lbl = document.getElementById('finCatSelectedLbl');
+    const sel = document.getElementById('finCatSelected');
+    if (mCat) mCat.value = value.trim();
+    if (lbl) lbl.textContent = value.trim();
+    if (sel) sel.classList.add('has-val');
+    const picker = document.getElementById('finCatPicker');
+    if (picker) picker.style.display = 'none';
+  }
+}
+window.setCustomCat = setCustomCat;
+
+function renderAgeCatList() {
+  const list = document.getElementById('ageCatList');
+  if (!list) return;
+  const clients = getClientesAge();
+  if (!clients.length) {
+    list.innerHTML = '<div style="padding:10px 12px;font-size:12px;color:var(--t4);">Sin clientes guardados en Mi Negocio</div>';
+    return;
+  }
+  list.innerHTML = clients.map(c =>
+    `<div class="cat-sel-item" onclick="selectAgeClient('${c.replace(/'/g,"\'")}')">
+      <span class="material-icons-round" style="font-size:16px;color:var(--t4)">person</span>
+      ${c}
+    </div>`
+  ).join('');
+}
+
+function selectAgeClient(nombre) {
+  const input = document.getElementById('evCliente');
+  const lbl = document.getElementById('ageCatSelectedLbl');
+  const sel = document.getElementById('ageCatSelected');
+  if (input) input.value = nombre;
+  if (lbl) lbl.textContent = nombre;
+  if (sel) { sel.classList.remove('open'); sel.classList.add('has-val'); }
+  const picker = document.getElementById('ageCatPicker');
+  if (picker) picker.style.display = 'none';
+}
+window.selectAgeClient = selectAgeClient;
+
+// Cerrar pickers al tocar fuera
+document.addEventListener('click', function(e) {
+  ['fin', 'age'].forEach(tipo => {
+    const picker = document.getElementById(tipo + 'CatPicker');
+    const trigger = document.getElementById(tipo + 'CatSelected');
+    if (picker && picker.style.display !== 'none') {
+      if (!picker.contains(e.target) && e.target !== trigger && !trigger?.contains(e.target)) {
+        picker.style.display = 'none';
+        if (trigger) trigger.classList.remove('open');
+      }
+    }
+  });
+});
 
 </script>
 </body>
