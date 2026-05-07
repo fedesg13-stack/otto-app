@@ -3288,9 +3288,7 @@ async function sendQuickMsg(){
     box.innerHTML+=`<div class="msg" id="${tid}"><div class="msg-av">O</div><div class="msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
     box.scrollTop=99999;
   }
-  const ctxQ=buildOttoContext()+'
-
-Respondé en máximo 2 oraciones. Sin markdown. Sin asteriscos.';
+  const ctxQ = buildOttoContext() + '\n\nRespondé en máximo 2 oraciones. Sin markdown. Sin asteriscos.';
   try{
     const res=await fetch('/.netlify/functions/chat',{
       method:'POST',
