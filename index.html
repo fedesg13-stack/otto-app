@@ -2001,6 +2001,47 @@ const MN_CONFIG={
   impositiva:{icon:'📊',label:'Obligación impositiva',campos:[{id:'nombre',label:'Nombre (ej: IVA, Ingresos Brutos)',type:'text',required:true},{id:'vencimiento',label:'Próximo vencimiento',type:'date'},{id:'monto',label:'Monto estimado',type:'number'},{id:'periodicidad',label:'Periodicidad',type:'text'},{id:'notas',label:'Notas',type:'text'}],color:'#b3261e',bg:'var(--red-t)'}
 };
 
+// ── FUNCIONES CRÍTICAS — asignadas a window PRIMERO ──
+// Deben estar disponibles antes de cualquier interacción del usuario
+window.toggleFab = function(){
+  const sh=document.getElementById('fabSelSheet');
+  const ov=document.getElementById('fabSelOverlay');
+  const btn=document.getElementById('fabBtn');
+  if(!sh)return;
+  const op=!sh.classList.contains('open');
+  sh.classList.toggle('open',op);
+  if(ov)ov.classList.toggle('open',op);
+  if(btn)btn.classList.toggle('open',op);
+};
+window.closeFab = function(){
+  document.getElementById('fabSelSheet')?.classList.remove('open');
+  document.getElementById('fabSelOverlay')?.classList.remove('open');
+  document.getElementById('fabBtn')?.classList.remove('open');
+};
+window.closeSheet = function(){
+  const ov=document.getElementById('formSheetOverlay');
+  if(ov)ov.classList.remove('visible');
+  document.querySelectorAll('.form-sheet').forEach(s=>{s.classList.remove('open');s.removeAttribute('style');});
+};
+window.toggleMenu = function(){ /* se sobreescribe más abajo */ };
+window.menuNav = function(id){ /* se sobreescribe más abajo */
+  const panel=document.getElementById('p-'+id);
+  if(panel){document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));panel.classList.add('on');}
+};
+window.openSheet = function(tipo){
+  window.closeFab();
+  document.querySelectorAll('.form-sheet').forEach(s=>{s.classList.remove('open');s.removeAttribute('style');});
+  const hoy=new Date().toISOString().split('T')[0];
+  const g=id=>document.getElementById(id);
+  if(tipo==='fin'&&g('mFecha'))g('mFecha').value=hoy;
+  if(tipo==='ped'&&g('pFecha'))g('pFecha').value=hoy;
+  if(tipo==='age'&&g('evFecha'))g('evFecha').value=hoy;
+  if(tipo==='task'&&g('taskFecha'))g('taskFecha').value=hoy;
+  const ov=g('formSheetOverlay');if(ov)ov.classList.add('visible');
+  const sh=g('sheet-'+tipo);if(sh)sh.classList.add('open');
+};
+window.loginGoogle = function(){ /* se sobreescribe más abajo */ };
+
 // ── HELPERS ──
 function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),3000);}
 function showSaving(){const s=document.getElementById('saving');s.classList.add('show');setTimeout(()=>s.classList.remove('show'),1500);}
