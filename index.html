@@ -1070,7 +1070,8 @@ let S = {
   uid:null, nombre:'', negocio:'', perfil:null,
   tipo:'ingreso', finFiltro:'todos', finMes:new Date().toISOString().slice(0,7),
   pedFecha:null, ageFecha:null, pedModoSemana:false,
-  movs:[], pedidos:[], eventos:[], tareas:[], catalogo:[], contactos:[], nota:'',
+  movs:[], pedidos:[], eventos:[], tareas:[], catalogo:[], contactos:[],
+  nota:'', notas:[],
   miNegocio:{productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},
   ottoCache:[], ottoCacheTime:0
 };
@@ -2082,45 +2083,6 @@ function renderMnItems(tab,items){
 // ── OTTO ──
 let sliderIdx=0; let sliderTimer=null;
 
-function buildOttoContext(){
-  const mes=new Date().toISOString().slice(0,7);
-  const mesPrev=new Date(new Date().getFullYear(),new Date().getMonth()-1,1).toISOString().slice(0,7);
-  // Finanzas detalladas por categoría
-  const movsMes=S.movs.filter(m=>m.fecha?.startsWith(mes));
-  const ing=movsMes.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
-  const gas=movsMes.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
-  const ingPrev=S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mesPrev)).reduce((s,m)=>s+m.monto,0);
-  // Top categorías
-  const catTotals={};
-  movsMes.forEach(m=>{const c=m.cat||'Sin cat';catTotals[c]=(catTotals[c]||0)+m.monto;});
-  const topCats=Object.entries(catTotals).sort((a,b)=>b[1]-a[1]).slice(0,4).map(([c,v])=>`${c}:${fmtARS(v)}`).join(', ');
-  // Pedidos con detalle
-  const activos=S.pedidos.filter(p=>!p.archivado);
-  const pedDet=activos.slice(0,5).map(p=>`${p.cli}(${(p.items||[]).map(i=>`${i.q}x${i.p}`).join(',')||'?'})el ${p.fecha||'?'}${p.notas?' nota:'+p.notas:''}`).join(' | ');
-  // Clientes únicos
-  const clientesUnicos=[...new Set(S.pedidos.map(p=>p.cli).filter(Boolean))];
-  const clientesFrecuentes=clientesUnicos.slice(0,5);
-  // Agenda
-  const proxEvs=S.eventos.filter(e=>e.fecha>=hoy()).sort((a,b)=>a.fecha.localeCompare(b.fecha)).slice(0,3);
-  const evDet=proxEvs.map(e=>`${e.tit} el ${e.fecha}${e.cliente?' con '+e.cliente:''}${e.prio==='urgente'?' [URGENTE]':''}`).join(' | ');
-  // Tareas
-  const pend=S.tareas.filter(t=>!t.done);
-  const taskDet=pend.slice(0,5).map(t=>`${t.tit}${t.fecha?' para '+t.fecha:''}${t.prio==='urgente'?' [URGENTE]':''}`).join(' | ');
-  // Catálogo
-  const prods=(S.miNegocio.productos||[]).slice(0,10).map(p=>`${p.nombre}${p.precio?' '+fmtARS(p.precio):''}`).join(', ');
-  return `NEGOCIO: "${S.perfil?.negocio||S.negocio||'—'}" | Rubro: ${S.perfil?.rubro||'—'} | Dueño: ${S.nombre?.split(' ')[0]||'—'}
-FECHA: ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
-FINANZAS ${mes}: Ingresos ${fmtARS(ing)} | Gastos ${fmtARS(gas)} | Balance ${ing-gas>=0?'+':''}${fmtARS(ing-gas)} | Mes anterior: ${fmtARS(ingPrev)}
-TOP CATEGORÍAS: ${topCats||'—'}
-PEDIDOS ACTIVOS (${activos.length}): ${pedDet||'ninguno'}
-CLIENTES (${clientesUnicos.length} únicos): ${clientesFrecuentes.join(', ')||'ninguno'}
-AGENDA (${proxEvs.length} próximos): ${evDet||'ninguno'}
-TAREAS (${pend.length} pendientes, ${pend.filter(t=>t.prio==='urgente').length} urgentes): ${taskDet||'ninguna'}
-CATÁLOGO (${(S.miNegocio.productos||[]).length} productos): ${prods||'—'}
-CLIENTES REGISTRADOS: ${(S.miNegocio.clientes||[]).map(c=>c.nombre).join(', ')||'—'}
-NOTA DEL DUEÑO: ${S.nota||'—'}`;
-}
-window.buildOttoContext=buildOttoContext;
 
 function buildLocalInsights(){
   const mes=new Date().toISOString().slice(0,7);
@@ -2381,26 +2343,34 @@ onAuthStateChanged(auth,async(user)=>{
     if(g('menu-av'))g('menu-av').textContent=S.nombre[0].toUpperCase();
     if(g('menu-name'))g('menu-name').textContent=S.nombre;
     if(g('home-hola'))g('home-hola').textContent=`Hola, ${S.nombre.split(' ')[0]} 👋`;
-    try{await Promise.race([loadAllData(),new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),12000))]);}catch(e){console.warn('load:',e.message);}
-    try{const snap=await getDocs(col('perfil'));if(!snap.empty){S.perfil=snap.docs[0].data();S.negocio=S.perfil.negocio||S.nombre;}}catch(e){}
+    // Mostrar la app inmediatamente — cargar datos en background
     g('loading').style.display='none';
     g('login').classList.remove('on');
     g('app').classList.add('on');
-    renderMnSections(); renderHomeBal(); updateBanner(); renderWeek();
-    renderMovsFin(); renderPedWeek(); renderPeds(); renderProduceSemana();
-    renderAgeWeek(); renderEvs(); renderTasks(); renderSlider();
-    if(!S.perfil?.onboardingDone)setTimeout(()=>{g('onboarding').classList.add('on');showOb('ob0');},500);
-    // Notas post-it
+    // Render vacío inmediato (para que no quede pantalla en blanco)
+    renderHomeBal(); updateBanner(); renderWeek(); renderMovsFin();
+    renderPedWeek(); renderPeds(); renderProduceDia();
+    renderAgeWeek(); renderEvs(); renderTasks();
+    renderNotas(); renderMnSections();
+    // Cargar datos de Firebase y re-renderizar
+    try{ await loadAllData(); }catch(e){ console.warn('loadAllData:', e.message); }
+    try{
+      const snap=await getDocs(col('perfil'));
+      if(!snap.empty){S.perfil=snap.docs[0].data();S.negocio=S.perfil.negocio||S.nombre;}
+    }catch(e){}
     try{
       const ns=await getDocs(col('notas'));
       if(!ns.empty){
         const d=ns.docs[0].data();
         S.notas=d.notas||[];
-        // Compatibilidad con nota texto vieja
         if(!S.notas.length&&d.texto) S.notas=[{id:'n0',texto:d.texto,fecha:new Date().toISOString()}];
       }
     }catch(e){}
-    renderNotas();
+    // Re-render con datos reales
+    renderMnSections(); renderHomeBal(); updateBanner(); renderWeek();
+    renderMovsFin(); renderPedWeek(); renderPeds(); renderProduceDia();
+    renderAgeWeek(); renderEvs(); renderTasks(); renderNotas(); renderSlider();
+    if(!S.perfil?.onboardingDone)setTimeout(()=>{g('onboarding').classList.add('on');showOb('ob0');},500);
   }else{
     g('loading').style.display='none';
     g('login').classList.add('on');
