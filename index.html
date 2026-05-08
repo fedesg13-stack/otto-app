@@ -2620,6 +2620,7 @@ async function saveNewMnItem(tab, nombre){
     S.miNegocio[tab].push({...base,_id:ref.id});
     const labels={productos:'Productos',clientes:'Clientes',proveedores:'Proveedores',equipo:'Equipo',servicios:'Servicios',impositiva:'Impositiva'};
     toast(`✅ "${nombre}" guardado en Mi Negocio → ${labels[tab]||tab}`);
+    renderMnSections();
   }catch(e){ console.error(e); toast('Error al guardar'); }
 }
 window.saveNewMnItem=saveNewMnItem;
