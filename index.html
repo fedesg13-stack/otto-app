@@ -1218,7 +1218,23 @@ function renderPickerList(items, selected, onAdd, query=''){
   const addBtn = g('picker-add-btn');
   if(addBtn && onAdd){
     addBtn.addEventListener('click', () => {
-      const val = g('picker-search').value.trim() || '';
+      let val = g('picker-search').value.trim();
+      if(!val){
+        // Pedir el nombre inline — focus en el search con placeholder claro
+        const search = g('picker-search');
+        search.placeholder = 'Escribí el nombre nuevo…';
+        search.focus();
+        search.select();
+        // Al presionar Enter o perder el foco con valor, ejecutar
+        const doAdd = () => {
+          const v = search.value.trim();
+          if(v){ onAdd.fn(v); closePicker(); }
+        };
+        search.addEventListener('keydown', function handler(e){
+          if(e.key==='Enter'){ search.removeEventListener('keydown',handler); doAdd(); }
+        });
+        return; // No cerrar el picker todavía
+      }
       if(onAdd.fn) onAdd.fn(val);
       closePicker();
     });
@@ -1249,12 +1265,12 @@ function getFinSecciones(){
     { key:'clientes',   label:'Clientes',     icon:'👤', sub: c => c.nombre },
   ];
   MAP.forEach(({key,label,icon,sub})=>{
-    const items=(S.miNegocio[key]||[]).map(sub).filter(Boolean);
+    const items=(S.miNegocio[key]||[]).map(sub).filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'));
     if(items.length) secciones.push({id:key, name:`${icon} ${label}`, items});
   });
 
   // Historial: categorías que ya se usaron
-  const hist=[...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))];
+  const hist=[...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
   if(hist.length) secciones.push({id:'historial', name:'🕐 Usadas antes', items:hist});
 
   // Siempre agregar categorías genéricas
@@ -1324,7 +1340,7 @@ function openCliPicker(hiddenId, triggerId, triggerLblId, titulo){
   const sel = g(hiddenId)?.value||'';
   openPicker({
     title: titulo||'Cliente',
-    items: clientes.map(c=>({id:c.nombre||'', name:c.nombre||'', sub:c.telefono||''})),
+    items: [...clientes].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es')).map(c=>({id:c.nombre||'', name:c.nombre||'', sub:c.telefono||''})),
     selected: sel,
     onSelect: (id, name) => {
       if(g(hiddenId)) g(hiddenId).value = name;
@@ -1745,12 +1761,20 @@ function renderMovsFin(){
     if(S.finFiltro==='ingreso')return m.tipo==='ingreso';
     if(S.finFiltro==='gasto')return m.tipo==='gasto';
     return true;
-  }).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
+  }).sort((a,b)=>(b.creadoEn||b.fecha||'').localeCompare(a.creadoEn||a.fecha||''));
   const list=g('mov-list');if(!list)return;
   if(!movs.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">💸</div><div class="empty-title">Sin movimientos</div><div class="empty-sub">Registrá tu primera venta o gasto.</div></div>`;return;}
+  // Agrupar por fecha manteniendo el orden de ingreso dentro de cada grupo
   const grupos={};
-  movs.forEach(m=>{const k=m.fecha||'Sin fecha';if(!grupos[k])grupos[k]=[];grupos[k].push(m);});
-  list.innerHTML=Object.entries(grupos).map(([f,ms])=>
+  const fechasOrden=[];
+  movs.forEach(m=>{
+    const k=m.fecha||'Sin fecha';
+    if(!grupos[k]){grupos[k]=[];fechasOrden.push(k);}
+    grupos[k].push(m);
+  });
+  // fechasOrden ya está en orden de último ingresado gracias al sort anterior
+  const fechasUnicas=[...new Set(fechasOrden)];
+  list.innerHTML=fechasUnicas.map(f=> {const ms=grupos[f]; return (
     `<div class="mov-group-hdr">${fmtM(f)}</div>${ms.map(m=>`
     <div class="card">
       <div class="card-row">
@@ -1771,7 +1795,7 @@ function renderMovsFin(){
         <button class="card-action del rpl" data-id="${m._id}" data-a="del"><span class="material-icons-round">delete_outline</span>Eliminar</button>
       </div>
     </div>`).join('')}`
-  ).join('');
+  ); }).join('');
   // Listeners acciones
   list.querySelectorAll('[data-a]').forEach(btn=>{
     btn.addEventListener('click',()=>{
@@ -1846,7 +1870,7 @@ function renderPeds(){
   let peds=S.pedidos.filter(p=>!p.archivado);
   // Siempre filtrar por día seleccionado (modo semana no afecta la lista de pedidos)
   if(S.pedFecha) peds=peds.filter(p=>p.fecha===S.pedFecha);
-  peds=peds.sort((a,b)=>(a.hora||'').localeCompare(b.hora||''));
+  peds=peds.sort((a,b)=>(a.cli||'').localeCompare(b.cli||'','es'));
   // Header con fecha seleccionada
   const fechaLabel=S.pedFecha?new Date(S.pedFecha+'T00:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}):'';
   const diff=S.pedFecha?Math.ceil((new Date(S.pedFecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
@@ -1859,7 +1883,12 @@ function renderPeds(){
   peds.map(p=>{
     const diffT=p.fecha?Math.ceil((new Date(p.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
     const badge=diffT===0?'<span class="ticket-badge hoy">Hoy</span>':diffT===1?'<span class="ticket-badge manana">Mañana</span>':'';
-    const prodsHtml=[...(p.items||[])].sort((a,b)=>(a.p||'').localeCompare(b.p||'','es')).map(i=>`<div style="padding:2px 0;font-size:12px;color:var(--t2);">${i.q}× ${i.p}</div>`).join('');
+    const prodsHtml=[...(p.items||[])].sort((a,b)=>(a.p||'').localeCompare(b.p||'','es')).map(i=>
+      `<div style="display:flex;align-items:baseline;gap:8px;padding:2px 0;">
+        <span style="font-size:12px;font-weight:700;color:var(--bosque);min-width:28px;text-align:right;">${i.q}×</span>
+        <span style="font-size:13px;color:var(--t1);">${i.p}</span>
+      </div>`
+    ).join('');
     return `<div class="ticket rpl" data-id="${p._id}" data-a="open" style="cursor:pointer;-webkit-tap-highlight-color:transparent;">
       <div class="ticket-top">
         <div>
@@ -1867,7 +1896,7 @@ function renderPeds(){
           <div style="font-size:12px;color:var(--t4);margin-top:2px;">${p.fecha?fmt(p.fecha):''}${p.hora?' · '+p.hora:''}</div>
         </div>${badge}
       </div>
-      <div class="ticket-prods" style="padding:4px 0 8px;">${prodsHtml||'Sin productos'}</div>
+      <div class="ticket-prods" style="padding:6px 0 8px;">${prodsHtml||'Sin productos'}</div>
     </div>`;
   }).join('');
   list.querySelectorAll('[data-a="open"]').forEach(ticket=>{
@@ -1943,7 +1972,7 @@ function renderProduceDia(){
             <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción · Semana</div>
             <div style="font-size:11px;color:var(--t3);">${activosSem.length} pedido${activosSem.length>1?'s':''}</div>
           </div>
-          ${Object.entries(totsSem).map(([n,q])=>`
+          ${Object.entries(totsSem).sort((a,b)=>a[0].localeCompare(b[0],'es')).map(([n,q])=>`
             <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
               <span style="font-size:13px;color:var(--t1);">${n}</span>
               <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
@@ -1966,7 +1995,7 @@ function renderProduceDia(){
           <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción · ${cuando}</div>
           <div style="font-size:11px;color:var(--t3);">${activosDia.length} pedido${activosDia.length>1?'s':''}</div>
         </div>
-        ${Object.entries(totsDia).map(([n,q])=>`
+        ${Object.entries(totsDia).sort((a,b)=>a[0].localeCompare(b[0],'es')).map(([n,q])=>`
           <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
             <span style="font-size:13px;color:var(--t1);">${n}</span>
             <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
