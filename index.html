@@ -1445,10 +1445,13 @@ function addPedProd(nombre){
 }
 window.addPedProd=addPedProd;
 
-function openEdit(titulo,bodyHtml,onSave){
-  g('edit-title').textContent=titulo; g('edit-body').innerHTML=bodyHtml;
-  g('edit-overlay').classList.add('on'); g('edit-sheet').classList.add('on');
-  if(onSave){const btn=g('edit-body').querySelector('.btn-save');if(btn)btn.addEventListener('click',onSave);}
+function openEdit(titulo,bodyHtml){
+  g('edit-title').textContent=titulo;
+  // Limpiar innerHTML elimina todos los listeners de nodos anteriores
+  g('edit-body').innerHTML='';
+  g('edit-body').innerHTML=bodyHtml;
+  g('edit-overlay').classList.add('on');
+  g('edit-sheet').classList.add('on');
 }
 function closeEdit(){ g('edit-overlay').classList.remove('on'); g('edit-sheet').classList.remove('on'); }
 window.openEdit=openEdit; window.closeEdit=closeEdit;
@@ -1695,15 +1698,27 @@ window.delMnItem=delMnItem;
 
 function openMnAdd(tab){
   const cfg=MN_CONFIG[tab];
-  const body=cfg.campos.map(c=>`<div class="m3-field"><input class="m3-inp" id="mn-f-${c.id}" type="${c.type||'text'}" placeholder=" " ${c.required?'required':''}><label class="m3-lbl">${c.label}</label></div>`).join('')+`<button class="btn-save rpl" id="mn-save-btn">Guardar</button>`;
+  const body=cfg.campos.map(c=>`
+    <div class="m3-field">
+      <input class="m3-inp" id="mn-f-${c.id}" type="${c.type||'text'}" placeholder=" " ${c.required?'required':''}>
+      <label class="m3-lbl">${c.label}</label>
+    </div>`).join('')+`<button class="btn-save rpl" id="mn-save-btn">Guardar</button>`;
   openEdit(`Nuevo ${cfg.label}`,body);
-  g('mn-save-btn').addEventListener('click',async()=>{
+  // Clonar el botón para eliminar cualquier listener previo
+  const oldBtn=g('mn-save-btn');
+  const newBtn=oldBtn.cloneNode(true);
+  oldBtn.parentNode.replaceChild(newBtn,oldBtn);
+  newBtn.addEventListener('click',async()=>{
     const nombre=g('mn-f-nombre')?.value.trim();
     if(!nombre){toast('El nombre es obligatorio');return;}
-    const data={};cfg.campos.forEach(c=>{const v=g('mn-f-'+c.id)?.value.trim();if(v)data[c.id]=v;});
+    const data={};
+    cfg.campos.forEach(c=>{
+      const v=g('mn-f-'+c.id)?.value.trim();
+      if(v) data[c.id]=v;
+    });
     data.creadoEn=new Date().toISOString();
-    closeEdit(); await saveMnItem(tab,data);
-    if(tab==='productos'){renderFinCatChips();renderCatChips();}
+    closeEdit();
+    await saveMnItem(tab,data);
   });
 }
 window.openMnAdd=openMnAdd;
