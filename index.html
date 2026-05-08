@@ -1070,7 +1070,7 @@ let S = {
   uid:null, nombre:'', negocio:'', perfil:null,
   tipo:'ingreso', finFiltro:'todos', finMes:new Date().toISOString().slice(0,7),
   pedFecha:null, ageFecha:null, pedModoSemana:false,
-  movs:[], pedidos:[], eventos:[], tareas:[], catalogo:[], contactos:[],
+  movs:[], pedidos:[], eventos:[], tareas:[],
   nota:'', notas:[],
   miNegocio:{productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},
   ottoCache:[], ottoCacheTime:0
@@ -1218,25 +1218,34 @@ function renderPickerList(items, selected, onAdd, query=''){
   const addBtn = g('picker-add-btn');
   if(addBtn && onAdd){
     addBtn.addEventListener('click', () => {
-      let val = g('picker-search').value.trim();
-      if(!val){
-        // Pedir el nombre inline — focus en el search con placeholder claro
-        const search = g('picker-search');
-        search.placeholder = 'Escribí el nombre nuevo…';
-        search.focus();
-        search.select();
-        // Al presionar Enter o perder el foco con valor, ejecutar
-        const doAdd = () => {
-          const v = search.value.trim();
-          if(v){ onAdd.fn(v); closePicker(); }
-        };
-        search.addEventListener('keydown', function handler(e){
-          if(e.key==='Enter'){ search.removeEventListener('keydown',handler); doAdd(); }
-        });
-        return; // No cerrar el picker todavía
+      const val = g('picker-search').value.trim();
+      if(val){
+        // Ya hay texto — usar directamente
+        if(onAdd.fn) onAdd.fn(val);
+        closePicker();
+        return;
       }
-      if(onAdd.fn) onAdd.fn(val);
-      closePicker();
+      // Sin texto — mostrar formulario inline para escribir el nombre
+      const list2 = g('picker-list');
+      list2.innerHTML = `
+        <div style="padding:20px 16px;">
+          <div style="font-size:13px;font-weight:600;color:var(--t2);margin-bottom:12px;">${onAdd.label||'Nuevo elemento'}</div>
+          <input id="picker-new-inp" class="m3-inp" style="width:100%;margin-bottom:16px;" placeholder="Escribí el nombre…" type="text" autocomplete="off">
+          <button id="picker-new-confirm" class="btn-save rpl" style="width:100%;">
+            Confirmar <span class="material-icons-round" style="font-size:18px">arrow_forward</span>
+          </button>
+        </div>`;
+      const inp = g('picker-new-inp');
+      const confirm = g('picker-new-confirm');
+      setTimeout(()=>inp?.focus(), 100);
+      const doConfirm = () => {
+        const v = inp.value.trim();
+        if(!v){ inp.style.borderColor='var(--red)'; return; }
+        if(onAdd.fn) onAdd.fn(v);
+        closePicker();
+      };
+      confirm.addEventListener('click', doConfirm);
+      inp.addEventListener('keydown', e=>{ if(e.key==='Enter') doConfirm(); });
     });
   }
 }
@@ -1257,12 +1266,12 @@ function getFinSecciones(){
 
   // Secciones de Mi Negocio que tengan ítems
   const MAP = [
-    { key:'productos',  label:'Productos',   icon:'🛍️', sub: p => p.nombre },
-    { key:'servicios',  label:'Servicios',    icon:'⚡', sub: s => s.nombre },
-    { key:'proveedores',label:'Proveedores',  icon:'🏭', sub: p => p.nombre },
-    { key:'equipo',     label:'Equipo',       icon:'👥', sub: e => e.nombre },
-    { key:'impositiva', label:'Impositiva',   icon:'📊', sub: i => i.nombre },
-    { key:'clientes',   label:'Clientes',     icon:'👤', sub: c => c.nombre },
+    { key:'productos',  label:'Productos / Servicios', icon:'🛍️', sub: p => p.nombre },
+    { key:'clientes',   label:'Clientes',              icon:'👤', sub: c => c.nombre },
+    { key:'proveedores',label:'Proveedores',            icon:'🏭', sub: p => p.nombre },
+    { key:'servicios',  label:'Servicios / Suscripciones', icon:'⚡', sub: s => s.nombre },
+    { key:'equipo',     label:'Equipo',                icon:'👥', sub: e => `${e.nombre}${e.rol?' ('+e.rol+')':''}` },
+    { key:'impositiva', label:'Impuestos / Obligaciones', icon:'📊', sub: i => `${i.nombre}${i.monto?' — $'+Number(i.monto).toLocaleString():''}` },
   ];
   MAP.forEach(({key,label,icon,sub})=>{
     const items=(S.miNegocio[key]||[]).map(sub).filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'));
@@ -1445,15 +1454,16 @@ window.openEdit=openEdit; window.closeEdit=closeEdit;
 
 // ── FIRESTORE ──
 async function loadAllData(){
-  const cols=['movimientos','pedidos','eventos','tareas','catalogo','contactos'];
-  const keys=['movs','pedidos','eventos','tareas','catalogo','contactos'];
+  // Colecciones transaccionales
+  const cols=['movimientos','pedidos','eventos','tareas'];
+  const keys=['movs','pedidos','eventos','tareas'];
   await Promise.allSettled(cols.map((c,i)=>
     getDocs(col(c)).then(snap=>{S[keys[i]]=snap.docs.map(d=>({...d.data(),_id:d.id}));}).catch(e=>console.warn(c,e))
   ));
+  // Mi Negocio — todas las secciones del MN_CONFIG
   await Promise.allSettled(Object.keys(MN_CONFIG).map(tab=>
     getDocs(col('mn_'+tab)).then(snap=>{S.miNegocio[tab]=snap.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{})
   ));
-  try{const ns=await getDocs(col('notas'));if(!ns.empty)S.nota=ns.docs[0].data().texto||'';}catch(e){}
 }
 
 // ── GUARDAR ──
@@ -1527,8 +1537,11 @@ async function savePed(){
     const q=parseInt(row.querySelector('.qty-num')?.textContent||'1');
     if(n)items.push({p:n,q,cat:g('s-ped-cat')?.value||''});
   });
+  // Enriquecer con datos completos del cliente de Mi Negocio
+  const cliData=(S.miNegocio.clientes||[]).find(c=>c.nombre===cli)||{};
   const data={
-    cli, fecha:g('s-ped-fecha')?.value||hoy(), hora:g('s-ped-hora')?.value||'',
+    cli, cliTel:cliData.telefono||'', cliDir:cliData.direccion||'',
+    fecha:g('s-ped-fecha')?.value||hoy(), hora:g('s-ped-hora')?.value||'',
     items, notas:g('s-ped-notas')?.value.trim()||'',
     catProducto:g('s-ped-cat')?.value||'',
     archivado:false, creadoEn:new Date().toISOString()
@@ -2577,15 +2590,20 @@ window.openPicker=function(opts){
 // El hook está en la función: cuando se usa onAdd en nivel 2, guardar en mn_productos como categoría
 async function saveNewFinCat(nombre){
   if(!nombre||!S.uid) return;
-  // Guardar como categoría "general" en productos de Mi Negocio si no existe
-  const existe=(S.miNegocio.productos||[]).some(p=>p.categoria===nombre);
+  // Guardar categoría en un producto placeholder solo si no existe ningún producto con esa categoría
+  const existe=(S.miNegocio.productos||[]).some(p=>
+    p.categoria===nombre || p.nombre===nombre
+  );
   if(!existe){
-    const data={nombre:`Categoría: ${nombre}`,categoria:nombre,creadoEn:new Date().toISOString()};
+    // Guardar como producto con esa categoría para que aparezca en todos los pickers
+    const data={nombre,categoria:nombre,precio:'',costo:'',descripcion:'',creadoEn:new Date().toISOString()};
     try{
       const ref=await addDoc(col('mn_productos'),data);
       S.miNegocio.productos.push({...data,_id:ref.id});
-      toast(`Categoría "${nombre}" guardada en Mi Negocio`);
+      toast(`"${nombre}" guardado en Mi Negocio → Productos`);
     }catch(e){console.error(e);}
+  } else {
+    toast(`"${nombre}" ya existe en Mi Negocio`);
   }
 }
 window.saveNewFinCat=saveNewFinCat;
