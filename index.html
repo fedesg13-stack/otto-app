@@ -96,21 +96,21 @@ body{background:var(--bg);color:var(--t1);font-family:var(--font);-webkit-font-s
 #app.on{display:flex;}
 
 /* Header */
-header{display:flex;align-items:center;height:68px;padding:0 10px;background:var(--surface);border-bottom:1px solid var(--border2);flex-shrink:0;position:sticky;top:0;z-index:50;}
-.hd-logo{background:transparent;border:none;cursor:pointer;padding:6px 8px;border-radius:var(--r10);color:var(--bosque);display:flex;align-items:center;flex-shrink:0;}
-.hd-logo svg{width:68px;height:20px;}
+header{display:flex;align-items:center;height:68px;padding:0 16px;background:var(--surface);border-bottom:1px solid var(--border2);flex-shrink:0;position:sticky;top:0;z-index:50;}
 .hd-negocio{
-  flex:1;text-align:center;
+  flex:1;text-align:left;
   font-family:'Inter',sans-serif;
   font-size:17px;font-weight:800;font-style:normal;
   color:var(--carbon);
   letter-spacing:-0.6px;
   line-height:1;
   white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
-  padding:0 6px;
+  padding:0;
   text-transform:uppercase;
 }
-.hd-menu-btn{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r10);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);}
+.hd-logo{background:transparent;border:none;cursor:pointer;padding:6px 0 6px 12px;border-radius:var(--r10);color:var(--bosque);display:flex;align-items:center;flex-shrink:0;}
+.hd-logo svg{width:68px;height:20px;}
+.hd-menu-btn{display:none;}
 
 /* Panels */
 .panels{flex:1;overflow:hidden;position:relative;}
@@ -520,6 +520,39 @@ header{display:flex;align-items:center;height:68px;padding:0 10px;background:var
 .ped-modal-btn.del .material-icons-round{color:var(--red);}
 .ped-modal-btn.del span:last-child{color:var(--red);}
 
+
+/* ── EMOJI PICKER ── */
+.emoji-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:12px 16px;max-height:260px;overflow-y:auto;}
+.emoji-btn{font-size:26px;background:transparent;border:2px solid transparent;border-radius:var(--r10);padding:6px 2px;cursor:pointer;text-align:center;transition:all .12s;-webkit-tap-highlight-color:transparent;line-height:1;}
+.emoji-btn:active,.emoji-btn.sel{background:var(--green-bg);border-color:var(--bosque);}
+/* Categorías propias en Mi Negocio */
+.mn-cat-row{display:flex;align-items:center;gap:8px;padding:8px 4px;border-bottom:1px solid var(--border2);}
+.mn-cat-row:last-child{border-bottom:none;}
+.mn-cat-emoji-btn{font-size:22px;background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r10);width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;}
+.mn-cat-label{flex:1;font-size:13px;font-weight:600;color:var(--t1);}
+.mn-cat-count{font-size:11px;color:var(--t4);margin-right:4px;}
+
+
+/* ── CALENDARIO MENSUAL ── */
+.cal-mes-wrap{padding:0 12px 10px;}
+.cal-mes-header{display:flex;align-items:center;justify-content:space-between;padding:8px 0 10px;}
+.cal-mes-lbl{font-size:14px;font-weight:700;color:var(--t1);}
+.cal-mes-nav{background:transparent;border:none;cursor:pointer;color:var(--t3);display:flex;padding:4px;}
+.cal-mes-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;background:var(--surface);border-radius:var(--r14);padding:8px;border:1px solid var(--border2);}
+.cal-mes-dia-lbl{font-size:10px;font-weight:700;color:var(--t5);text-align:center;padding:2px 0 6px;}
+.cal-mes-dia{display:flex;flex-direction:column;align-items:center;gap:2px;padding:3px 0;cursor:pointer;border-radius:var(--r6);transition:background .1s;-webkit-tap-highlight-color:transparent;min-height:34px;}
+.cal-mes-dia:active{background:var(--surface2);}
+.cal-mes-dia.otro-mes .cal-mes-num{color:var(--t5);}
+.cal-mes-dia.today .cal-mes-num{background:var(--bosque);color:#fff;}
+.cal-mes-dia.sel{background:var(--green-bg);}
+.cal-mes-dia.sel .cal-mes-num{color:var(--bosque);font-weight:700;}
+.cal-mes-num{font-size:13px;font-weight:500;color:var(--t2);width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;}
+.cal-mes-dot{width:4px;height:4px;border-radius:50%;background:var(--bosque);}
+/* Botón toggle semana/mes */
+.cal-toggle-btn{display:flex;align-items:center;gap:4px;background:var(--surface2);border:1px solid var(--border);border-radius:var(--rfull);padding:5px 10px;font-family:var(--font);font-size:11px;font-weight:600;color:var(--t3);cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.cal-toggle-btn.mes{background:var(--bosque);color:#fff;border-color:var(--bosque);}
+.cal-toggle-btn .material-icons-round{font-size:14px;}
+
 </style>
 </head>
 <body>
@@ -718,14 +751,40 @@ header{display:flex;align-items:center;height:68px;padding:0 10px;background:var
 
     <!-- AGENDA -->
     <div class="panel" id="p-age">
-      <div class="section-hdr"><span class="section-title">Agenda</span></div>
-      <div class="ped-cal-strip"><div class="ped-week" id="age-week"></div></div>
+      <div class="section-hdr">
+        <span class="section-title">Agenda</span>
+        <button class="cal-toggle-btn rpl" id="age-cal-toggle">
+          <span class="material-icons-round">calendar_month</span>Mes
+        </button>
+      </div>
+      <div class="ped-cal-strip" id="age-week-strip"><div class="ped-week" id="age-week"></div></div>
+      <div class="cal-mes-wrap" id="age-mes-wrap" style="display:none;">
+        <div class="cal-mes-header">
+          <button class="cal-mes-nav rpl" id="age-mes-prev"><span class="material-icons-round">chevron_left</span></button>
+          <span class="cal-mes-lbl" id="age-mes-lbl"></span>
+          <button class="cal-mes-nav rpl" id="age-mes-next"><span class="material-icons-round">chevron_right</span></button>
+        </div>
+        <div class="cal-mes-grid" id="age-mes-grid"></div>
+      </div>
       <div class="evs-list" id="evs-list"></div>
     </div>
 
     <!-- TAREAS -->
     <div class="panel" id="p-task">
-      <div class="section-hdr"><span class="section-title">Tareas</span></div>
+      <div class="section-hdr">
+        <span class="section-title">Tareas</span>
+        <button class="cal-toggle-btn rpl" id="task-cal-toggle">
+          <span class="material-icons-round">calendar_month</span>Mes
+        </button>
+      </div>
+      <div class="cal-mes-wrap" id="task-mes-wrap" style="display:none;">
+        <div class="cal-mes-header">
+          <button class="cal-mes-nav rpl" id="task-mes-prev"><span class="material-icons-round">chevron_left</span></button>
+          <span class="cal-mes-lbl" id="task-mes-lbl"></span>
+          <button class="cal-mes-nav rpl" id="task-mes-next"><span class="material-icons-round">chevron_right</span></button>
+        </div>
+        <div class="cal-mes-grid" id="task-mes-grid"></div>
+      </div>
       <div class="tasks-list" id="tasks-list"></div>
     </div>
 
@@ -855,16 +914,16 @@ header{display:flex;align-items:center;height:68px;padding:0 10px;background:var
 
   <!-- BOTTOM BAR -->
   <nav class="bottom-bar">
-    <button class="nav-side-btn rpl" id="nav-menu-btn">
-      <span class="material-icons-round">menu</span>
-      <span class="nav-side-lbl">Menú</span>
+    <button class="nav-otto rpl" id="nav-otto-btn">
+      <span class="material-icons-round">smart_toy</span>
+      <span class="nav-otto-lbl">OTTO</span>
     </button>
     <button class="nav-fab rpl" id="nav-fab">
       <span class="material-icons-round">add</span>
     </button>
-    <button class="nav-otto rpl" id="nav-otto-btn">
-      <span class="material-icons-round">smart_toy</span>
-      <span class="nav-otto-lbl">OTTO</span>
+    <button class="nav-side-btn rpl" id="nav-menu-btn">
+      <span class="material-icons-round">menu</span>
+      <span class="nav-side-lbl">Menú</span>
     </button>
   </nav>
 </div>
@@ -1069,10 +1128,10 @@ const provider = new GoogleAuthProvider();
 let S = {
   uid:null, nombre:'', negocio:'', perfil:null,
   tipo:'ingreso', finFiltro:'todos', finMes:new Date().toISOString().slice(0,7),
-  pedFecha:null, ageFecha:null, pedModoSemana:false,
+  pedFecha:null, ageFecha:null, taskFecha:null, pedModoSemana:false,
   movs:[], pedidos:[], eventos:[], tareas:[],
   nota:'', notas:[],
-  miNegocio:{productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},
+  miNegocio:{categorias:[],productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},
   ottoCache:[], ottoCacheTime:0
 };
 const MN_CONFIG={
@@ -1263,31 +1322,33 @@ window.renderFinCatChips=renderFinCatChips;
 // Estructura de dos niveles para el picker de categorías
 function getFinSecciones(){
   const secciones = [];
-
-  // Secciones de Mi Negocio que tengan ítems
+  // Categorías propias (con emoji) — van primero si existen
+  const cats=S.miNegocio.categorias||[];
+  if(cats.length){
+    cats.sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es')).forEach(cat=>{
+      // Productos de esta categoría
+      const prods=(S.miNegocio.productos||[])
+        .filter(p=>p.categoria===cat.nombre)
+        .map(p=>p.nombre).filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'));
+      secciones.push({id:'cat_'+cat._id, name:`${cat.emoji||'📦'} ${cat.nombre}`, items:prods, mnTab:'productos'});
+    });
+  }
+  // Resto de Mi Negocio
   const MAP = [
-    { key:'productos',  label:'Productos / Servicios', icon:'🛍️', sub: p => p.nombre },
-    { key:'clientes',   label:'Clientes',              icon:'👤', sub: c => c.nombre },
-    { key:'proveedores',label:'Proveedores',            icon:'🏭', sub: p => p.nombre },
-    { key:'servicios',  label:'Servicios / Suscripciones', icon:'⚡', sub: s => s.nombre },
-    { key:'equipo',     label:'Equipo',                icon:'👥', sub: e => `${e.nombre}${e.rol?' ('+e.rol+')':''}` },
-    { key:'impositiva', label:'Impuestos / Obligaciones', icon:'📊', sub: i => `${i.nombre}${i.monto?' — $'+Number(i.monto).toLocaleString():''}` },
+    { key:'productos',  label:'Productos sin categoría', icon:'🛍️', sub: p => !p.categoria||!cats.some(c=>c.nombre===p.categoria)?p.nombre:null },
+    { key:'clientes',   label:'Clientes',                icon:'👤', sub: c => c.nombre },
+    { key:'proveedores',label:'Proveedores',              icon:'🏭', sub: p => p.nombre },
+    { key:'servicios',  label:'Servicios',                icon:'⚡', sub: s => s.nombre },
+    { key:'equipo',     label:'Equipo',                  icon:'👥', sub: e => `${e.nombre}${e.rol?' ('+e.rol+')':''}` },
+    { key:'impositiva', label:'Impuestos',                icon:'📊', sub: i => `${i.nombre}${i.monto?' — $'+Number(i.monto).toLocaleString():''}` },
   ];
   MAP.forEach(({key,label,icon,sub})=>{
     const items=(S.miNegocio[key]||[]).map(sub).filter(Boolean).sort((a,b)=>a.localeCompare(b,'es'));
-    if(items.length) secciones.push({id:key, name:`${icon} ${label}`, items});
+    secciones.push({id:key, name:`${icon} ${label}`, items, mnTab:key});
   });
-
-  // Historial: categorías que ya se usaron
+  // Historial
   const hist=[...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
-  if(hist.length) secciones.push({id:'historial', name:'🕐 Usadas antes', items:hist});
-
-  // Siempre agregar categorías genéricas
-  secciones.push({
-    id:'general', name:'📋 Generales',
-    items:['Ventas','Materiales','Sueldos','Alquiler','Marketing','Equipamiento','Transporte','Impuestos','Otros']
-  });
-
+  if(hist.length) secciones.push({id:'historial', name:'🕐 Usadas antes', items:hist, mnTab:null});
   return secciones;
 }
 
@@ -1296,7 +1357,7 @@ function openFinCatPicker(){
   // Nivel 1: mostrar secciones
   openPicker({
     title: 'Categoría — sección',
-    items: secciones.map(s=>({id:s.id, name:s.name, sub:`${s.items.length} ítems`})),
+    items: secciones.map(s=>({id:s.id, name:s.name, sub:s.items.length ? `${s.items.length} ítem${s.items.length>1?'s':''}` : 'Vacía — tocá para agregar'})),
     selected: '',
     onSelect: (id) => {
       const sec = secciones.find(s=>s.id===id);
@@ -1313,7 +1374,7 @@ function openFinCatPicker(){
             if(lbl){ lbl.textContent=itemName; lbl.style.color='var(--t1)'; }
             g('fin-cat-trigger')?.classList.add('filled');
           },
-          onAdd: (sec.id==='historial'||sec.id==='general') ? null : {
+          onAdd: (sec.id==='historial'||!sec.mnTab) ? null : {
             label: `Agregar a ${sec.name}`,
             fn: (nombre) => {
               if(!nombre) return;
@@ -1321,21 +1382,22 @@ function openFinCatPicker(){
               const lbl = g('fin-cat-trigger-lbl');
               if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
               g('fin-cat-trigger')?.classList.add('filled');
-              // Guardar en la colección correcta según la sección
-              saveNewMnItem(sec.id, nombre);
+              saveNewMnItem(sec.mnTab, nombre);
             }
           }
         });
       }, 60);
     },
     onAdd: {
-      label: 'Escribir categoría manualmente',
+      label: 'Crear categoría nueva',
       fn: (nombre) => {
         if(!nombre) return;
         g('s-fin-cat').value = nombre;
         const lbl = g('fin-cat-trigger-lbl');
         if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
         g('fin-cat-trigger')?.classList.add('filled');
+        // Guardar como nueva categoría en productos
+        saveNewMnItem('productos', nombre);
       }
     }
   });
@@ -1465,6 +1527,11 @@ async function loadAllData(){
     getDocs(col(c)).then(snap=>{S[keys[i]]=snap.docs.map(d=>({...d.data(),_id:d.id}));}).catch(e=>console.warn(c,e))
   ));
   // Mi Negocio — todas las secciones del MN_CONFIG
+  // Categorías propias (antes que productos para poder referenciarlas)
+  try{
+    const cs=await getDocs(col('mn_categorias'));
+    S.miNegocio.categorias=cs.docs.map(d=>({...d.data(),_id:d.id}));
+  }catch(e){}
   await Promise.allSettled(Object.keys(MN_CONFIG).map(tab=>
     getDocs(col('mn_'+tab)).then(snap=>{S.miNegocio[tab]=snap.docs.map(d=>({...d.data(),_id:d.id}));}).catch(()=>{})
   ));
@@ -2061,28 +2128,113 @@ function renderAgeWeek(){
 }
 window.renderAgeWeek=renderAgeWeek;
 
+// Estado calendarios
+let ageCalMes = false; let ageMesOffset = 0;
+let taskCalMes = false; let taskMesOffset = 0;
+
+function renderCalMes(prefix, offsetKey, fechaKey, getItems, getDot){
+  const grid = g(prefix+'-mes-grid');
+  const lbl = g(prefix+'-mes-lbl');
+  if(!grid||!lbl) return;
+  const hoyD = new Date(); hoyD.setHours(0,0,0,0);
+  const base = new Date(hoyD.getFullYear(), hoyD.getMonth() + (prefix==='age'?ageMesOffset:taskMesOffset), 1);
+  const mes = base.getMonth(); const anio = base.getFullYear();
+  lbl.textContent = base.toLocaleDateString('es-AR',{month:'long',year:'numeric'}).replace(/^\w/,c=>c.toUpperCase());
+  const primerDia = new Date(anio,mes,1).getDay()||7; // 1=lun
+  const diasMes = new Date(anio,mes+1,0).getDate();
+  const DIAS=['L','M','X','J','V','S','D'];
+  let html = DIAS.map(d=>`<div class="cal-mes-dia-lbl">${d}</div>`).join('');
+  // Días vacíos al inicio
+  for(let i=1;i<primerDia;i++) html+=`<div class="cal-mes-dia otro-mes"><span class="cal-mes-num"></span></div>`;
+  const selFecha = S[fechaKey];
+  for(let d=1;d<=diasMes;d++){
+    const ds=`${anio}-${String(mes+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const isToday=new Date(anio,mes,d).getTime()===hoyD.getTime();
+    const isSel=ds===selFecha;
+    const hasDot=getDot(ds);
+    html+=`<div class="cal-mes-dia${isSel?' sel':''}" data-fecha="${ds}">
+      <span class="cal-mes-num${isToday?' today':''}">${d}</span>
+      ${hasDot?'<span class="cal-mes-dot"></span>':''}
+    </div>`;
+  }
+  grid.innerHTML=html;
+  grid.querySelectorAll('.cal-mes-dia[data-fecha]').forEach(el=>{
+    el.addEventListener('click',()=>{
+      S[fechaKey]=el.dataset.fecha;
+      renderCalMes(prefix,offsetKey,fechaKey,getItems,getDot);
+      if(prefix==='age'){renderEvs();}
+      else{renderTasks();}
+    });
+  });
+}
+window.renderCalMes=renderCalMes;
+
 function renderEvs(){
   const list=g('evs-list');if(!list)return;
   const today=hoy();
   let evs=[...S.eventos];
-  if(S.ageFecha)evs=evs.filter(e=>e.fecha===S.ageFecha);
+  if(S.ageFecha) evs=evs.filter(e=>e.fecha===S.ageFecha);
   else evs=evs.filter(e=>e.fecha>=today);
   evs.sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''));
-  if(!evs.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Sin eventos</div><div class="empty-sub">Tocá + para agregar un evento.</div></div>`;return;}
+  if(!evs.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Sin eventos</div><div class="empty-sub">Tocá + para agregar un evento.</div></div>`;
+    return;
+  }
   list.innerHTML=`<div class="mov-list">${evs.map(e=>{
     const diff=e.fecha?Math.ceil((new Date(e.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
     const cuando=diff===0?'Hoy':diff===1?'Mañana':diff!=null&&diff<0?'Vencido':diff!=null?`En ${diff} días`:fmt(e.fecha);
-    return `<div class="card"><div class="card-row">
-      <div class="card-icon" style="background:var(--amber-bg)"><span class="material-icons-round" style="color:var(--amber)">event</span></div>
-      <div class="card-info"><div class="card-title">${e.tit}${e.prio==='urgente'?' 🔴':''}</div><div class="card-sub">${e.cliente||''}${e.hora?' · '+e.hora:''}</div></div>
-      <div class="card-right"><div class="card-date" style="font-weight:600;color:var(--amber)">${cuando}</div><button class="rpl" data-id="${e._id}" style="background:transparent;border:none;cursor:pointer;color:var(--t5);font-size:12px;" data-a="del">🗑️</button></div>
-    </div></div>`;
+    return `<div class="card">
+      <div class="card-row">
+        <div class="card-icon" style="background:var(--amber-bg)"><span class="material-icons-round" style="color:var(--amber)">event</span></div>
+        <div class="card-info">
+          <div class="card-title">${e.tit}${e.prio==='urgente'?' 🔴':''}</div>
+          <div class="card-sub">${e.cliente||''}${e.hora?' · '+e.hora:''}</div>
+        </div>
+        <div class="card-right">
+          <div class="card-date" style="font-weight:600;color:var(--amber)">${cuando}</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="card-action edit rpl" data-id="${e._id}" data-a="edit"><span class="material-icons-round">edit</span>Editar</button>
+        <button class="card-action del rpl" data-id="${e._id}" data-a="del"><span class="material-icons-round">delete_outline</span>Eliminar</button>
+      </div>
+    </div>`;
   }).join('')}</div>`;
-  list.querySelectorAll('[data-a="del"]').forEach(btn=>{
-    btn.addEventListener('click',()=>{if(confirm('¿Eliminar evento?'))delEv(btn.dataset.id);});
+  list.querySelectorAll('[data-a]').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const id=btn.dataset.id;
+      if(btn.dataset.a==='edit') editEv(id);
+      else if(btn.dataset.a==='del'&&confirm('¿Eliminar evento?')) delEv(id);
+    });
   });
 }
 window.renderEvs=renderEvs;
+
+function editEv(id){
+  const e=S.eventos.find(e=>e._id===id); if(!e) return;
+  openEdit('✏️ Editar evento',`
+    <div class="m3-field"><input class="m3-inp" id="ee-tit" value="${(e.tit||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Título</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="ee-fecha" type="date" value="${e.fecha||''}" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+      <div class="m3-field"><input class="m3-inp" id="ee-hora" type="time" value="${e.hora||''}" placeholder=" "><label class="m3-lbl">Hora</label></div>
+    </div>
+    <div class="m3-field"><input class="m3-inp" id="ee-cli" value="${(e.cliente||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Cliente</label></div>
+    <select class="m3-select" id="ee-prio"><option value="normal"${e.prio!=='urgente'?' selected':''}>Normal</option><option value="urgente"${e.prio==='urgente'?' selected':''}>🔴 Urgente</option></select>
+    <textarea class="m3-select" id="ee-desc" rows="2" style="resize:none;padding-top:10px;">${e.desc||''}</textarea>
+    <button class="btn-save rpl" id="ee-save">Guardar cambios</button>
+  `);
+  g('ee-save').addEventListener('click',async()=>{
+    const tit=g('ee-tit')?.value.trim(); if(!tit){toast('El título es obligatorio');return;}
+    const upd={tit,fecha:g('ee-fecha')?.value||e.fecha,hora:g('ee-hora')?.value||'',cliente:g('ee-cli')?.value.trim()||'',prio:g('ee-prio')?.value||'normal',desc:g('ee-desc')?.value.trim()||''};
+    saving();
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/eventos/${id}`),upd);
+      Object.assign(e,upd); S.ottoCache=[];
+      closeEdit(); toast('✅ Evento actualizado'); renderEvs(); renderAgeWeek();
+    }catch(err){console.error(err);toast('Error al guardar');}
+  });
+}
+window.editEv=editEv;
 
 function renderTasks(){
   const list=g('tasks-list');if(!list)return;
@@ -2093,14 +2245,51 @@ function renderTasks(){
   const th=t=>{
     const diff=t.fecha?Math.ceil((new Date(t.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
     const vence=diff===0?'Vence hoy':diff===1?'Mañana':diff!=null&&diff<0?'Vencida':diff!=null?`En ${diff} días`:'';
-    return `<div class="task-item"><div class="task-check rpl${t.done?' done':''}" data-id="${t._id}" data-a="toggle"></div><div class="task-body"><div class="task-title${t.done?' done':''}">${t.tit}${t.prio==='urgente'?'<span class="task-prio">🔴</span>':''}</div>${vence?`<div class="task-meta">${vence}</div>`:''}</div><button class="rpl" data-id="${t._id}" data-a="del" style="background:transparent;border:none;cursor:pointer;color:var(--t5);padding:4px;"><span class="material-icons-round" style="font-size:18px">close</span></button></div>`;
+    return `<div class="task-item">
+      <div class="task-check rpl${t.done?' done':''}" data-id="${t._id}" data-a="toggle"></div>
+      <div class="task-body">
+        <div class="task-title${t.done?' done':''}">${t.tit}${t.prio==='urgente'?'<span class="task-prio">🔴</span>':''}</div>
+        ${vence?`<div class="task-meta">${vence}</div>`:''}
+      </div>
+      <button class="rpl" data-id="${t._id}" data-a="edit" style="background:transparent;border:none;cursor:pointer;color:var(--t4);padding:4px;display:flex;"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+      <button class="rpl" data-id="${t._id}" data-a="del" style="background:transparent;border:none;cursor:pointer;color:var(--t5);padding:4px;display:flex;"><span class="material-icons-round" style="font-size:18px">close</span></button>
+    </div>`;
   };
   list.innerHTML=pend.map(th).join('')+(hechas.length?`<div class="mov-group-hdr">Completadas</div>${hechas.map(th).join('')}`:'');
   list.querySelectorAll('[data-a]').forEach(btn=>{
-    btn.addEventListener('click',()=>{if(btn.dataset.a==='toggle')toggleTask(btn.dataset.id);else delTask(btn.dataset.id);});
+    btn.addEventListener('click',()=>{
+      const id=btn.dataset.id;
+      if(btn.dataset.a==='toggle') toggleTask(id);
+      else if(btn.dataset.a==='edit') editTask(id);
+      else delTask(id);
+    });
   });
 }
 window.renderTasks=renderTasks;
+
+function editTask(id){
+  const t=S.tareas.find(t=>t._id===id); if(!t) return;
+  openEdit('✏️ Editar tarea',`
+    <div class="m3-field"><input class="m3-inp" id="et-tit" value="${(t.tit||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Tarea</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="et-fecha" type="date" value="${t.fecha||''}" placeholder=" "><label class="m3-lbl">Para cuándo</label></div>
+      <select class="m3-select" id="et-prio"><option value="normal"${t.prio!=='urgente'?' selected':''}>Normal</option><option value="urgente"${t.prio==='urgente'?' selected':''}>🔴 Urgente</option></select>
+    </div>
+    <div class="m3-field"><input class="m3-inp" id="et-desc" value="${(t.desc||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Nota</label></div>
+    <button class="btn-save rpl" id="et-save">Guardar cambios</button>
+  `);
+  g('et-save').addEventListener('click',async()=>{
+    const tit=g('et-tit')?.value.trim(); if(!tit){toast('La tarea es obligatoria');return;}
+    const upd={tit,fecha:g('et-fecha')?.value||'',prio:g('et-prio')?.value||'normal',desc:g('et-desc')?.value.trim()||''};
+    saving();
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/tareas/${id}`),upd);
+      Object.assign(t,upd); S.ottoCache=[];
+      closeEdit(); toast('✅ Tarea actualizada'); renderTasks(); updateBanner();
+    }catch(err){console.error(err);toast('Error al guardar');}
+  });
+}
+window.editTask=editTask;
 
 function renderMnSections(){
   const p=S.perfil;
@@ -2114,32 +2303,223 @@ function renderMnSections(){
   wrap.innerHTML=Object.keys(MN_CONFIG).map(tab=>{
     const cfg=MN_CONFIG[tab];
     const items=S.miNegocio[tab]||[];
-    return `<div class="mn-section"><button class="mn-sec-btn rpl" data-tab="${tab}">${cfg.icon} ${tab.charAt(0).toUpperCase()+tab.slice(1)}<span class="material-icons-round" style="font-size:18px;color:var(--t4)">expand_more</span></button><div class="mn-sec-body" id="mn-body-${tab}"><button class="mn-add-btn rpl" data-tab="${tab}"><span class="material-icons-round" style="font-size:16px">add</span> Agregar</button>${renderMnItems(tab,items)}</div></div>`;
+    const isProds=tab==='productos';
+    const addBtn=`<button class="mn-add-btn rpl" data-tab="${tab}"><span class="material-icons-round" style="font-size:16px">add</span> Agregar</button>`;
+    const catBtn=isProds?`<button class="mn-add-btn rpl" data-tab="cat" style="color:var(--salvia);"><span class="material-icons-round" style="font-size:16px">label</span> Nueva categoría</button>`:'';
+    return `<div class="mn-section">
+      <button class="mn-sec-btn rpl" data-tab="${tab}">${cfg.icon} ${tab.charAt(0).toUpperCase()+tab.slice(1)}<span class="material-icons-round" style="font-size:18px;color:var(--t4)">expand_more</span></button>
+      <div class="mn-sec-body" id="mn-body-${tab}">${addBtn}${catBtn}${renderMnItems(tab,items)}</div>
+    </div>`;
   }).join('');
-  wrap.querySelectorAll('.mn-sec-btn').forEach(btn=>{btn.addEventListener('click',()=>{const b=g('mn-body-'+btn.dataset.tab);if(b)b.classList.toggle('on');});});
-  wrap.querySelectorAll('.mn-add-btn').forEach(btn=>{btn.addEventListener('click',()=>openMnAdd(btn.dataset.tab));});
+  wrap.querySelectorAll('.mn-sec-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{g('mn-body-'+btn.dataset.tab)?.classList.toggle('on');});
+  });
+  wrap.querySelectorAll('.mn-add-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      if(btn.dataset.tab==='cat') openMnAddCat();
+      else openMnAdd(btn.dataset.tab);
+    });
+  });
   wrap.querySelectorAll('[data-del-tab]').forEach(btn=>{btn.addEventListener('click',()=>delMnItem(btn.dataset.delTab,btn.dataset.delId));});
   wrap.querySelectorAll('[data-edit-tab]').forEach(btn=>{btn.addEventListener('click',()=>editMnItem(btn.dataset.editTab,btn.dataset.editId));});
+  // Editar emoji de categoría
+  wrap.querySelectorAll('[data-cat-emoji-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>openEmojiPickerForCat(btn.dataset.catEmojiId,btn));
+  });
+  // Editar nombre de categoría
+  wrap.querySelectorAll('[data-cat-edit-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>editCat(btn.dataset.catEditId));
+  });
+  // Eliminar categoría
+  wrap.querySelectorAll('[data-cat-del-id]').forEach(btn=>{
+    btn.addEventListener('click',()=>delCat(btn.dataset.catDelId));
+  });
 }
 window.renderMnSections=renderMnSections;
 
 function renderMnItems(tab,items){
-  if(!items.length)return '<div style="font-size:13px;color:var(--t4);padding:8px 4px;">Sin elementos aún.</div>';
   const itemHtml=(i)=>`<div class="mn-item">
     <div class="mn-item-name">${i.nombre||'—'}${i.precio?'<div class="mn-item-sub">'+fmtARS(i.precio)+'</div>':i.rol?'<div class="mn-item-sub">'+i.rol+'</div>':i.queProvee?'<div class="mn-item-sub">'+i.queProvee+'</div>':''}</div>
     <button class="mn-item-del rpl" style="padding:4px;" data-edit-tab="${tab}" data-edit-id="${i._id}"><span class="material-icons-round" style="font-size:18px;color:var(--t4)">edit</span></button>
     <button class="mn-item-del rpl" data-del-tab="${tab}" data-del-id="${i._id}"><span class="material-icons-round" style="font-size:18px">delete_outline</span></button>
   </div>`;
+
   if(tab==='productos'){
+    // Agrupar por categoría, usar categorías propias si existen
+    const cats=S.miNegocio.categorias||[];
     const grupos={};
-    [...items].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es')).forEach(i=>{const c=i.categoria||'General';if(!grupos[c])grupos[c]=[];grupos[c].push(i);});
-    return Object.entries(grupos).sort((a,b)=>a[0].localeCompare(b[0],'es')).map(([cat,prods])=>`<div class="mn-cat-lbl">${cat}</div>`+prods.map(itemHtml).join('')).join('');
+    [...items].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es')).forEach(i=>{
+      const c=i.categoria||'Sin categoría';
+      if(!grupos[c])grupos[c]=[];
+      grupos[c].push(i);
+    });
+    // Ordenar: primero las categorías propias (en su orden), luego el resto
+    const catNames=[...cats.map(c=>c.nombre),...Object.keys(grupos).filter(k=>!cats.some(c=>c.nombre===k))].sort((a,b)=>a.localeCompare(b,'es'));
+    if(!items.length && !cats.length) return '<div style="font-size:13px;color:var(--t4);padding:8px 4px;">Sin elementos aún.</div>';
+    return catNames.map(catName=>{
+      const cat=cats.find(c=>c.nombre===catName);
+      const emoji=cat?.emoji||'📦';
+      const catId=cat?._id||'';
+      const prods=grupos[catName]||[];
+      return `<div class="mn-cat-row">
+        <button class="mn-cat-emoji-btn rpl" data-cat-emoji-id="${catId}" title="Cambiar emoji">${emoji}</button>
+        <span class="mn-cat-label">${catName}</span>
+        <span class="mn-cat-count">${prods.length}</span>
+        ${catId?`<button class="mn-cat-action rpl" data-cat-edit-id="${catId}"><span class="material-icons-round" style="font-size:17px;color:var(--t4)">edit</span></button>`:''}
+        ${catId?`<button class="mn-cat-action rpl" data-cat-del-id="${catId}"><span class="material-icons-round" style="font-size:17px;color:var(--t5)">delete_outline</span></button>`:''}
+      </div>
+      ${prods.length?'<div style="padding-left:8px;">'+prods.map(itemHtml).join('')+'</div>':''}`;
+    }).join('');
   }
+  if(!items.length) return '<div style="font-size:13px;color:var(--t4);padding:8px 4px;">Sin elementos aún.</div>';
   return [...items].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es')).map(itemHtml).join('');
 }
 
-// ── OTTO ──
-let sliderIdx=0; let sliderTimer=null;
+// ── CATEGORÍAS PROPIAS ──
+const EMOJIS_COMUNES=[
+  '🛍️','🥐','🍰','🎂','🥖','🧁','🍕','🍔','☕','🫖','🍷','🍺',
+  '🥩','🥦','🧀','🥚','🧈','🫙','📦','🏭','⚙️','🔧','🪛','🔑',
+  '💼','📋','📊','💰','💳','🧾','📱','💻','🖨️','📸','🎨','✂️',
+  '👕','👗','👟','🎁','🌸','🌿','🌱','⭐','🔥','💡','🚗','🏠',
+  '👤','👥','🤝','📞','✉️','📍','🗓️','⏰','🎯','🏆','❤️','✅'
+];
+
+function openMnAddCat(){
+  let selectedEmoji='📦';
+  const body=`
+    <div style="margin-bottom:12px;">
+      <label class="sec-lbl">Emoji de la categoría</label>
+      <div id="cat-emoji-display" style="font-size:40px;text-align:center;padding:12px;background:var(--surface2);border-radius:var(--r14);cursor:pointer;margin-bottom:8px;">📦</div>
+      <div class="emoji-grid" id="cat-emoji-grid">
+        ${EMOJIS_COMUNES.map(e=>`<button class="emoji-btn rpl" data-e="${e}">${e}</button>`).join('')}
+      </div>
+    </div>
+    <div class="m3-field">
+      <input class="m3-inp" id="cat-nombre-inp" type="text" placeholder=" " maxlength="30">
+      <label class="m3-lbl">Nombre de la categoría</label>
+    </div>
+    <button class="btn-save rpl" id="cat-save-btn">Crear categoría</button>
+  `;
+  openEdit('Nueva categoría',body);
+  // Emoji selector
+  g('cat-emoji-grid').querySelectorAll('.emoji-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      g('cat-emoji-grid').querySelectorAll('.emoji-btn').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      selectedEmoji=btn.dataset.e;
+      g('cat-emoji-display').textContent=selectedEmoji;
+    });
+  });
+  // Guardar
+  g('cat-save-btn').addEventListener('click',async()=>{
+    const nombre=g('cat-nombre-inp')?.value.trim();
+    if(!nombre){toast('Ingresá un nombre');return;}
+    const existe=(S.miNegocio.categorias||[]).some(c=>c.nombre.toLowerCase()===nombre.toLowerCase());
+    if(existe){toast('Esa categoría ya existe');return;}
+    const data={nombre,emoji:selectedEmoji,creadoEn:new Date().toISOString()};
+    try{
+      const ref=await addDoc(col('mn_categorias'),data);
+      S.miNegocio.categorias.push({...data,_id:ref.id});
+      closeEdit();
+      renderMnSections();
+      // Abrir la sección productos para verla
+      setTimeout(()=>g('mn-body-productos')?.classList.add('on'),200);
+      toast(`✅ Categoría "${nombre}" creada`);
+    }catch(e){console.error(e);toast('Error al guardar');}
+  });
+  setTimeout(()=>g('cat-nombre-inp')?.focus(),200);
+}
+window.openMnAddCat=openMnAddCat;
+
+function openEmojiPickerForCat(catId,btnEl){
+  if(!catId) return;
+  const cat=(S.miNegocio.categorias||[]).find(c=>c._id===catId);
+  if(!cat) return;
+  let sel=cat.emoji||'📦';
+  const body=`
+    <div style="font-size:40px;text-align:center;padding:8px 0 12px;" id="ep-emoji-preview">${sel}</div>
+    <div class="emoji-grid" id="ep-emoji-grid">
+      ${EMOJIS_COMUNES.map(e=>`<button class="emoji-btn rpl${e===sel?' sel':''}" data-e="${e}">${e}</button>`).join('')}
+    </div>
+    <button class="btn-save rpl" style="margin-top:12px;" id="ep-emoji-save">Guardar emoji</button>
+  `;
+  openEdit(`Emoji — ${cat.nombre}`,body);
+  g('ep-emoji-grid').querySelectorAll('.emoji-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      g('ep-emoji-grid').querySelectorAll('.emoji-btn').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      sel=btn.dataset.e;
+      g('ep-emoji-preview').textContent=sel;
+    });
+  });
+  g('ep-emoji-save').addEventListener('click',async()=>{
+    cat.emoji=sel;
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/mn_categorias/${catId}`),{emoji:sel});
+      if(btnEl) btnEl.textContent=sel;
+      closeEdit();
+      renderMnSections();
+      toast('✅ Emoji actualizado');
+    }catch(e){console.error(e);}
+  });
+}
+window.openEmojiPickerForCat=openEmojiPickerForCat;
+
+async function editCat(catId){
+  const cat=(S.miNegocio.categorias||[]).find(c=>c._id===catId);
+  if(!cat) return;
+  let sel=cat.emoji||'📦';
+  const body=`
+    <div style="font-size:36px;text-align:center;padding:4px 0 10px;" id="ec-emoji-prev">${sel}</div>
+    <div class="emoji-grid" id="ec-emoji-grid" style="margin-bottom:12px;">
+      ${EMOJIS_COMUNES.map(e=>`<button class="emoji-btn rpl${e===sel?' sel':''}" data-e="${e}">${e}</button>`).join('')}
+    </div>
+    <div class="m3-field">
+      <input class="m3-inp" id="ec-nombre-inp" type="text" value="${(cat.nombre||'').replace(/"/g,'&quot;')}" placeholder=" ">
+      <label class="m3-lbl">Nombre de la categoría</label>
+    </div>
+    <button class="btn-save rpl" id="ec-save-btn">Guardar cambios</button>
+  `;
+  openEdit(`Editar categoría`,body);
+  g('ec-emoji-grid').querySelectorAll('.emoji-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      g('ec-emoji-grid').querySelectorAll('.emoji-btn').forEach(b=>b.classList.remove('sel'));
+      btn.classList.add('sel');
+      sel=btn.dataset.e;
+      g('ec-emoji-prev').textContent=sel;
+    });
+  });
+  g('ec-save-btn').addEventListener('click',async()=>{
+    const nombre=g('ec-nombre-inp')?.value.trim();
+    if(!nombre){toast('Ingresá un nombre');return;}
+    const oldNombre=cat.nombre;
+    cat.nombre=nombre; cat.emoji=sel;
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/mn_categorias/${catId}`),{nombre,emoji:sel});
+      // Actualizar la categoría en todos los productos que la usan
+      const prods=(S.miNegocio.productos||[]).filter(p=>p.categoria===oldNombre);
+      for(const p of prods){
+        p.categoria=nombre;
+        try{await updateDoc(doc(db,`usuarios/${S.uid}/mn_productos/${p._id}`),{categoria:nombre});}catch(e){}
+      }
+      closeEdit(); renderMnSections();
+      toast('✅ Categoría actualizada');
+    }catch(e){console.error(e);toast('Error');}
+  });
+}
+window.editCat=editCat;
+
+async function delCat(catId){
+  const cat=(S.miNegocio.categorias||[]).find(c=>c._id===catId);
+  if(!cat) return;
+  if(!confirm(`¿Eliminar la categoría "${cat.nombre}"?\nLos productos quedarán sin categoría.`)) return;
+  try{
+    await deleteDoc(doc(db,`usuarios/${S.uid}/mn_categorias/${catId}`));
+    S.miNegocio.categorias=S.miNegocio.categorias.filter(c=>c._id!==catId);
+    renderMnSections(); toast('Categoría eliminada');
+  }catch(e){console.error(e);}
+}
+window.delCat=delCat;
 
 
 function buildLocalInsights(){
@@ -2507,6 +2887,43 @@ document.querySelectorAll('.user-field-edit[data-field]').forEach(btn=>{
   btn.addEventListener('click',()=>editUserField(btn.dataset.field));
 });
 g('btn-delete-account')?.addEventListener('click',deleteAccount);
+// Toggle calendario mensual — Agenda
+g('age-cal-toggle')?.addEventListener('click',()=>{
+  ageCalMes=!ageCalMes;
+  const btn=g('age-cal-toggle');
+  const strip=g('age-week-strip');
+  const mes=g('age-mes-wrap');
+  if(ageCalMes){
+    strip.style.display='none'; mes.style.display='block';
+    btn.classList.add('mes'); btn.innerHTML='<span class="material-icons-round">view_week</span>Semana';
+    renderCalMes('age','ageMesOffset','ageFecha',
+      ds=>S.eventos.filter(e=>e.fecha===ds).length,
+      ds=>S.eventos.some(e=>e.fecha===ds));
+  } else {
+    strip.style.display='block'; mes.style.display='none';
+    btn.classList.remove('mes'); btn.innerHTML='<span class="material-icons-round">calendar_month</span>Mes';
+    renderAgeWeek();
+  }
+});
+g('age-mes-prev')?.addEventListener('click',()=>{ ageMesOffset--; renderCalMes('age','ageMesOffset','ageFecha',null,ds=>S.eventos.some(e=>e.fecha===ds)); });
+g('age-mes-next')?.addEventListener('click',()=>{ ageMesOffset++; renderCalMes('age','ageMesOffset','ageFecha',null,ds=>S.eventos.some(e=>e.fecha===ds)); });
+
+// Toggle calendario mensual — Tareas
+g('task-cal-toggle')?.addEventListener('click',()=>{
+  taskCalMes=!taskCalMes;
+  const btn=g('task-cal-toggle');
+  const mes=g('task-mes-wrap');
+  if(taskCalMes){
+    mes.style.display='block';
+    btn.classList.add('mes'); btn.innerHTML='<span class="material-icons-round">view_week</span>Semana';
+    renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
+  } else {
+    mes.style.display='none';
+    btn.classList.remove('mes'); btn.innerHTML='<span class="material-icons-round">calendar_month</span>Mes';
+  }
+});
+g('task-mes-prev')?.addEventListener('click',()=>{ taskMesOffset--; renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done)); });
+g('task-mes-next')?.addEventListener('click',()=>{ taskMesOffset++; renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done)); });
 g('ob-start-btn')?.addEventListener('click',()=>showOb('ob1'));
 g('ob-skip-btn')?.addEventListener('click',()=>g('onboarding').classList.remove('on'));
 g('obNegocio')?.addEventListener('input',()=>{const btn=g('ob1-btn');if(btn)btn.disabled=!g('obNegocio').value.trim();});
