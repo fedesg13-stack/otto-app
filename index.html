@@ -553,6 +553,73 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 .cal-toggle-btn.mes{background:var(--bosque);color:#fff;border-color:var(--bosque);}
 .cal-toggle-btn .material-icons-round{font-size:14px;}
 
+
+/* ── PANEL OTTO REDISEÑADO ── */
+#p-otto{background:var(--bosque);display:none;flex-direction:column;}
+#p-otto.on{display:flex;}
+.otto-chat-header{
+  padding:28px 20px 20px;
+  background:var(--bosque);
+  flex-shrink:0;
+}
+.otto-chat-avatar{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(255,255,255,.15);
+  border:2px solid rgba(255,255,255,.25);
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:10px;
+}
+.otto-chat-avatar svg{width:32px;height:10px;filter:brightness(10);}
+.otto-chat-title{font-size:22px;font-weight:700;color:#fff;letter-spacing:-.4px;}
+.otto-chat-sub{font-size:13px;color:rgba(255,255,255,.6);margin-top:3px;}
+.otto-chat-body{
+  flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;
+  background:var(--bg);
+  border-radius:24px 24px 0 0;
+  padding:16px 16px 16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+#chat-msgs{display:flex;flex-direction:column;gap:10px;flex:1;}
+.chat-input-row{
+  display:flex;gap:8px;padding:12px 16px;
+  border-top:1px solid var(--border2);
+  position:sticky;bottom:0;
+  background:var(--surface);
+  flex-shrink:0;
+}
+/* Burbujas rediseñadas para OTTO */
+#p-otto .msg-av{
+  width:32px;height:32px;border-radius:50%;
+  background:var(--bosque);color:#fff;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+#p-otto .msg.me .msg-av{background:var(--surface3);color:var(--t2);}
+#p-otto .msg-bub{
+  padding:11px 15px;border-radius:16px;
+  font-size:14px;line-height:1.6;
+  max-width:82%;
+  background:var(--surface);color:var(--t1);
+  box-shadow:var(--s1);
+}
+#p-otto .msg-bub.me{
+  background:var(--bosque);color:#fff;
+  border-radius:16px 16px 4px 16px;
+  box-shadow:none;
+}
+#p-otto .msg-bub.otto{border-radius:16px 16px 16px 4px;}
+/* Quick chips en OTTO */
+.otto-quick-chips{display:flex;flex-wrap:wrap;gap:7px;padding:4px 0 8px;}
+.otto-quick-chip{
+  background:var(--surface);border:1.5px solid var(--border);
+  border-radius:var(--rfull);padding:7px 14px;
+  font-family:var(--font);font-size:12px;font-weight:500;color:var(--t2);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:all .12s;
+}
+.otto-quick-chip:active{background:var(--green-bg);border-color:var(--bosque);color:var(--bosque);}
+
 </style>
 </head>
 <body>
@@ -651,6 +718,7 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 <!-- APP -->
 <div id="app">
   <header>
+    <div class="hd-negocio" id="hd-negocio"></div>
     <button class="hd-logo rpl" id="hd-logo-btn">
       <svg viewBox="0 0 68 20" style="width:68px;height:20px;"><svg xmlns="http://www.w3.org/2000/svg" viewBox="3100 5050 6420 2500" >
 <g transform="translate(0,12540) scale(1,-1)" fill="#234136" stroke="none">
@@ -661,10 +729,6 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 <path d="M4557 7346 c-68 -25 -97 -66 -97 -138 0 -58 30 -104 83 -128 39 -18 68 -20 368 -20 321 0 327 0 369 -23 30 -16 51 -37 67 -67 l23 -43 0 -757 c0 -835 -1 -818 63 -901 55 -72 206 -139 243 -108 12 10 14 153 14 889 l0 877 23 43 c16 30 37 51 67 67 l43 23 461 0 c449 0 462 -1 495 -21 46 -28 68 -56 80 -107 8 -28 11 -285 11 -795 -1 -850 -4 -810 76 -893 49 -50 106 -79 173 -90 36 -6 46 -4 58 11 11 16 13 177 13 900 l0 882 23 33 c12 19 38 43 57 54 33 20 55 21 377 26 325 5 343 6 369 26 50 37 69 72 69 124 0 52 -19 87 -69 124 -27 21 -28 21 -1724 23 -1402 2 -1704 0 -1735 -11z"/>
 </g>
 </svg></svg>
-    </button>
-    <div class="hd-negocio" id="hd-negocio"></div>
-    <button class="hd-menu-btn rpl" id="hd-menu-btn">
-      <span class="material-icons-round" style="font-size:20px">menu</span>
     </button>
   </header>
 
@@ -753,17 +817,13 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
     <div class="panel" id="p-age">
       <div class="section-hdr">
         <span class="section-title">Agenda</span>
-        <button class="cal-toggle-btn rpl" id="age-cal-toggle">
-          <span class="material-icons-round">calendar_month</span>Mes
-        </button>
-      </div>
-      <div class="ped-cal-strip" id="age-week-strip"><div class="ped-week" id="age-week"></div></div>
-      <div class="cal-mes-wrap" id="age-mes-wrap" style="display:none;">
-        <div class="cal-mes-header">
+        <div style="display:flex;gap:4px;">
           <button class="cal-mes-nav rpl" id="age-mes-prev"><span class="material-icons-round">chevron_left</span></button>
-          <span class="cal-mes-lbl" id="age-mes-lbl"></span>
+          <span class="cal-mes-lbl" id="age-mes-lbl" style="font-size:13px;font-weight:600;color:var(--t2);display:flex;align-items:center;min-width:110px;justify-content:center;"></span>
           <button class="cal-mes-nav rpl" id="age-mes-next"><span class="material-icons-round">chevron_right</span></button>
         </div>
+      </div>
+      <div class="cal-mes-wrap" id="age-mes-wrap">
         <div class="cal-mes-grid" id="age-mes-grid"></div>
       </div>
       <div class="evs-list" id="evs-list"></div>
@@ -773,16 +833,13 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
     <div class="panel" id="p-task">
       <div class="section-hdr">
         <span class="section-title">Tareas</span>
-        <button class="cal-toggle-btn rpl" id="task-cal-toggle">
-          <span class="material-icons-round">calendar_month</span>Mes
-        </button>
-      </div>
-      <div class="cal-mes-wrap" id="task-mes-wrap" style="display:none;">
-        <div class="cal-mes-header">
+        <div style="display:flex;gap:4px;">
           <button class="cal-mes-nav rpl" id="task-mes-prev"><span class="material-icons-round">chevron_left</span></button>
-          <span class="cal-mes-lbl" id="task-mes-lbl"></span>
+          <span class="cal-mes-lbl" id="task-mes-lbl" style="font-size:13px;font-weight:600;color:var(--t2);display:flex;align-items:center;min-width:110px;justify-content:center;"></span>
           <button class="cal-mes-nav rpl" id="task-mes-next"><span class="material-icons-round">chevron_right</span></button>
         </div>
+      </div>
+      <div class="cal-mes-wrap" id="task-mes-wrap">
         <div class="cal-mes-grid" id="task-mes-grid"></div>
       </div>
       <div class="tasks-list" id="tasks-list"></div>
@@ -903,8 +960,30 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 
     <!-- OTTO CHAT -->
     <div class="panel" id="p-otto">
-      <div class="section-hdr"><span class="section-title">OTTO</span></div>
-      <div class="chat-msgs" id="chat-msgs"></div>
+      <div class="otto-chat-header">
+        <div class="otto-chat-avatar">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="3100 5050 6420 2500" style="width:100%;height:100%;">
+<g transform="translate(0,12540) scale(1,-1)" fill="#234136" stroke="none">
+<path d="M3155 7360 c-666 -140 -1067 -824 -859 -1465 56 -172 145 -316 279 -451 177 -177 396 -290 634 -324 133 -20 363 -8 486 25 196 52 372 154 515 299 221 223 330 490 330 807 0 196 -34 338 -123 515 -161 320 -471 546 -830 604 -103 16 -330 11 -432 -10z m458 -309 c164 -43 345 -163 448 -299 240 -316 228 -736 -29 -1050 -90 -110 -281 -228 -432 -266 -395 -100 -827 114 -981 486 -47 115 -62 212 -56 362 5 136 27 227 78 329 119 233 358 409 621 456 79 15 261 5 351 -18z"/>
+<path d="M3302 6423 c-107 -52 -142 -194 -72 -291 72 -100 226 -108 312 -16 66 71 65 192 -1 268 -47 53 -169 74 -239 39z"/>
+<path d="M8929 7364 c-141 -25 -322 -102 -449 -192 -89 -62 -225 -202 -285 -292 -247 -374 -254 -837 -18 -1234 59 -99 238 -283 338 -348 200 -129 398 -188 635 -188 382 0 706 161 935 465 68 90 151 265 181 380 36 138 44 340 19 486 -38 231 -146 439 -315 609 -165 167 -377 277 -614 319 -82 15 -335 12 -427 -5z m449 -313 c228 -66 427 -229 527 -436 59 -121 85 -232 85 -365 0 -231 -82 -429 -242 -588 -114 -112 -215 -173 -365 -218 -77 -23 -106 -27 -228 -27 -125 -1 -150 2 -228 26 -147 45 -261 113 -366 215 -246 242 -315 629 -167 937 117 244 326 410 591 469 97 22 294 15 393 -13z"/>
+<path d="M9065 6427 c-71 -33 -124 -131 -110 -206 19 -100 87 -162 183 -169 70 -4 131 24 176 81 64 80 41 217 -47 275 -48 32 -152 41 -202 19z"/>
+<path d="M4557 7346 c-68 -25 -97 -66 -97 -138 0 -58 30 -104 83 -128 39 -18 68 -20 368 -20 321 0 327 0 369 -23 30 -16 51 -37 67 -67 l23 -43 0 -757 c0 -835 -1 -818 63 -901 55 -72 206 -139 243 -108 12 10 14 153 14 889 l0 877 23 43 c16 30 37 51 67 67 l43 23 461 0 c449 0 462 -1 495 -21 46 -28 68 -56 80 -107 8 -28 11 -285 11 -795 -1 -850 -4 -810 76 -893 49 -50 106 -79 173 -90 36 -6 46 -4 58 11 11 16 13 177 13 900 l0 882 23 33 c12 19 38 43 57 54 33 20 55 21 377 26 325 5 343 6 369 26 50 37 69 72 69 124 0 52 -19 87 -69 124 -27 21 -28 21 -1724 23 -1402 2 -1704 0 -1735 -11z"/>
+</g>
+</svg>
+        </div>
+        <div class="otto-chat-title">OTTO</div>
+        <div class="otto-chat-sub" id="otto-chat-sub">Tu socio inteligente · siempre disponible</div>
+      </div>
+      <div class="otto-chat-body">
+        <div id="chat-msgs"></div>
+        <div class="otto-quick-chips" id="otto-chips">
+          <button class="otto-quick-chip rpl" data-q="¿Cómo va el negocio esta semana?">📊 Esta semana</button>
+          <button class="otto-quick-chip rpl" data-q="¿Qué pedidos tengo hoy?">📋 Pedidos hoy</button>
+          <button class="otto-quick-chip rpl" data-q="¿Cuál es mi producto más vendido?">🏆 Más vendido</button>
+          <button class="otto-quick-chip rpl" data-q="Dame un consejo para mi negocio">💡 Consejo</button>
+        </div>
+      </div>
       <div class="chat-input-row">
         <input class="chat-inp" id="chat-inp" placeholder="Preguntarle algo a OTTO…">
         <button class="chat-send rpl" id="chat-send"><span class="material-icons-round">send</span></button>
@@ -1159,6 +1238,19 @@ function navTo(panel){
   const p=g('p-'+panel); if(p) p.classList.add('on');
   const btn=document.querySelector(`.menu-item[data-nav="${panel}"]`); if(btn) btn.classList.add('on');
   if(panel==='user') renderUserPanel();
+  if(panel==='age') renderCalMes('age','ageMesOffset','ageFecha',null,ds=>S.eventos.some(e=>e.fecha===ds));
+  if(panel==='task') renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
+  if(panel==='otto'){
+    const msgs=g('chat-msgs');
+    if(msgs&&!msgs.innerHTML.trim()){
+      // Primer mensaje de bienvenida
+      const nombre=S.nombre?.split(' ')[0]||'';
+      msgs.innerHTML=`<div class="msg">
+        <div class="msg-av" style="background:var(--bosque);color:#fff;">O</div>
+        <div class="msg-bub otto">Hola${nombre?' '+nombre:''}! Soy OTTO, tu socio. Preguntame lo que quieras sobre tu negocio. 🌿</div>
+      </div>`;
+    }
+  }
   closeMenu();
 }
 window.navTo=navTo;
@@ -2788,7 +2880,9 @@ onAuthStateChanged(auth,async(user)=>{
     // Render vacío inmediato (para que no quede pantalla en blanco)
     renderHomeBal(); updateBanner(); renderWeek(); renderMovsFin();
     renderPedWeek(); renderPeds(); renderProduceDia();
-    renderAgeWeek(); renderEvs(); renderTasks();
+    renderEvs(); renderTasks();
+    renderCalMes('age','ageMesOffset','ageFecha',null,ds=>S.eventos.some(e=>e.fecha===ds));
+    renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
     renderNotas(); renderMnSections();
     // Cargar datos de Firebase y re-renderizar
     try{ await loadAllData(); }catch(e){ console.warn('loadAllData:', e.message); }
@@ -2807,7 +2901,10 @@ onAuthStateChanged(auth,async(user)=>{
     // Re-render con datos reales
     renderMnSections(); renderHomeBal(); updateBanner(); renderWeek();
     renderMovsFin(); renderPedWeek(); renderPeds(); renderProduceDia();
-    renderAgeWeek(); renderEvs(); renderTasks(); renderNotas(); renderSlider();
+    renderEvs(); renderTasks();
+    renderCalMes('age','ageMesOffset','ageFecha',null,ds=>S.eventos.some(e=>e.fecha===ds));
+    renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
+    renderNotas(); renderSlider();
     if(!S.perfil?.onboardingDone)setTimeout(()=>{g('onboarding').classList.add('on');showOb('ob0');},500);
   }else{
     g('loading').style.display='none';
@@ -2887,43 +2984,22 @@ document.querySelectorAll('.user-field-edit[data-field]').forEach(btn=>{
   btn.addEventListener('click',()=>editUserField(btn.dataset.field));
 });
 g('btn-delete-account')?.addEventListener('click',deleteAccount);
-// Toggle calendario mensual — Agenda
-g('age-cal-toggle')?.addEventListener('click',()=>{
-  ageCalMes=!ageCalMes;
-  const btn=g('age-cal-toggle');
-  const strip=g('age-week-strip');
-  const mes=g('age-mes-wrap');
-  if(ageCalMes){
-    strip.style.display='none'; mes.style.display='block';
-    btn.classList.add('mes'); btn.innerHTML='<span class="material-icons-round">view_week</span>Semana';
-    renderCalMes('age','ageMesOffset','ageFecha',
-      ds=>S.eventos.filter(e=>e.fecha===ds).length,
-      ds=>S.eventos.some(e=>e.fecha===ds));
-  } else {
-    strip.style.display='block'; mes.style.display='none';
-    btn.classList.remove('mes'); btn.innerHTML='<span class="material-icons-round">calendar_month</span>Mes';
-    renderAgeWeek();
-  }
-});
+// Calendario mensual Agenda — siempre visible
 g('age-mes-prev')?.addEventListener('click',()=>{ ageMesOffset--; renderCalMes('age','ageMesOffset','ageFecha',null,ds=>S.eventos.some(e=>e.fecha===ds)); });
 g('age-mes-next')?.addEventListener('click',()=>{ ageMesOffset++; renderCalMes('age','ageMesOffset','ageFecha',null,ds=>S.eventos.some(e=>e.fecha===ds)); });
-
-// Toggle calendario mensual — Tareas
-g('task-cal-toggle')?.addEventListener('click',()=>{
-  taskCalMes=!taskCalMes;
-  const btn=g('task-cal-toggle');
-  const mes=g('task-mes-wrap');
-  if(taskCalMes){
-    mes.style.display='block';
-    btn.classList.add('mes'); btn.innerHTML='<span class="material-icons-round">view_week</span>Semana';
-    renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
-  } else {
-    mes.style.display='none';
-    btn.classList.remove('mes'); btn.innerHTML='<span class="material-icons-round">calendar_month</span>Mes';
-  }
-});
+// Calendario mensual Tareas — siempre visible
 g('task-mes-prev')?.addEventListener('click',()=>{ taskMesOffset--; renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done)); });
 g('task-mes-next')?.addEventListener('click',()=>{ taskMesOffset++; renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done)); });
+// Chat OTTO — chips de preguntas rápidas
+document.querySelectorAll('.otto-quick-chip').forEach(chip=>{
+  chip.addEventListener('click',()=>{
+    const inp=g('chat-inp'); if(!inp) return;
+    inp.value=chip.dataset.q;
+    // Ocultar chips al usar uno
+    const chips=g('otto-chips'); if(chips) chips.style.display='none';
+    sendMsg();
+  });
+});
 g('ob-start-btn')?.addEventListener('click',()=>showOb('ob1'));
 g('ob-skip-btn')?.addEventListener('click',()=>g('onboarding').classList.remove('on'));
 g('obNegocio')?.addEventListener('input',()=>{const btn=g('ob1-btn');if(btn)btn.disabled=!g('obNegocio').value.trim();});
