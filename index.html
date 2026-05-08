@@ -1301,7 +1301,7 @@ function openFinCatPicker(){
     onSelect: (id) => {
       const sec = secciones.find(s=>s.id===id);
       if(!sec) return;
-      // Nivel 2: mostrar ítems de esa sección
+      // Nivel 2: ítems de esa sección
       setTimeout(()=>{
         openPicker({
           title: sec.name,
@@ -1313,15 +1313,16 @@ function openFinCatPicker(){
             if(lbl){ lbl.textContent=itemName; lbl.style.color='var(--t1)'; }
             g('fin-cat-trigger')?.classList.add('filled');
           },
-          onAdd: {
-            label: 'Agregar y guardar en Mi Negocio',
-            fn: (val) => {
-              const nombre = val; if(!nombre) return;
+          onAdd: (sec.id==='historial'||sec.id==='general') ? null : {
+            label: `Agregar a ${sec.name}`,
+            fn: (nombre) => {
+              if(!nombre) return;
               g('s-fin-cat').value = nombre;
               const lbl = g('fin-cat-trigger-lbl');
               if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
               g('fin-cat-trigger')?.classList.add('filled');
-              saveNewFinCat(nombre);
+              // Guardar en la colección correcta según la sección
+              saveNewMnItem(sec.id, nombre);
             }
           }
         });
@@ -1329,8 +1330,8 @@ function openFinCatPicker(){
     },
     onAdd: {
       label: 'Escribir categoría manualmente',
-      fn: (val) => {
-        const nombre = val; if(!nombre) return;
+      fn: (nombre) => {
+        if(!nombre) return;
         g('s-fin-cat').value = nombre;
         const lbl = g('fin-cat-trigger-lbl');
         if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
@@ -2588,55 +2589,45 @@ window.openPicker=function(opts){
 // ── 4. GUARDAR CATEGORÍA NUEVA EN MI NEGOCIO ──
 // Se agrega en openFinCatPicker nivel 2 — modificar fn de onAdd
 // El hook está en la función: cuando se usa onAdd en nivel 2, guardar en mn_productos como categoría
-async function saveNewFinCat(nombre){
+// Guardar nuevo ítem en la sección correcta de Mi Negocio
+// tab: 'productos' | 'clientes' | 'proveedores' | 'equipo' | 'servicios' | 'impositiva'
+async function saveNewMnItem(tab, nombre){
   if(!nombre||!S.uid) return;
-  // Guardar categoría en un producto placeholder solo si no existe ningún producto con esa categoría
-  const existe=(S.miNegocio.productos||[]).some(p=>
-    p.categoria===nombre || p.nombre===nombre
-  );
-  if(!existe){
-    // Guardar como producto con esa categoría para que aparezca en todos los pickers
-    const data={nombre,categoria:nombre,precio:'',costo:'',descripcion:'',creadoEn:new Date().toISOString()};
-    try{
-      const ref=await addDoc(col('mn_productos'),data);
-      S.miNegocio.productos.push({...data,_id:ref.id});
-      toast(`"${nombre}" guardado en Mi Negocio → Productos`);
-    }catch(e){console.error(e);}
-  } else {
-    toast(`"${nombre}" ya existe en Mi Negocio`);
-  }
+  // Verificar que no exista ya
+  const existe=(S.miNegocio[tab]||[]).some(i=>(i.nombre||'').toLowerCase()===nombre.toLowerCase());
+  if(existe){ toast(`"${nombre}" ya existe en ${tab}`); return; }
+  // Estructura mínima según la sección
+  const base={nombre,creadoEn:new Date().toISOString()};
+  // Para productos, usar el nombre también como categoría si no hay ninguna
+  if(tab==='productos') base.categoria=g('s-ped-cat')?.value||nombre;
+  try{
+    const ref=await addDoc(col('mn_'+tab),base);
+    S.miNegocio[tab].push({...base,_id:ref.id});
+    const labels={productos:'Productos',clientes:'Clientes',proveedores:'Proveedores',equipo:'Equipo',servicios:'Servicios',impositiva:'Impositiva'};
+    toast(`✅ "${nombre}" guardado en Mi Negocio → ${labels[tab]||tab}`);
+  }catch(e){ console.error(e); toast('Error al guardar'); }
 }
+window.saveNewMnItem=saveNewMnItem;
+
+// Mantener saveNewFinCat como alias para compatibilidad
+async function saveNewFinCat(nombre){ await saveNewMnItem('productos',nombre); }
 window.saveNewFinCat=saveNewFinCat;
 
 // ── 5. GUARDAR CATEGORÍA DE PRODUCTO EN PEDIDOS ──
 async function saveNewPedCat(nombre){
   if(!nombre||!S.uid) return;
-  const existe=(S.miNegocio.productos||[]).some(p=>p.categoria===nombre);
-  if(!existe){
-    const data={nombre:`Cat: ${nombre}`,categoria:nombre,creadoEn:new Date().toISOString()};
-    try{
-      const ref=await addDoc(col('mn_productos'),data);
-      S.miNegocio.productos.push({...data,_id:ref.id});
-    }catch(e){}
-  }
-  // Actualizar el trigger
+  await saveNewMnItem('productos', nombre);
   g('s-ped-cat').value=nombre;
   const lbl=g('ped-cat-trigger-lbl');
   if(lbl){lbl.textContent=nombre;lbl.style.color='var(--t1)';}
-  toast(`Categoría "${nombre}" guardada`);
+  g('ped-cat-trigger')?.classList.add('filled');
 }
 window.saveNewPedCat=saveNewPedCat;
 
 // ── 6. GUARDAR PRODUCTO NUEVO EN PEDIDOS → MI NEGOCIO ──
 async function saveNewPedProd(nombre){
   if(!nombre||!S.uid) return;
-  const cat=g('s-ped-cat')?.value||'General';
-  const data={nombre,categoria:cat,creadoEn:new Date().toISOString()};
-  try{
-    const ref=await addDoc(col('mn_productos'),data);
-    S.miNegocio.productos.push({...data,_id:ref.id});
-    toast(`Producto "${nombre}" guardado en Mi Negocio`);
-  }catch(e){console.error(e);}
+  await saveNewMnItem('productos', nombre);
   addPedProd(nombre);
 }
 window.saveNewPedProd=saveNewPedProd;
