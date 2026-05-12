@@ -1208,14 +1208,21 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 
     <!-- MI NEGOCIO -->
     <div class="panel" id="p-mn">
-      <div style="padding:20px 16px 4px;">
-        <div id="mn-negocio" style="font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-.5px;">—</div>
-        <div id="mn-rubro" style="font-size:13px;color:var(--t3);margin-top:4px;"></div>
-      </div>
-      <div class="perfil-card" id="perfil-card">
+      <div class="perfil-card" id="perfil-card" style="margin:12px 12px 0;">
         <div class="perfil-neg" id="perfil-neg">—</div>
         <div class="perfil-rubro" id="perfil-rubro">💼 Mi negocio</div>
       </div>
+      <!-- Búsqueda -->
+      <div class="mbd-search" style="margin:10px 12px 4px;">
+        <span class="material-icons-round">search</span>
+        <input id="mn-search-inp" placeholder="Buscar categoría o ítem…">
+      </div>
+      <!-- Botón nueva categoría -->
+      <button class="mbd-new-cat-btn rpl" id="mn-new-cat" style="margin:0 12px 4px;">
+        <span class="mbd-new-cat-lbl">Nueva categoría principal</span>
+        <div class="mbd-new-cat-plus"><span class="material-icons-round">add</span></div>
+      </button>
+      <!-- Lista categorías/subcategorías -->
       <div id="mn-sections"></div>
     </div>
 
@@ -1319,24 +1326,7 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
       </div>
     </div>
 
-    <!-- MI BASE DE DATOS -->
-    <div class="panel" id="p-mbd">
-      <div class="mbd-header">
-        <div class="mbd-title">Mi Base de Datos</div>
-        <div class="mbd-sub">El cerebro de tu negocio. Todo conectado.</div>
-      </div>
-      <div class="mbd-search">
-        <span class="material-icons-round">search</span>
-        <input id="mbd-search-inp" placeholder="Buscar categoría o ítem…">
-      </div>
-      <button class="mbd-new-cat-btn rpl" id="mbd-new-cat">
-        <span class="mbd-new-cat-lbl">Crear nueva categoría</span>
-        <div class="mbd-new-cat-plus"><span class="material-icons-round">add</span></div>
-      </button>
-      <div id="mbd-list"></div>
-    </div>
-
-    <!-- OTTO PANEL -->
+        <!-- OTTO PANEL -->
     <div class="panel" id="p-otto">
       <!-- Header -->
       <div class="otto-header">
@@ -1660,8 +1650,7 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
     <button class="menu-item rpl" data-nav="age"><span class="material-icons-round">calendar_month</span>Agenda</button>
     <button class="menu-item rpl" data-nav="task"><span class="material-icons-round">check_circle</span>Tareas</button>
     <button class="menu-item rpl" data-nav="mn"><span class="material-icons-round">store</span>Mi Negocio</button>
-    <button class="menu-item rpl" data-nav="mbd"><span class="material-icons-round">folder_open</span>Mi Base de Datos</button>
-    <button class="menu-item rpl" data-nav="otto"><span class="material-icons-round">smart_toy</span>OTTO</button>
+<button class="menu-item rpl" data-nav="otto"><span class="material-icons-round">smart_toy</span>OTTO</button>
     <div class="menu-divider"></div>
     <button class="menu-item rpl" data-nav="user"><span class="material-icons-round">account_circle</span>Mi usuario</button>
     <div class="menu-divider"></div>
@@ -1778,7 +1767,6 @@ function navTo(panel){
   const p=g('p-'+panel); if(p) p.classList.add('on');
   const btn=document.querySelector(`.menu-item[data-nav="${panel}"]`); if(btn) btn.classList.add('on');
   if(panel==='user') renderUserPanel();
-  if(panel==='mbd'){ renderMbd(); }
   if(panel==='age') renderAgeCalGoogle();
   if(panel==='task') renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
   if(panel==='otto'){
@@ -3087,48 +3075,80 @@ function editTask(id){
 }
 window.editTask=editTask;
 
-function renderMnSections(){
-  const p=S.perfil;
-  const neg=p?.negocio||S.negocio||'';
+function renderMnSections(filtro){
+  // Actualizar header perfil
+  const p=S.perfil; const neg=p?.negocio||S.negocio||'';
   if(neg){
     ['mn-negocio','hd-negocio','menu-neg','perfil-neg'].forEach(id=>{const e=g(id);if(e)e.textContent=neg;});
     if(g('mn-rubro'))g('mn-rubro').textContent=p?.rubro||'';
     if(g('perfil-rubro'))g('perfil-rubro').textContent=(p?.emoji||'💼')+' '+(p?.rubro||'Mi negocio');
   }
-  const wrap=g('mn-sections');if(!wrap)return;
-  wrap.innerHTML=Object.keys(MN_CONFIG).map(tab=>{
-    const cfg=MN_CONFIG[tab];
-    const items=S.miNegocio[tab]||[];
-    const isProds=tab==='productos';
-    const addBtn=`<button class="mn-add-btn rpl" data-tab="${tab}"><span class="material-icons-round" style="font-size:16px">add</span> Agregar</button>`;
-    const catBtn=isProds?`<button class="mn-add-btn rpl" data-tab="cat" style="color:var(--salvia);"><span class="material-icons-round" style="font-size:16px">label</span> Nueva categoría</button>`:'';
-    return `<div class="mn-section">
-      <button class="mn-sec-btn rpl" data-tab="${tab}">${cfg.icon} ${tab.charAt(0).toUpperCase()+tab.slice(1)}<span class="material-icons-round" style="font-size:18px;color:var(--t4)">expand_more</span></button>
-      <div class="mn-sec-body" id="mn-body-${tab}">${addBtn}${catBtn}${renderMnItems(tab,items)}</div>
+  const wrap=g('mn-sections'); if(!wrap) return;
+
+  // Usar el sistema MBD (categorias + cat_items)
+  let cats=[...( S.mbd?.categorias||[])].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
+  if(filtro){
+    const f=filtro.toLowerCase();
+    cats=cats.filter(c=>(c.nombre||'').toLowerCase().includes(f)||
+      (S.mbd?.items||[]).filter(i=>i.catId===c._id).some(i=>(i.nombre||'').toLowerCase().includes(f)));
+  }
+
+  if(!cats.length){
+    wrap.innerHTML=`<div class="empty-state" style="margin-top:24px;"><div class="empty-icon">📁</div><div class="empty-title">${filtro?'Sin resultados':'Sin categorías'}</div><div class="empty-sub">${filtro?'Probá otro término':'Tocá + para crear tu primera categoría.'}</div></div>`;
+    return;
+  }
+
+  wrap.innerHTML=cats.map(cat=>{
+    const items=(S.mbd?.items||[]).filter(i=>i.catId===cat._id).sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
+    const tipoBadge='';
+    return `<div class="mbd-cat-section" id="mbd-cat-${cat._id}" style="margin:0 12px 8px;">
+      <div class="mbd-cat-header" data-catid="${cat._id}">
+        <div class="mbd-cat-icon" style="background:${cat.bg||'var(--surface2)'}; width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;">${cat.icono||'📁'}</div>
+        <div class="mbd-cat-info">
+          <div class="mbd-cat-name">${cat.nombre||'—'}</div>
+          <div class="mbd-cat-meta">${items.length} ítem${items.length!==1?'s':''} · ${tipoBadge}</div>
+        </div>
+        <div class="mbd-cat-actions">
+          <button class="rpl" data-edit-cat="${cat._id}" style="background:transparent;border:none;cursor:pointer;color:var(--t4);padding:4px;display:flex;"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+          <span class="material-icons-round mbd-cat-chevron">expand_more</span>
+        </div>
+      </div>
+      <div class="mbd-items">
+        ${items.map(item=>`
+          <div class="mbd-item">
+            <button class="mbd-item-del rpl" data-del-item="${item._id}" data-del-cat="${cat._id}"><span class="material-icons-round">remove</span></button>
+            <div style="flex:1;">
+              <div class="mbd-item-name">${item.nombre||'—'}</div>
+              ${item.extra&&Object.values(item.extra).filter(Boolean).length?`<div class="mbd-item-sub">${Object.values(item.extra).filter(Boolean).slice(0,2).join(' · ')}</div>`:''}
+            </div>
+            <button class="mbd-item-edit rpl" data-edit-item="${item._id}" data-cat-id="${cat._id}"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+          </div>`).join('')}
+        <button class="mbd-add-item rpl" data-add-item="${cat._id}" data-cat-nombre="${(cat.nombre||'').replace(/"/g,'&quot;')}">
+          <span class="material-icons-round">add</span>
+          <span class="mbd-add-item-lbl">Agregar subcategoría</span>
+        </button>
+      </div>
     </div>`;
   }).join('');
-  wrap.querySelectorAll('.mn-sec-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{g('mn-body-'+btn.dataset.tab)?.classList.toggle('on');});
-  });
-  wrap.querySelectorAll('.mn-add-btn').forEach(btn=>{
-    btn.addEventListener('click',()=>{
-      if(btn.dataset.tab==='cat') openMnAddCat();
-      else openMnAdd(btn.dataset.tab);
+
+  // Listeners toggle
+  wrap.querySelectorAll('.mbd-cat-header').forEach(h=>{
+    h.addEventListener('click',e=>{
+      if(e.target.closest('[data-edit-cat]')) return;
+      document.getElementById('mbd-cat-'+h.dataset.catid)?.classList.toggle('open');
     });
   });
-  wrap.querySelectorAll('[data-del-tab]').forEach(btn=>{btn.addEventListener('click',()=>delMnItem(btn.dataset.delTab,btn.dataset.delId));});
-  wrap.querySelectorAll('[data-edit-tab]').forEach(btn=>{btn.addEventListener('click',()=>editMnItem(btn.dataset.editTab,btn.dataset.editId));});
-  // Editar emoji de categoría
-  wrap.querySelectorAll('[data-cat-emoji-id]').forEach(btn=>{
-    btn.addEventListener('click',()=>openEmojiPickerForCat(btn.dataset.catEmojiId,btn));
+  wrap.querySelectorAll('[data-edit-cat]').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.stopPropagation();mbdEditCat(btn.dataset.editCat);});
   });
-  // Editar nombre de categoría
-  wrap.querySelectorAll('[data-cat-edit-id]').forEach(btn=>{
-    btn.addEventListener('click',()=>editCat(btn.dataset.catEditId));
+  wrap.querySelectorAll('[data-del-item]').forEach(btn=>{
+    btn.addEventListener('click',()=>mbdDelItem(btn.dataset.delItem,btn.dataset.delCat));
   });
-  // Eliminar categoría
-  wrap.querySelectorAll('[data-cat-del-id]').forEach(btn=>{
-    btn.addEventListener('click',()=>delCat(btn.dataset.catDelId));
+  wrap.querySelectorAll('[data-edit-item]').forEach(btn=>{
+    btn.addEventListener('click',()=>mbdEditItem(btn.dataset.editItem,btn.dataset.catId));
+  });
+  wrap.querySelectorAll('[data-add-item]').forEach(btn=>{
+    btn.addEventListener('click',()=>mbdAddItem(btn.dataset.addItem,btn.dataset.catNombre));
   });
 }
 window.renderMnSections=renderMnSections;
@@ -3621,11 +3641,12 @@ g('btnGoogle')?.addEventListener('click',loginGoogle);
 g('hd-logo-btn')?.addEventListener('click',()=>navTo('home'));
 g('hd-menu-btn')?.addEventListener('click',openMenu);
 g('nav-home-btn')?.addEventListener('click',()=>navTo('home'));
-g('mbd-new-cat')?.addEventListener('click',mbdNewCat);
-let mbdSearchTimer=null;
-g('mbd-search-inp')?.addEventListener('input',()=>{
-  clearTimeout(mbdSearchTimer);
-  mbdSearchTimer=setTimeout(()=>renderMbd(g('mbd-search-inp').value),250);
+// Mi Negocio usa el mismo motor MBD
+g('mn-new-cat')?.addEventListener('click',mbdNewCat);
+let mnSearchTimer=null;
+g('mn-search-inp')?.addEventListener('input',()=>{
+  clearTimeout(mnSearchTimer);
+  mnSearchTimer=setTimeout(()=>renderMnSections(g('mn-search-inp').value),250);
 });
 g('nav-menu-btn')?.addEventListener('click',openMenu);
 // Link ir a finanzas
@@ -4366,21 +4387,14 @@ function renderMbd(filtro=''){
     btn.addEventListener('click',()=>mbdAddItem(btn.dataset.addItem, btn.dataset.catNombre));
   });
 }
-window.renderMbd=renderMbd;
+window.renderMbd=renderMnSections;
 
 // ── CRUD CATEGORÍAS ──
 function mbdNewCat(){
   const ts = new Date().toISOString();
   openEdit('📁 Nueva categoría', `
     <div class="m3-field"><input class="m3-inp" id="mbd-cat-nombre" placeholder=" " maxlength="40"><label class="m3-lbl">Nombre de la categoría *</label></div>
-    <div style="margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);margin-bottom:8px;">Tipo</div>
-      <div style="display:flex;gap:8px;">
-        <button class="tipo-pill ing rpl" id="mbd-tipo-ing" style="flex:1;" onclick="mbdSelTipo('ingreso')"><span class="material-icons-round">trending_up</span>Ingreso</button>
-        <button class="tipo-pill gas rpl" id="mbd-tipo-gas" style="flex:1;" onclick="mbdSelTipo('gasto')"><span class="material-icons-round">trending_down</span>Gasto</button>
-        <button class="tipo-pill rpl sel" id="mbd-tipo-amb" style="flex:1;background:var(--surface2);border-color:var(--border);" onclick="mbdSelTipo('ambos')">⟺ Ambos</button>
-      </div>
-    </div>
+
     <div style="margin-bottom:12px;">
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);margin-bottom:8px;">Ícono</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;">${MBD_ICONOS.map(ic=>`<button class="rpl mbd-ic-btn" data-ic="${ic}" style="font-size:22px;width:40px;height:40px;border-radius:10px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;">${ic}</button>`).join('')}</div>
@@ -4389,7 +4403,6 @@ function mbdNewCat(){
       <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);margin-bottom:8px;">Color</div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;">${MBD_COLORS.map(c=>`<button class="rpl mbd-col-btn" data-val="${c.val}" data-bg="${c.bg}" style="width:30px;height:30px;border-radius:50%;background:${c.val};border:3px solid transparent;cursor:pointer;" title="${c.name}"></button>`).join('')}</div>
     </div>
-    <input type="hidden" id="mbd-tipo-sel" value="ambos">
     <input type="hidden" id="mbd-ic-sel" value="📁">
     <input type="hidden" id="mbd-col-sel" value="#5E7A68">
     <input type="hidden" id="mbd-bg-sel" value="var(--surface2)">
@@ -4416,7 +4429,7 @@ function mbdNewCat(){
     const nombre=g('mbd-cat-nombre')?.value.trim();
     if(!nombre){toast('El nombre es obligatorio');return;}
     const data={
-      nombre, tipo:g('mbd-tipo-sel')?.value||'ambos',
+      nombre, tipo:'general',
       icono:g('mbd-ic-sel')?.value||'📁',
       color:g('mbd-col-sel')?.value||'#5E7A68',
       bg:g('mbd-bg-sel')?.value||'var(--surface2)',
@@ -4426,33 +4439,13 @@ function mbdNewCat(){
     try{
       const ref=await addDoc(col('categorias'),data);
       S.mbd.categorias.push({...data,_id:ref.id});
-      closeEdit(); toast('✅ Categoría creada'); renderMbd();
+      closeEdit(); toast('✅ Categoría creada'); renderMnSections();
     }catch(e){console.error(e);toast('Error al guardar');}
   });
 }
 window.mbdNewCat=mbdNewCat;
 
-let mbdTipoSel='ambos';
-function mbdSelTipo(tipo){
-  mbdTipoSel=tipo;
-  ['ing','gas','amb'].forEach(t=>{
-    const btn=g('mbd-tipo-'+t);
-    if(!btn)return;
-    btn.classList.remove('sel');
-    btn.style.background='var(--surface2)';
-    btn.style.borderColor='var(--border)';
-  });
-  const map={ingreso:'ing',gasto:'gas',ambos:'amb'};
-  const btn=g('mbd-tipo-'+map[tipo]);
-  if(btn){
-    btn.classList.add('sel');
-    if(tipo==='ingreso'){btn.style.background='var(--green-bg)';btn.style.borderColor='var(--bosque)';}
-    else if(tipo==='gasto'){btn.style.background='var(--red-bg)';btn.style.borderColor='var(--red)';}
-    else{btn.style.background='var(--surface3)';btn.style.borderColor='var(--t4)';}
-  }
-  const hi=g('mbd-tipo-sel');if(hi)hi.value=tipo;
-}
-window.mbdSelTipo=mbdSelTipo;
+
 
 function mbdEditCat(catId){
   const cat=S.mbd.categorias.find(c=>c._id===catId);if(!cat)return;
@@ -4467,7 +4460,7 @@ function mbdEditCat(catId){
     try{
       await updateDoc(doc(db,`usuarios/${S.uid}/categorias/${catId}`),{nombre,actualizadoEn:new Date().toISOString()});
       cat.nombre=nombre;
-      closeEdit();toast('✅ Actualizado');renderMbd();
+      closeEdit();toast('✅ Actualizado');renderMnSections();
     }catch(e){console.error(e);toast('Error');}
   });
   g('mbd-cat-del').addEventListener('click',async()=>{
@@ -4480,7 +4473,7 @@ function mbdEditCat(catId){
       await deleteDoc(doc(db,`usuarios/${S.uid}/categorias/${catId}`));
       S.mbd.categorias=S.mbd.categorias.filter(c=>c._id!==catId);
       S.mbd.items=S.mbd.items.filter(i=>i.catId!==catId);
-      closeEdit();toast('Categoría eliminada');renderMbd();
+      closeEdit();toast('Categoría eliminada');renderMnSections();
     }catch(e){console.error(e);toast('Error');}
   });
 }
@@ -4507,7 +4500,7 @@ function mbdAddItem(catId, catNombre){
     try{
       const ref=await addDoc(col('cat_items'),data);
       S.mbd.items.push({...data,_id:ref.id});
-      closeEdit();toast('✅ Ítem agregado');renderMbd();
+      closeEdit();toast('✅ Ítem agregado');renderMnSections();
       // Re-abrir la sección
       setTimeout(()=>document.getElementById('mbd-cat-'+catId)?.classList.add('open'),100);
     }catch(e){console.error(e);toast('Error');}
@@ -4533,7 +4526,7 @@ function mbdEditItem(itemId, catId){
     try{
       await updateDoc(doc(db,`usuarios/${S.uid}/cat_items/${itemId}`),upd);
       Object.assign(item,upd);
-      closeEdit();toast('✅ Actualizado');renderMbd();
+      closeEdit();toast('✅ Actualizado');renderMnSections();
       setTimeout(()=>document.getElementById('mbd-cat-'+catId)?.classList.add('open'),100);
     }catch(e){console.error(e);toast('Error');}
   });
