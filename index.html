@@ -761,6 +761,127 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 .prod-modal-qty{font-size:20px;font-weight:800;color:var(--bosque);min-width:40px;text-align:right;}
 .prod-modal-empty{text-align:center;padding:32px 0;color:var(--t4);font-size:14px;}
 
+
+/* ── OTTO PANEL REDISEÑO COMPLETO ── */
+#p-otto{background:var(--bosque);display:none;flex-direction:column;overflow:hidden;}
+#p-otto.on{display:flex;}
+
+/* Header compacto */
+.otto-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:20px 20px 16px;flex-shrink:0;
+}
+.otto-header-left{display:flex;align-items:center;gap:12px;}
+.otto-logo-pill{
+  background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.2);
+  border-radius:var(--rfull);padding:6px 14px;
+  display:flex;align-items:center;gap:8px;
+}
+.otto-logo-pill svg{width:44px;height:13px;filter:brightness(10);}
+.otto-status-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;
+  box-shadow:0 0 0 2px rgba(74,222,128,.3);animation:pulse 2s infinite;}
+.otto-header-greeting{
+  font-size:13px;font-weight:500;color:rgba(255,255,255,.65);
+}
+.otto-header-name{font-weight:700;color:#fff;}
+.otto-back-btn{
+  background:rgba(255,255,255,.12);border:none;border-radius:50%;
+  width:36px;height:36px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;color:#fff;-webkit-tap-highlight-color:transparent;
+  display:none;
+}
+.otto-back-btn.on{display:flex;}
+
+/* Vista HOME de OTTO */
+#otto-home{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--bosque);}
+
+/* Stats rápidos */
+.otto-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px 16px;}
+.otto-stat{
+  background:rgba(255,255,255,.1);border-radius:var(--r14);padding:14px;
+  border:1px solid rgba(255,255,255,.08);
+}
+.otto-stat-icon{font-size:18px;margin-bottom:6px;display:block;}
+.otto-stat-val{font-size:18px;font-weight:800;color:#fff;letter-spacing:-.4px;line-height:1;}
+.otto-stat-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:rgba(255,255,255,.5);margin-top:3px;}
+
+/* Sección de preguntas */
+.otto-section{background:var(--bg);border-radius:24px 24px 0 0;flex:1;padding:20px 0 100px;}
+.otto-section-lbl{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--t4);padding:0 16px 10px;}
+.otto-cards-row{display:flex;gap:10px;padding:0 16px 18px;overflow-x:auto;scrollbar-width:none;}
+.otto-cards-row::-webkit-scrollbar{display:none;}
+.otto-card-chip{
+  flex-shrink:0;width:140px;
+  background:var(--surface);border-radius:var(--r18);padding:14px;
+  border:1px solid var(--border2);box-shadow:var(--s1);
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+  transition:all .15s;text-align:left;font-family:var(--font);
+}
+.otto-card-chip:active{transform:scale(.97);background:var(--surface2);}
+.otto-card-chip-icon{font-size:22px;display:block;margin-bottom:8px;}
+.otto-card-chip-txt{font-size:13px;font-weight:600;color:var(--t1);line-height:1.35;}
+/* Lista de preguntas */
+.otto-q-list{padding:0 16px 0;}
+.otto-q-item{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 16px;background:var(--surface);
+  border-radius:var(--r14);margin-bottom:8px;
+  border:1px solid var(--border2);cursor:pointer;
+  -webkit-tap-highlight-color:transparent;transition:all .12s;
+}
+.otto-q-item:active{background:var(--surface2);}
+.otto-q-item-icon{font-size:18px;flex-shrink:0;}
+.otto-q-item-txt{font-size:14px;font-weight:500;color:var(--t1);flex:1;}
+.otto-q-item-arr{color:var(--t5);display:flex;flex-shrink:0;}
+
+/* Vista CHAT de OTTO */
+#otto-chat{flex:1;display:none;flex-direction:column;background:var(--bg);border-radius:24px 24px 0 0;}
+#otto-chat.on{display:flex;}
+.otto-chat-msgs{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.otto-chat-input{
+  display:flex;gap:8px;padding:12px 16px;
+  border-top:1px solid var(--border2);
+  background:var(--surface);flex-shrink:0;
+  padding-bottom:max(16px,env(safe-area-inset-bottom,0px));
+}
+.otto-chat-inp{
+  flex:1;background:var(--surface2);border:1.5px solid transparent;
+  border-radius:var(--rfull);padding:11px 16px;
+  font-family:var(--font);font-size:14px;color:var(--t1);outline:none;
+  transition:border-color .15s;
+}
+.otto-chat-inp:focus{border-color:var(--bosque);background:#fff;}
+.otto-send-btn{
+  background:var(--bosque);border:none;border-radius:50%;
+  width:42px;height:42px;display:flex;align-items:center;justify-content:center;
+  cursor:pointer;flex-shrink:0;-webkit-tap-highlight-color:transparent;
+  transition:all .15s;
+}
+.otto-send-btn:active{transform:scale(.92);}
+.otto-send-btn .material-icons-round{font-size:20px;color:#fff;}
+/* Burbujas */
+.otto-msg{display:flex;align-items:flex-end;gap:8px;}
+.otto-msg.me{flex-direction:row-reverse;}
+.otto-msg-av{
+  width:30px;height:30px;border-radius:50%;
+  background:var(--bosque);color:#fff;
+  font-size:11px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.otto-msg.me .otto-msg-av{background:var(--surface3);color:var(--t3);}
+.otto-msg-bub{
+  max-width:78%;padding:11px 15px;
+  font-size:14px;line-height:1.6;
+  background:var(--surface);color:var(--t1);
+  border-radius:18px 18px 18px 4px;
+  box-shadow:var(--s1);
+}
+.otto-msg-bub.me{
+  background:var(--bosque);color:#fff;
+  border-radius:18px 18px 4px 18px;box-shadow:none;
+}
+
 </style>
 </head>
 <body>
@@ -1153,11 +1274,13 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
       </div>
     </div>
 
-    <!-- OTTO CHAT -->
+    <!-- OTTO PANEL -->
     <div class="panel" id="p-otto">
-      <div class="otto-chat-header">
-        <div class="otto-chat-avatar">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="3100 5050 6420 2500" style="width:100%;height:100%;">
+      <!-- Header -->
+      <div class="otto-header">
+        <div class="otto-header-left">
+          <div class="otto-logo-pill">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="3100 5050 6420 2500" style="width:100%;height:100%;">
 <g transform="translate(0,12540) scale(1,-1)" fill="#234136" stroke="none">
 <path d="M3155 7360 c-666 -140 -1067 -824 -859 -1465 56 -172 145 -316 279 -451 177 -177 396 -290 634 -324 133 -20 363 -8 486 25 196 52 372 154 515 299 221 223 330 490 330 807 0 196 -34 338 -123 515 -161 320 -471 546 -830 604 -103 16 -330 11 -432 -10z m458 -309 c164 -43 345 -163 448 -299 240 -316 228 -736 -29 -1050 -90 -110 -281 -228 -432 -266 -395 -100 -827 114 -981 486 -47 115 -62 212 -56 362 5 136 27 227 78 329 119 233 358 409 621 456 79 15 261 5 351 -18z"/>
 <path d="M3302 6423 c-107 -52 -142 -194 -72 -291 72 -100 226 -108 312 -16 66 71 65 192 -1 268 -47 53 -169 74 -239 39z"/>
@@ -1166,28 +1289,151 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 <path d="M4557 7346 c-68 -25 -97 -66 -97 -138 0 -58 30 -104 83 -128 39 -18 68 -20 368 -20 321 0 327 0 369 -23 30 -16 51 -37 67 -67 l23 -43 0 -757 c0 -835 -1 -818 63 -901 55 -72 206 -139 243 -108 12 10 14 153 14 889 l0 877 23 43 c16 30 37 51 67 67 l43 23 461 0 c449 0 462 -1 495 -21 46 -28 68 -56 80 -107 8 -28 11 -285 11 -795 -1 -850 -4 -810 76 -893 49 -50 106 -79 173 -90 36 -6 46 -4 58 11 11 16 13 177 13 900 l0 882 23 33 c12 19 38 43 57 54 33 20 55 21 377 26 325 5 343 6 369 26 50 37 69 72 69 124 0 52 -19 87 -69 124 -27 21 -28 21 -1724 23 -1402 2 -1704 0 -1735 -11z"/>
 </g>
 </svg>
+            <div class="otto-status-dot"></div>
+          </div>
+          <div class="otto-header-greeting">Hola, <span class="otto-header-name" id="otto-hola-nombre">—</span></div>
         </div>
-        <div class="otto-chat-title">OTTO</div>
-        <div class="otto-chat-sub" id="otto-chat-sub">Tu socio inteligente · siempre disponible</div>
+        <button class="otto-back-btn rpl" id="otto-back-btn">
+          <span class="material-icons-round" style="font-size:20px">arrow_back</span>
+        </button>
       </div>
-      <div class="otto-chat-body">
-        <div id="chat-msgs"></div>
-        <div class="otto-quick-chips" id="otto-chips">
-          <button class="otto-quick-chip rpl" data-q="¿Cómo va el negocio esta semana?">📊 Esta semana</button>
-          <button class="otto-quick-chip rpl" data-q="¿Qué pedidos tengo hoy?">📋 Pedidos hoy</button>
-          <button class="otto-quick-chip rpl" data-q="¿Cuál es mi producto más vendido?">🏆 Más vendido</button>
-          <button class="otto-quick-chip rpl" data-q="Dame un consejo para mi negocio">💡 Consejo</button>
+
+      <!-- VISTA HOME -->
+      <div id="otto-home">
+        <!-- Stats rápidos -->
+        <div class="otto-stats" id="otto-stats">
+          <div class="otto-stat">
+            <span class="otto-stat-icon">💰</span>
+            <div class="otto-stat-val" id="os-ventas">$0</div>
+            <div class="otto-stat-lbl">Ventas del mes</div>
+          </div>
+          <div class="otto-stat">
+            <span class="otto-stat-icon">📋</span>
+            <div class="otto-stat-val" id="os-pedidos">0</div>
+            <div class="otto-stat-lbl">Pedidos activos</div>
+          </div>
+          <div class="otto-stat">
+            <span class="otto-stat-icon">✅</span>
+            <div class="otto-stat-val" id="os-tareas">0</div>
+            <div class="otto-stat-lbl">Tareas pendientes</div>
+          </div>
+          <div class="otto-stat">
+            <span class="otto-stat-icon">📅</span>
+            <div class="otto-stat-val" id="os-eventos">0</div>
+            <div class="otto-stat-lbl">Eventos próximos</div>
+          </div>
+        </div>
+
+        <!-- Sección principal -->
+        <div class="otto-section">
+          <!-- Cards rápidas horizontales -->
+          <div class="otto-section-lbl">Análisis rápido</div>
+          <div class="otto-cards-row">
+            <button class="otto-card-chip rpl" data-q="¿Cómo va el negocio este mes comparado con el anterior?">
+              <span class="otto-card-chip-icon">📊</span>
+              <span class="otto-card-chip-txt">Resumen del mes</span>
+            </button>
+            <button class="otto-card-chip rpl" data-q="¿Cuál es mi producto más vendido este mes?">
+              <span class="otto-card-chip-icon">🏆</span>
+              <span class="otto-card-chip-txt">Más vendido</span>
+            </button>
+            <button class="otto-card-chip rpl" data-q="¿Quiénes son mis clientes más frecuentes?">
+              <span class="otto-card-chip-icon">👥</span>
+              <span class="otto-card-chip-txt">Mejores clientes</span>
+            </button>
+            <button class="otto-card-chip rpl" data-q="¿Cómo están mis gastos este mes? ¿Hay algo que pueda reducir?">
+              <span class="otto-card-chip-icon">💸</span>
+              <span class="otto-card-chip-txt">Analizar gastos</span>
+            </button>
+          </div>
+
+          <!-- Preguntas por categoría -->
+          <div class="otto-section-lbl" style="margin-top:4px;">Pedidos y producción</div>
+          <div class="otto-q-list">
+            <button class="otto-q-item rpl" data-q="¿Qué pedidos tengo para hoy?">
+              <span class="otto-q-item-icon">📋</span>
+              <span class="otto-q-item-txt">Pedidos de hoy</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+            <button class="otto-q-item rpl" data-q="¿Qué tengo que producir esta semana?">
+              <span class="otto-q-item-icon">🏭</span>
+              <span class="otto-q-item-txt">Producción de la semana</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+            <button class="otto-q-item rpl" data-q="¿Hay pedidos urgentes o próximos a vencer?">
+              <span class="otto-q-item-icon">⚠️</span>
+              <span class="otto-q-item-txt">Pedidos urgentes</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+          </div>
+
+          <div class="otto-section-lbl" style="margin-top:12px;">Finanzas</div>
+          <div class="otto-q-list">
+            <button class="otto-q-item rpl" data-q="¿Cuánto gané neto este mes después de gastos?">
+              <span class="otto-q-item-icon">💵</span>
+              <span class="otto-q-item-txt">Ganancia neta del mes</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+            <button class="otto-q-item rpl" data-q="¿En qué categoría gasté más este mes?">
+              <span class="otto-q-item-icon">🔍</span>
+              <span class="otto-q-item-txt">Mayor gasto</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+            <button class="otto-q-item rpl" data-q="Comparame las ventas de este mes con el mes pasado">
+              <span class="otto-q-item-icon">📈</span>
+              <span class="otto-q-item-txt">Comparar con mes anterior</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+          </div>
+
+          <div class="otto-section-lbl" style="margin-top:12px;">Consejos</div>
+          <div class="otto-q-list">
+            <button class="otto-q-item rpl" data-q="Dame un consejo concreto para mejorar mi negocio esta semana">
+              <span class="otto-q-item-icon">💡</span>
+              <span class="otto-q-item-txt">Consejo de la semana</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+            <button class="otto-q-item rpl" data-q="¿Qué debería priorizar hacer hoy en mi negocio?">
+              <span class="otto-q-item-icon">🎯</span>
+              <span class="otto-q-item-txt">¿Qué priorizar hoy?</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+            <button class="otto-q-item rpl" data-q="¿Cómo puedo aumentar mis ventas este mes?">
+              <span class="otto-q-item-icon">🚀</span>
+              <span class="otto-q-item-txt">Aumentar ventas</span>
+              <span class="otto-q-item-arr"><span class="material-icons-round" style="font-size:18px">chevron_right</span></span>
+            </button>
+          </div>
+
+          <!-- Input siempre disponible abajo -->
+          <div style="padding:16px 16px 0;">
+            <div style="display:flex;gap:8px;background:var(--surface);border-radius:var(--rfull);padding:8px 8px 8px 16px;border:1.5px solid var(--border);box-shadow:var(--s1);">
+              <input id="otto-home-inp" style="flex:1;border:none;background:transparent;font-family:var(--font);font-size:14px;color:var(--t1);outline:none;" placeholder="O escribile algo a OTTO…">
+              <button id="otto-home-send" style="background:var(--bosque);border:none;border-radius:var(--rfull);width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;">
+                <span class="material-icons-round" style="font-size:18px;color:#fff">arrow_upward</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
-      <div class="chat-input-row">
-        <input class="chat-inp" id="chat-inp" placeholder="Preguntarle algo a OTTO…">
-        <button class="chat-send rpl" id="chat-send"><span class="material-icons-round">send</span></button>
+
+      <!-- VISTA CHAT -->
+      <div id="otto-chat">
+        <div class="otto-chat-msgs" id="chat-msgs"></div>
+        <div class="otto-chat-input">
+          <input class="otto-chat-inp" id="chat-inp" placeholder="Preguntarle algo a OTTO…">
+          <button class="otto-send-btn rpl" id="chat-send"><span class="material-icons-round">send</span></button>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- BOTTOM BAR -->
   <nav class="bottom-bar">
+    <button class="nav-side-btn rpl" id="nav-home-btn">
+      <span class="material-icons-round">home</span>
+      <span class="nav-side-lbl">Home</span>
+    </button>
     <button class="nav-otto rpl" id="nav-otto-btn">
       <span class="material-icons-round">smart_toy</span>
       <span class="nav-otto-lbl">OTTO</span>
@@ -1383,12 +1629,20 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 <div id="prod-modal">
   <div class="prod-modal-handle"><div class="prod-modal-bar"></div></div>
   <div class="prod-modal-header">
-    <span class="prod-modal-title" id="prod-modal-title">Producción semanal</span>
+    <span class="prod-modal-title">Producción</span>
     <button class="prod-modal-close rpl" id="prod-modal-close">
       <span class="material-icons-round" style="font-size:18px;color:var(--t3)">close</span>
     </button>
   </div>
-  <div class="prod-modal-subtitle" id="prod-modal-subtitle"></div>
+  <!-- Navegación de semanas -->
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px 4px;">
+    <button class="age-nav-btn rpl" id="prod-sem-prev"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
+    <div style="text-align:center;">
+      <div class="prod-modal-subtitle" id="prod-modal-subtitle" style="padding:0;margin:0;"></div>
+      <button id="prod-sem-today" style="background:transparent;border:none;font-family:var(--font);font-size:11px;font-weight:700;color:var(--bosque);cursor:pointer;padding:4px 0;">Esta semana</button>
+    </div>
+    <button class="age-nav-btn rpl" id="prod-sem-next"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
+  </div>
   <div class="prod-modal-body" id="prod-modal-body"></div>
 </div>
 
@@ -1436,6 +1690,12 @@ const fmt = d => d ? new Date(d+'T00:00:00').toLocaleDateString('es-AR',{day:'nu
 const fmtM = d => d ? new Date(d+'T00:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'}) : '';
 const fmtARS = n => '$' + Number(n||0).toLocaleString('es-AR');
 const hoy = () => new Date().toISOString().split('T')[0];
+// Diferencia en días calendario entre dos fechas string 'YYYY-MM-DD'
+function diffDias(fechaStr, desdeStr){
+  const a = new Date(fechaStr+'T00:00:00');
+  const b = new Date((desdeStr||hoy())+'T00:00:00');
+  return Math.round((a-b)/86400000);
+}
 function col(name){ return collection(db, `usuarios/${S.uid}/${name}`); }
 function toast(msg){ const t=g('toast'); t.textContent=msg; t.classList.add('on'); setTimeout(()=>t.classList.remove('on'),3000); }
 function saving(){ const s=g('saving'); s.classList.add('on'); setTimeout(()=>s.classList.remove('on'),1500); }
@@ -1450,15 +1710,8 @@ function navTo(panel){
   if(panel==='age') renderAgeCalGoogle();
   if(panel==='task') renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
   if(panel==='otto'){
-    const msgs=g('chat-msgs');
-    if(msgs&&!msgs.innerHTML.trim()){
-      // Primer mensaje de bienvenida
-      const nombre=S.nombre?.split(' ')[0]||'';
-      msgs.innerHTML=`<div class="msg">
-        <div class="msg-av" style="background:var(--bosque);color:#fff;">O</div>
-        <div class="msg-bub otto">Hola${nombre?' '+nombre:''}! Soy OTTO, tu socio. Preguntame lo que quieras sobre tu negocio. 🌿</div>
-      </div>`;
-    }
+    ottoGoHome();
+    renderOttoStats();
   }
   closeMenu();
 }
@@ -2340,7 +2593,7 @@ function renderPeds(){
   peds=peds.sort((a,b)=>(a.cli||'').localeCompare(b.cli||'','es'));
   // Header con fecha seleccionada
   const fechaLabel=S.pedFecha?new Date(S.pedFecha+'T00:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'}):'';
-  const diff=S.pedFecha?Math.ceil((new Date(S.pedFecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
+  const diff=S.pedFecha?diffDias(S.pedFecha, today):null;
   const cuando=diff===0?'Hoy':diff===1?'Mañana':diff!=null&&diff<0?fechaLabel:fechaLabel;
   if(!peds.length){
     list.innerHTML=`<div style="padding:8px 16px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">${cuando}</div><div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Sin pedidos</div><div class="empty-sub">No hay pedidos para este día.</div></div>`;
@@ -2348,7 +2601,7 @@ function renderPeds(){
   }
   list.innerHTML=`<div style="padding:8px 16px 4px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">${cuando} · ${peds.length} pedido${peds.length>1?'s':''}</div>`+
   peds.map(p=>{
-    const diffT=p.fecha?Math.ceil((new Date(p.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
+    const diffT=p.fecha?diffDias(p.fecha, today):null;
     const badge=diffT===0?'<span class="ticket-badge hoy">Hoy</span>':diffT===1?'<span class="ticket-badge manana">Mañana</span>':'';
     const prodsHtml=[...(p.items||[])].sort((a,b)=>(a.p||'').localeCompare(b.p||'','es')).map(i=>
       `<div style="display:flex;align-items:baseline;gap:8px;padding:2px 0;">
@@ -2421,7 +2674,7 @@ function renderProduceDia(){
       const totsDia={};
       activosDia.forEach(p=>(p.items||[]).forEach(i=>{totsDia[i.p]=(totsDia[i.p]||0)+i.q;}));
       const fd=new Date(S.pedFecha+'T00:00:00');
-      const diff=Math.ceil((fd-new Date(hoy()+'T00:00:00'))/86400000);
+      const diff=diffDias(p.fecha, hoy());
       const cuando=diff===0?'Hoy':diff===1?'Mañana':diff<0?fd.toLocaleDateString('es-AR',{day:'numeric',month:'short'}):fd.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'short'});
       wrap.style.display='block';
       wrap.innerHTML=`<div class="card" style="margin:0 0 8px;">
@@ -2447,36 +2700,51 @@ function renderProduceDia(){
 window.renderProduceDia=renderProduceDia;
 
 // ── Producción SEMANAL → popup modal ──
-function openProdSemanaModal(){
-  const today=new Date();today.setHours(0,0,0,0);
-  const mon=new Date(today);mon.setDate(today.getDate()-(today.getDay()||7)+1);
-  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
-  const activos=S.pedidos.filter(p=>{
-    if(p.archivado||!p.fecha)return false;
-    const fd=new Date(p.fecha+'T00:00:00');
-    return fd>=mon&&fd<=sun;
+let pedSemanaOffset = 0; // semanas hacia adelante/atrás
+
+function renderProdSemanaModal(){
+  const today = new Date(); today.setHours(0,0,0,0);
+  // Calcular lunes de la semana actual + offset
+  const mon = new Date(today);
+  mon.setDate(today.getDate() - (today.getDay()||7) + 1 + (pedSemanaOffset * 7));
+  const sun = new Date(mon); sun.setDate(mon.getDate() + 6);
+
+  const activos = S.pedidos.filter(p=>{
+    if(p.archivado||!p.fecha) return false;
+    const fd = new Date(p.fecha+'T00:00:00');
+    return fd >= mon && fd <= sun;
   });
-  const tots={};
+  const tots = {};
   activos.forEach(p=>(p.items||[]).forEach(i=>{tots[i.p]=(tots[i.p]||0)+i.q;}));
-  const sorted=Object.entries(tots).sort((a,b)=>a[0].localeCompare(b[0],'es'));
-  // Fechas de la semana
-  const semLbl=`${mon.toLocaleDateString('es-AR',{day:'numeric',month:'short'})} – ${sun.toLocaleDateString('es-AR',{day:'numeric',month:'short'})}`;
-  if(g('prod-modal-title')) g('prod-modal-title').textContent='Producción semanal';
-  if(g('prod-modal-subtitle')) g('prod-modal-subtitle').textContent=`${semLbl} · ${activos.length} pedido${activos.length!==1?'s':''}`;
-  const body=g('prod-modal-body');
+  const sorted = Object.entries(tots).sort((a,b)=>a[0].localeCompare(b[0],'es'));
+
+  const semLbl = `${mon.toLocaleDateString('es-AR',{day:'numeric',month:'short'})} – ${sun.toLocaleDateString('es-AR',{day:'numeric',month:'short'})}`;
+  const esSemActual = pedSemanaOffset === 0;
+  const esPasada = pedSemanaOffset < 0;
+
+  const sub = g('prod-modal-subtitle');
+  if(sub) sub.textContent = `${semLbl} · ${activos.length} pedido${activos.length!==1?'s':''}`;
+
+  const body = g('prod-modal-body');
   if(body){
     if(!sorted.length){
-      body.innerHTML=`<div class="prod-modal-empty">Sin pedidos esta semana</div>`;
+      body.innerHTML = `<div class="prod-modal-empty">${esPasada?'Sin producción esa semana':'Sin pedidos esta semana'}</div>`;
     } else {
-      body.innerHTML=sorted.map(([n,q])=>`
+      body.innerHTML = sorted.map(([n,q])=>`
         <div class="prod-modal-row">
           <span class="prod-modal-prod">${n}</span>
           <span class="prod-modal-qty">${q}</span>
         </div>`).join('');
     }
   }
+}
+window.renderProdSemanaModal=renderProdSemanaModal;
+
+function openProdSemanaModal(){
+  pedSemanaOffset = 0;
   g('prod-modal-overlay').classList.add('on');
   g('prod-modal').classList.add('on');
+  renderProdSemanaModal();
 }
 window.openProdSemanaModal=openProdSemanaModal;
 
@@ -2631,7 +2899,7 @@ function renderEvs(){
     return;
   }
   list.innerHTML=`<div class="mov-list">${evs.map(e=>{
-    const diff=e.fecha?Math.ceil((new Date(e.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
+    const diff=e.fecha?diffDias(e.fecha, today):null;
     const cuando=diff===0?'Hoy':diff===1?'Mañana':diff!=null&&diff<0?'Vencido':diff!=null?`En ${diff} días`:fmt(e.fecha);
     return `<div class="card">
       <div class="card-row">
@@ -2693,7 +2961,7 @@ function renderTasks(){
   const hechas=S.tareas.filter(t=>t.done).slice(0,5);
   if(!pend.length&&!hechas.length){list.innerHTML=`<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-title">Sin tareas</div><div class="empty-sub">Todo al día.</div></div>`;return;}
   const th=t=>{
-    const diff=t.fecha?Math.ceil((new Date(t.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
+    const diff=t.fecha?diffDias(t.fecha, today):null;
     const vence=diff===0?'Vence hoy':diff===1?'Mañana':diff!=null&&diff<0?'Vencida':diff!=null?`En ${diff} días`:'';
     return `<div class="task-item">
       <div class="task-check rpl${t.done?' done':''}" data-id="${t._id}" data-a="toggle"></div>
@@ -3032,9 +3300,9 @@ async function sendMsg(){
   const msg=inp.value.trim();if(!msg)return;
   inp.value='';
   const box=g('chat-msgs');
-  box.innerHTML+=`<div class="msg me"><div class="msg-av" style="background:var(--surface3);color:var(--t2)">${S.nombre?.[0]?.toUpperCase()||'U'}</div><div class="msg-bub me">${msg}</div></div>`;
+  box.innerHTML+=`<div class="otto-msg me"><div class="otto-msg-av">${S.nombre?.[0]?.toUpperCase()||'U'}</div><div class="otto-msg-bub me">${msg}</div></div>`;
   const tid='t'+Date.now();
-  box.innerHTML+=`<div class="msg" id="${tid}"><div class="msg-av">O</div><div class="msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
+  box.innerHTML+=`<div class="otto-msg" id="${tid}"><div class="otto-msg-av">O</div><div class="otto-msg-bub otto"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
   box.scrollTop=99999;
   chatHistory.push({role:'user',content:msg});
   const system=buildOttoContext()+'\n\nRespondé máximo 3 oraciones. Sin markdown. Sin asteriscos.';
@@ -3274,6 +3542,7 @@ onAuthStateChanged(auth,async(user)=>{
 g('btnGoogle')?.addEventListener('click',loginGoogle);
 g('hd-logo-btn')?.addEventListener('click',()=>navTo('home'));
 g('hd-menu-btn')?.addEventListener('click',openMenu);
+g('nav-home-btn')?.addEventListener('click',()=>navTo('home'));
 g('nav-menu-btn')?.addEventListener('click',openMenu);
 // Link ir a finanzas
 g('h-fin-btn')?.addEventListener('click',()=>navTo('fin'));
@@ -3294,6 +3563,9 @@ g('fab-overlay')?.addEventListener('click',closeFab);
 g('ped-semana-btn')?.addEventListener('click',()=>openProdSemanaModal());
 g('prod-modal-overlay')?.addEventListener('click',closeProdModal);
 g('prod-modal-close')?.addEventListener('click',closeProdModal);
+g('prod-sem-prev')?.addEventListener('click',()=>{ pedSemanaOffset--; renderProdSemanaModal(); });
+g('prod-sem-next')?.addEventListener('click',()=>{ pedSemanaOffset++; renderProdSemanaModal(); });
+g('prod-sem-today')?.addEventListener('click',()=>{ pedSemanaOffset=0; renderProdSemanaModal(); });
 document.querySelectorAll('.fab-btn[data-sheet]').forEach(btn=>{btn.addEventListener('click',()=>{closeFab();setTimeout(()=>openSheet(btn.dataset.sheet),60);});});
 g('sheet-overlay')?.addEventListener('click',closeSheet);
 ['fin','ped','age','task'].forEach(t=>{g('s-'+t+'-close')?.addEventListener('click',closeSheet);});
@@ -3387,15 +3659,20 @@ g('ped-mes-btn')?.addEventListener('click',()=>{
 });
 g('ped-mes-prev')?.addEventListener('click',()=>{ pedMesOffset--; renderCalMes('ped','pedMesOffset','pedFecha',null,ds=>S.pedidos.some(p=>p.fecha===ds&&!p.archivado)); });
 g('ped-mes-next')?.addEventListener('click',()=>{ pedMesOffset++; renderCalMes('ped','pedMesOffset','pedFecha',null,ds=>S.pedidos.some(p=>p.fecha===ds&&!p.archivado)); });
-// Chat OTTO — chips de preguntas rápidas
-document.querySelectorAll('.otto-quick-chip').forEach(chip=>{
-  chip.addEventListener('click',()=>{
-    const inp=g('chat-inp'); if(!inp) return;
-    inp.value=chip.dataset.q;
-    // Ocultar chips al usar uno
-    const chips=g('otto-chips'); if(chips) chips.style.display='none';
-    sendMsg();
-  });
+// OTTO panel — cards y preguntas rápidas
+document.querySelectorAll('.otto-card-chip[data-q], .otto-q-item[data-q]').forEach(el=>{
+  el.addEventListener('click',()=>ottoGoChat(el.dataset.q));
+});
+// Botón volver al home de OTTO
+g('otto-back-btn')?.addEventListener('click',ottoGoHome);
+// Input rápido del home
+g('otto-home-send')?.addEventListener('click',()=>{
+  const inp=g('otto-home-inp'); if(!inp||!inp.value.trim()) return;
+  const q=inp.value.trim(); inp.value='';
+  ottoGoChat(q);
+});
+g('otto-home-inp')?.addEventListener('keydown',e=>{
+  if(e.key==='Enter'){const inp=g('otto-home-inp');if(inp&&inp.value.trim()){const q=inp.value.trim();inp.value='';ottoGoChat(q);}}
 });
 g('ob-start-btn')?.addEventListener('click',()=>showOb('ob1'));
 g('ob-skip-btn')?.addEventListener('click',()=>g('onboarding').classList.remove('on'));
@@ -3542,7 +3819,7 @@ window.saveNewPedProd=saveNewPedProd;
 function openPedModal(id){
   const p=S.pedidos.find(p=>p._id===id); if(!p) return;
   const today=hoy();
-  const diff=p.fecha?Math.ceil((new Date(p.fecha+'T00:00:00')-new Date(today+'T00:00:00'))/86400000):null;
+  const diff=p.fecha?diffDias(p.fecha, today):null;
   const cuando=diff===0?'Hoy':diff===1?'Mañana':diff!=null&&diff<0?'Vencido':p.fecha?fmt(p.fecha):'Sin fecha';
   const modal=g('ped-modal'); if(!modal) return;
   modal.innerHTML=`
@@ -3827,6 +4104,58 @@ function renderFinCatsList(segments, total){
     });
   });
 }
+
+// ── OTTO PANEL — lógica completa ──
+let ottoEnChat = false;
+
+function ottoGoChat(pregunta){
+  ottoEnChat = true;
+  g('otto-home').style.display = 'none';
+  g('otto-chat').classList.add('on');
+  g('otto-back-btn').classList.add('on');
+  if(pregunta){
+    const inp = g('chat-inp'); if(inp) inp.value = pregunta;
+    sendMsg();
+  } else {
+    setTimeout(()=>g('chat-inp')?.focus(), 200);
+  }
+}
+window.ottoGoChat=ottoGoChat;
+
+function ottoGoHome(){
+  ottoEnChat = false;
+  g('otto-home').style.display = 'block';
+  g('otto-chat').classList.remove('on');
+  g('otto-back-btn').classList.remove('on');
+}
+window.ottoGoHome=ottoGoHome;
+
+function renderOttoStats(){
+  const mes = new Date().toISOString().slice(0,7);
+  const ventas = S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mes)).reduce((s,m)=>s+m.monto,0);
+  const pedidos = S.pedidos.filter(p=>!p.archivado).length;
+  const tareas = S.tareas.filter(t=>!t.done).length;
+  const hoyStr = hoy();
+  const eventos = S.eventos.filter(e=>e.fecha>=hoyStr).length;
+  if(g('os-ventas')) g('os-ventas').textContent = fmtARS(ventas);
+  if(g('os-pedidos')) g('os-pedidos').textContent = pedidos;
+  if(g('os-tareas')) g('os-tareas').textContent = tareas;
+  if(g('os-eventos')) g('os-eventos').textContent = eventos;
+  if(g('otto-hola-nombre')) g('otto-hola-nombre').textContent = S.nombre?.split(' ')[0]||'';
+}
+window.renderOttoStats=renderOttoStats;
+
+// Sobreescribir addBub para usar los nuevos estilos
+function addBub(text, who, containerId){
+  const box = g(containerId||'chat-msgs'); if(!box) return;
+  const av = who==='otto'?'O':(S.nombre?.[0]?.toUpperCase()||'U');
+  box.innerHTML+=`<div class="otto-msg ${who==='me'?'me':''}">
+    <div class="otto-msg-av">${av}</div>
+    <div class="otto-msg-bub ${who}">${text}</div>
+  </div>`;
+  box.scrollTop=99999;
+}
+window.addBub=addBub;
 
 </script>
 </body>
