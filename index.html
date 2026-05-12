@@ -742,6 +742,25 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 /* Panel agenda sin padding-bottom para el cal */
 #p-age .evs-list{padding-bottom:0;}
 
+
+/* ── MODAL PRODUCCIÓN SEMANAL ── */
+#prod-modal-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(26,31,28,.55);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);}
+#prod-modal-overlay.on{display:block;}
+#prod-modal{display:none;position:fixed;bottom:0;left:0;right:0;z-index:501;background:var(--surface);border-radius:24px 24px 0 0;max-height:80vh;overflow-y:auto;-webkit-overflow-scrolling:touch;box-shadow:0 -8px 40px rgba(26,31,28,.15);}
+#prod-modal.on{display:block;animation:slideUp .28s cubic-bezier(.32,0,.2,1);}
+.prod-modal-handle{display:flex;justify-content:center;padding:12px 0 0;}
+.prod-modal-bar{width:36px;height:4px;border-radius:2px;background:var(--border);}
+.prod-modal-header{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 10px;}
+.prod-modal-title{font-size:17px;font-weight:700;color:var(--t1);letter-spacing:-.3px;}
+.prod-modal-close{background:var(--surface2);border:none;border-radius:50%;width:32px;height:32px;display:flex;align-items:center;justify-content:center;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.prod-modal-subtitle{font-size:12px;color:var(--t3);padding:0 20px 14px;}
+.prod-modal-body{padding:0 20px 36px;}
+.prod-modal-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border2);}
+.prod-modal-row:last-child{border-bottom:none;}
+.prod-modal-prod{font-size:15px;font-weight:500;color:var(--t1);}
+.prod-modal-qty{font-size:20px;font-weight:800;color:var(--bosque);min-width:40px;text-align:right;}
+.prod-modal-empty{text-align:center;padding:32px 0;color:var(--t4);font-size:14px;}
+
 </style>
 </head>
 <body>
@@ -1358,6 +1377,20 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
 <!-- PEDIDO MODAL -->
 <div id="ped-modal-overlay"></div>
 <div id="ped-modal"></div>
+
+<!-- PRODUCCIÓN SEMANAL MODAL -->
+<div id="prod-modal-overlay"></div>
+<div id="prod-modal">
+  <div class="prod-modal-handle"><div class="prod-modal-bar"></div></div>
+  <div class="prod-modal-header">
+    <span class="prod-modal-title" id="prod-modal-title">Producción semanal</span>
+    <button class="prod-modal-close rpl" id="prod-modal-close">
+      <span class="material-icons-round" style="font-size:18px;color:var(--t3)">close</span>
+    </button>
+  </div>
+  <div class="prod-modal-subtitle" id="prod-modal-subtitle"></div>
+  <div class="prod-modal-body" id="prod-modal-body"></div>
+</div>
 
 <!-- TOAST + SAVING -->
 <div id="toast"></div>
@@ -2381,70 +2414,77 @@ window.renderHistorialPeds=renderHistorialPeds;
 function renderProduceDia(){
   const wrap=g('ped-produce');if(!wrap)return;
 
-  // ── Producción del día seleccionado (siempre visible si hay pedidos) ──
-  const activosDia=S.pedFecha
-    ? S.pedidos.filter(p=>!p.archivado&&p.fecha===S.pedFecha)
-    : [];
-  const totsDia={};
-  activosDia.forEach(p=>(p.items||[]).forEach(i=>{totsDia[i.p]=(totsDia[i.p]||0)+i.q;}));
-
-  // ── Producción semanal (solo si está activado el modo semana) ──
-  let htmlSemana='';
-  if(S.pedModoSemana){
-    const today=new Date();today.setHours(0,0,0,0);
-    const mon=new Date(today);mon.setDate(today.getDate()-(today.getDay()||7)+1);
-    const sun=new Date(mon);sun.setDate(mon.getDate()+6);
-    const activosSem=S.pedidos.filter(p=>{
-      if(p.archivado||!p.fecha)return false;
-      const fd=new Date(p.fecha+'T00:00:00');
-      return fd>=mon&&fd<=sun;
-    });
-    if(activosSem.length){
-      const totsSem={};
-      activosSem.forEach(p=>(p.items||[]).forEach(i=>{totsSem[i.p]=(totsSem[i.p]||0)+i.q;}));
-      htmlSemana=`<div class="card" style="margin:0 0 8px;">
+  // ── Producción del día seleccionado (inline, siempre) ──
+  if(S.pedFecha){
+    const activosDia=S.pedidos.filter(p=>!p.archivado&&p.fecha===S.pedFecha);
+    if(activosDia.length){
+      const totsDia={};
+      activosDia.forEach(p=>(p.items||[]).forEach(i=>{totsDia[i.p]=(totsDia[i.p]||0)+i.q;}));
+      const fd=new Date(S.pedFecha+'T00:00:00');
+      const diff=Math.ceil((fd-new Date(hoy()+'T00:00:00'))/86400000);
+      const cuando=diff===0?'Hoy':diff===1?'Mañana':diff<0?fd.toLocaleDateString('es-AR',{day:'numeric',month:'short'}):fd.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'short'});
+      wrap.style.display='block';
+      wrap.innerHTML=`<div class="card" style="margin:0 0 8px;">
         <div style="padding:12px 16px;">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción · Semana</div>
-            <div style="font-size:11px;color:var(--t3);">${activosSem.length} pedido${activosSem.length>1?'s':''}</div>
+            <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción · ${cuando}</div>
+            <div style="font-size:11px;color:var(--t3);">${activosDia.length} pedido${activosDia.length>1?'s':''}</div>
           </div>
-          ${Object.entries(totsSem).sort((a,b)=>a[0].localeCompare(b[0],'es')).map(([n,q])=>`
+          ${Object.entries(totsDia).sort((a,b)=>a[0].localeCompare(b[0],'es')).map(([n,q])=>`
             <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
               <span style="font-size:13px;color:var(--t1);">${n}</span>
               <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
             </div>`).join('')}
         </div>
       </div>`;
+    } else {
+      wrap.style.display='none'; wrap.innerHTML='';
     }
+  } else {
+    wrap.style.display='none'; wrap.innerHTML='';
   }
-
-  // Etiqueta dinámica del día
-  const fd=S.pedFecha?new Date(S.pedFecha+'T00:00:00'):null;
-  const diff=fd?Math.ceil((fd-new Date(hoy()+'T00:00:00'))/86400000):null;
-  const cuando=diff===0?'Hoy':diff===1?'Mañana':fd?fd.toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'short'}):'';
-
-  let htmlDia='';
-  if(Object.keys(totsDia).length){
-    htmlDia=`<div class="card" style="margin:0 0 8px;">
-      <div style="padding:12px 16px;">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
-          <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);">Producción · ${cuando}</div>
-          <div style="font-size:11px;color:var(--t3);">${activosDia.length} pedido${activosDia.length>1?'s':''}</div>
-        </div>
-        ${Object.entries(totsDia).sort((a,b)=>a[0].localeCompare(b[0],'es')).map(([n,q])=>`
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border2);">
-            <span style="font-size:13px;color:var(--t1);">${n}</span>
-            <strong style="font-size:16px;color:var(--bosque);">${q}</strong>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  }
-
-  const html = htmlDia + htmlSemana;
-  wrap.style.display = html ? 'block' : 'none';
-  wrap.innerHTML = html;
 }
 window.renderProduceDia=renderProduceDia;
+
+// ── Producción SEMANAL → popup modal ──
+function openProdSemanaModal(){
+  const today=new Date();today.setHours(0,0,0,0);
+  const mon=new Date(today);mon.setDate(today.getDate()-(today.getDay()||7)+1);
+  const sun=new Date(mon);sun.setDate(mon.getDate()+6);
+  const activos=S.pedidos.filter(p=>{
+    if(p.archivado||!p.fecha)return false;
+    const fd=new Date(p.fecha+'T00:00:00');
+    return fd>=mon&&fd<=sun;
+  });
+  const tots={};
+  activos.forEach(p=>(p.items||[]).forEach(i=>{tots[i.p]=(tots[i.p]||0)+i.q;}));
+  const sorted=Object.entries(tots).sort((a,b)=>a[0].localeCompare(b[0],'es'));
+  // Fechas de la semana
+  const semLbl=`${mon.toLocaleDateString('es-AR',{day:'numeric',month:'short'})} – ${sun.toLocaleDateString('es-AR',{day:'numeric',month:'short'})}`;
+  if(g('prod-modal-title')) g('prod-modal-title').textContent='Producción semanal';
+  if(g('prod-modal-subtitle')) g('prod-modal-subtitle').textContent=`${semLbl} · ${activos.length} pedido${activos.length!==1?'s':''}`;
+  const body=g('prod-modal-body');
+  if(body){
+    if(!sorted.length){
+      body.innerHTML=`<div class="prod-modal-empty">Sin pedidos esta semana</div>`;
+    } else {
+      body.innerHTML=sorted.map(([n,q])=>`
+        <div class="prod-modal-row">
+          <span class="prod-modal-prod">${n}</span>
+          <span class="prod-modal-qty">${q}</span>
+        </div>`).join('');
+    }
+  }
+  g('prod-modal-overlay').classList.add('on');
+  g('prod-modal').classList.add('on');
+}
+window.openProdSemanaModal=openProdSemanaModal;
+
+function closeProdModal(){
+  g('prod-modal-overlay').classList.remove('on');
+  g('prod-modal').classList.remove('on');
+}
+window.closeProdModal=closeProdModal;
 function renderProduceSemana(){ renderProduceDia(); }
 window.renderProduceSemana=renderProduceSemana;
 
@@ -3251,11 +3291,9 @@ g('menu-overlay')?.addEventListener('click',closeMenu);
 document.querySelectorAll('.menu-item[data-nav]').forEach(btn=>{btn.addEventListener('click',()=>navTo(btn.dataset.nav));});
 g('menu-logout')?.addEventListener('click',logoutOtto);
 g('fab-overlay')?.addEventListener('click',closeFab);
-g('ped-semana-btn')?.addEventListener('click',()=>{
-  S.pedModoSemana=!S.pedModoSemana;
-  actualizarBtnSemana();
-  renderProduceDia();
-});
+g('ped-semana-btn')?.addEventListener('click',()=>openProdSemanaModal());
+g('prod-modal-overlay')?.addEventListener('click',closeProdModal);
+g('prod-modal-close')?.addEventListener('click',closeProdModal);
 document.querySelectorAll('.fab-btn[data-sheet]').forEach(btn=>{btn.addEventListener('click',()=>{closeFab();setTimeout(()=>openSheet(btn.dataset.sheet),60);});});
 g('sheet-overlay')?.addEventListener('click',closeSheet);
 ['fin','ped','age','task'].forEach(t=>{g('s-'+t+'-close')?.addEventListener('click',closeSheet);});
