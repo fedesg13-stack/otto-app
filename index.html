@@ -777,7 +777,7 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
   border-radius:var(--rfull);padding:6px 14px;
   display:flex;align-items:center;gap:8px;
 }
-.otto-logo-pill svg{width:44px;height:13px;filter:brightness(10);}
+.otto-logo-pill svg{width:32px;height:9px;filter:brightness(10);}
 .otto-status-dot{width:7px;height:7px;border-radius:50%;background:#4ade80;flex-shrink:0;
   box-shadow:0 0 0 2px rgba(74,222,128,.3);animation:pulse 2s infinite;}
 .otto-header-greeting{
@@ -881,6 +881,51 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
   background:var(--bosque);color:#fff;
   border-radius:18px 18px 4px 18px;box-shadow:none;
 }
+
+
+/* ── MI BASE DE DATOS ── */
+.mbd-header{padding:20px 16px 8px;}
+.mbd-title{font-size:26px;font-weight:800;color:var(--t1);letter-spacing:-.5px;}
+.mbd-sub{font-size:13px;color:var(--t3);margin-top:4px;}
+/* Barra de búsqueda */
+.mbd-search{display:flex;align-items:center;gap:8px;margin:12px 16px;background:var(--surface);border:1.5px solid var(--border);border-radius:var(--rfull);padding:9px 14px;}
+.mbd-search .material-icons-round{font-size:18px;color:var(--t4);}
+.mbd-search input{flex:1;border:none;background:transparent;font-family:var(--font);font-size:14px;color:var(--t1);outline:none;}
+/* Botón nueva categoría */
+.mbd-new-cat-btn{display:flex;align-items:center;justify-content:space-between;margin:0 16px 8px;padding:14px 16px;background:var(--surface);border:1.5px dashed var(--border);border-radius:var(--r14);cursor:pointer;font-family:var(--font);-webkit-tap-highlight-color:transparent;transition:all .12s;}
+.mbd-new-cat-btn:active{background:var(--surface2);}
+.mbd-new-cat-lbl{font-size:14px;font-weight:600;color:var(--t3);}
+.mbd-new-cat-plus{width:28px;height:28px;border-radius:50%;background:var(--bosque);display:flex;align-items:center;justify-content:center;}
+.mbd-new-cat-plus .material-icons-round{font-size:18px;color:#fff;}
+/* Sección de categoría */
+.mbd-cat-section{margin:0 16px 12px;background:var(--surface);border-radius:var(--r18);border:1px solid var(--border2);overflow:hidden;box-shadow:var(--s1);}
+.mbd-cat-header{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.mbd-cat-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.mbd-cat-info{flex:1;min-width:0;}
+.mbd-cat-name{font-size:15px;font-weight:700;color:var(--t1);}
+.mbd-cat-meta{font-size:11px;color:var(--t4);margin-top:1px;}
+.mbd-cat-actions{display:flex;gap:6px;align-items:center;}
+.mbd-cat-chevron{font-size:18px;color:var(--t4);transition:transform .2s;}
+.mbd-cat-section.open .mbd-cat-chevron{transform:rotate(180deg);}
+/* Ítems dentro de categoría */
+.mbd-items{display:none;border-top:1px solid var(--border2);}
+.mbd-cat-section.open .mbd-items{display:block;}
+.mbd-item{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--border2);-webkit-tap-highlight-color:transparent;}
+.mbd-item:last-child{border-bottom:none;}
+.mbd-item-del{width:22px;height:22px;border-radius:50%;background:var(--red);display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;border:none;-webkit-tap-highlight-color:transparent;}
+.mbd-item-del .material-icons-round{font-size:13px;color:#fff;}
+.mbd-item-name{flex:1;font-size:14px;font-weight:500;color:var(--t1);}
+.mbd-item-sub{font-size:11px;color:var(--t4);margin-top:1px;}
+.mbd-item-edit{background:transparent;border:none;cursor:pointer;color:var(--t5);padding:4px;display:flex;-webkit-tap-highlight-color:transparent;}
+/* Add item dentro de categoría */
+.mbd-add-item{display:flex;align-items:center;gap:8px;padding:10px 16px;cursor:pointer;background:var(--surface2);border:none;width:100%;font-family:var(--font);-webkit-tap-highlight-color:transparent;}
+.mbd-add-item .material-icons-round{font-size:16px;color:var(--bosque);}
+.mbd-add-item-lbl{font-size:13px;font-weight:600;color:var(--bosque);}
+/* Tipo badge */
+.mbd-tipo-badge{font-size:9px;font-weight:700;padding:2px 7px;border-radius:var(--rfull);text-transform:uppercase;letter-spacing:.4px;}
+.mbd-tipo-badge.ing{background:var(--green-bg);color:var(--bosque);}
+.mbd-tipo-badge.gas{background:var(--red-bg);color:var(--red);}
+.mbd-tipo-badge.amb{background:var(--surface2);color:var(--t3);}
 
 </style>
 </head>
@@ -1274,6 +1319,23 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
       </div>
     </div>
 
+    <!-- MI BASE DE DATOS -->
+    <div class="panel" id="p-mbd">
+      <div class="mbd-header">
+        <div class="mbd-title">Mi Base de Datos</div>
+        <div class="mbd-sub">El cerebro de tu negocio. Todo conectado.</div>
+      </div>
+      <div class="mbd-search">
+        <span class="material-icons-round">search</span>
+        <input id="mbd-search-inp" placeholder="Buscar categoría o ítem…">
+      </div>
+      <button class="mbd-new-cat-btn rpl" id="mbd-new-cat">
+        <span class="mbd-new-cat-lbl">Crear nueva categoría</span>
+        <div class="mbd-new-cat-plus"><span class="material-icons-round">add</span></div>
+      </button>
+      <div id="mbd-list"></div>
+    </div>
+
     <!-- OTTO PANEL -->
     <div class="panel" id="p-otto">
       <!-- Header -->
@@ -1598,6 +1660,7 @@ header{display:flex;align-items:center;height:68px;padding:0 16px;background:var
     <button class="menu-item rpl" data-nav="age"><span class="material-icons-round">calendar_month</span>Agenda</button>
     <button class="menu-item rpl" data-nav="task"><span class="material-icons-round">check_circle</span>Tareas</button>
     <button class="menu-item rpl" data-nav="mn"><span class="material-icons-round">store</span>Mi Negocio</button>
+    <button class="menu-item rpl" data-nav="mbd"><span class="material-icons-round">folder_open</span>Mi Base de Datos</button>
     <button class="menu-item rpl" data-nav="otto"><span class="material-icons-round">smart_toy</span>OTTO</button>
     <div class="menu-divider"></div>
     <button class="menu-item rpl" data-nav="user"><span class="material-icons-round">account_circle</span>Mi usuario</button>
@@ -1674,7 +1737,7 @@ let S = {
   movs:[], pedidos:[], eventos:[], tareas:[],
   nota:'', notas:[],
   miNegocio:{categorias:[],productos:[],clientes:[],proveedores:[],equipo:[],servicios:[],impositiva:[]},
-  ottoCache:[], ottoCacheTime:0
+  ottoCache:[], ottoCacheTime:0, mbd:{categorias:[],items:[]}
 };
 const MN_CONFIG={
   productos:{icon:'🛍️',label:'Producto / Servicio',campos:[{id:'nombre',label:'Nombre',type:'text',required:true},{id:'precio',label:'Precio de venta',type:'number'},{id:'costo',label:'Costo / precio de costo',type:'number'},{id:'categoria',label:'Categoría',type:'text'},{id:'descripcion',label:'Descripción',type:'text'}],color:'var(--amber)',bg:'var(--amber-t)'},
@@ -1689,11 +1752,19 @@ const g = id => document.getElementById(id);
 const fmt = d => d ? new Date(d+'T00:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short'}) : '';
 const fmtM = d => d ? new Date(d+'T00:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short',year:'numeric'}) : '';
 const fmtARS = n => '$' + Number(n||0).toLocaleString('es-AR');
-const hoy = () => new Date().toISOString().split('T')[0];
-// Diferencia en días calendario entre dos fechas string 'YYYY-MM-DD'
+// Fecha local del dispositivo — NO UTC — para que en Uruguay las 23hs siga siendo el mismo día
+function hoy(){
+  const d=new Date();
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+// Diferencia en días calendario puros (ambas fechas en hora local)
 function diffDias(fechaStr, desdeStr){
-  const a = new Date(fechaStr+'T00:00:00');
-  const b = new Date((desdeStr||hoy())+'T00:00:00');
+  const base = desdeStr||hoy();
+  // Parsear como fecha local sin timezone
+  const [ay,am,ad]=fechaStr.split('-').map(Number);
+  const [by,bm,bd]=base.split('-').map(Number);
+  const a=new Date(ay,am-1,ad);
+  const b=new Date(by,bm-1,bd);
   return Math.round((a-b)/86400000);
 }
 function col(name){ return collection(db, `usuarios/${S.uid}/${name}`); }
@@ -1707,6 +1778,7 @@ function navTo(panel){
   const p=g('p-'+panel); if(p) p.classList.add('on');
   const btn=document.querySelector(`.menu-item[data-nav="${panel}"]`); if(btn) btn.classList.add('on');
   if(panel==='user') renderUserPanel();
+  if(panel==='mbd'){ renderMbd(); }
   if(panel==='age') renderAgeCalGoogle();
   if(panel==='task') renderCalMes('task','taskMesOffset','taskFecha',null,ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
   if(panel==='otto'){
@@ -2091,6 +2163,12 @@ async function loadAllData(){
   await Promise.allSettled(cols.map((c,i)=>
     getDocs(col(c)).then(snap=>{S[keys[i]]=snap.docs.map(d=>({...d.data(),_id:d.id}));}).catch(e=>console.warn(c,e))
   ));
+  // Mi Base de Datos
+  try{
+    const [catSnap,itemSnap]=await Promise.all([getDocs(col('categorias')),getDocs(col('cat_items'))]);
+    S.mbd.categorias=catSnap.docs.map(d=>({...d.data(),_id:d.id}));
+    S.mbd.items=itemSnap.docs.map(d=>({...d.data(),_id:d.id}));
+  }catch(e){}
   // Mi Negocio — todas las secciones del MN_CONFIG
   // Categorías propias (antes que productos para poder referenciarlas)
   try{
@@ -3543,6 +3621,12 @@ g('btnGoogle')?.addEventListener('click',loginGoogle);
 g('hd-logo-btn')?.addEventListener('click',()=>navTo('home'));
 g('hd-menu-btn')?.addEventListener('click',openMenu);
 g('nav-home-btn')?.addEventListener('click',()=>navTo('home'));
+g('mbd-new-cat')?.addEventListener('click',mbdNewCat);
+let mbdSearchTimer=null;
+g('mbd-search-inp')?.addEventListener('input',()=>{
+  clearTimeout(mbdSearchTimer);
+  mbdSearchTimer=setTimeout(()=>renderMbd(g('mbd-search-inp').value),250);
+});
 g('nav-menu-btn')?.addEventListener('click',openMenu);
 // Link ir a finanzas
 g('h-fin-btn')?.addEventListener('click',()=>navTo('fin'));
@@ -3947,6 +4031,11 @@ function buildOttoContext(){
   S.pedidos.forEach(p=>(p.items||[]).forEach(i=>{prodCount[i.p]=(prodCount[i.p]||0)+i.q;}));
   const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,c])=>`${n}(${c})`).join(', ');
 
+  // Mi Base de Datos — categorías e ítems
+  const mbdResumen=(S.mbd?.categorias||[]).map(c=>{
+    const items=(S.mbd?.items||[]).filter(i=>i.catId===c._id).map(i=>i.nombre).join(', ');
+    return `${c.nombre}(${c.tipo}): ${items||'vacío'}`;
+  }).join(' | ');
   return `=== NEGOCIO ===
 Nombre: ${S.perfil?.negocio||S.negocio||'—'} | Rubro: ${S.perfil?.rubro||'—'} | Dueño: ${S.nombre||'—'}
 País: ${S.perfil?.pais||'Uruguay'} | Moneda: ${S.perfil?.moneda||'UYU $'}
@@ -4113,7 +4202,13 @@ function ottoGoChat(pregunta){
   g('otto-home').style.display = 'none';
   g('otto-chat').classList.add('on');
   g('otto-back-btn').classList.add('on');
+  // Scroll al fondo del chat al entrar
+  const box=g('chat-msgs');
+  if(box) setTimeout(()=>{ box.scrollTop=box.scrollHeight; },80);
   if(pregunta){
+    // Limpiar historial de conversación anterior al hacer nueva pregunta desde home
+    chatHistory=[];
+    if(box) box.innerHTML='';
     const inp = g('chat-inp'); if(inp) inp.value = pregunta;
     sendMsg();
   } else {
@@ -4156,6 +4251,373 @@ function addBub(text, who, containerId){
   box.scrollTop=99999;
 }
 window.addBub=addBub;
+
+// ══════════════════════════════════════════════════
+// MI BASE DE DATOS — Motor central de información
+// Estructura Firebase:
+//   categorias/{id}  → {nombre, tipo, icono, color, creadoEn, actualizadoEn}
+//   cat_items/{id}   → {nombre, catId, catNombre, tipo, extra{}, creadoEn, actualizadoEn}
+// ══════════════════════════════════════════════════
+
+// Estado local
+if(!S.mbd) S.mbd = { categorias:[], items:[] };
+
+// Paleta de colores para categorías
+const MBD_COLORS = [
+  {name:'Verde', val:'#234136', bg:'#EBF0EC'},
+  {name:'Teal',  val:'#1A7A62', bg:'#E0F2EE'},
+  {name:'Azul',  val:'#4682B4', bg:'#EBF1F8'},
+  {name:'Morado',val:'#5B4FCF', bg:'#EDEAFB'},
+  {name:'Naranja',val:'#E8710A',bg:'#FEF3E9'},
+  {name:'Rojo',  val:'#C0392B', bg:'#FDECEA'},
+  {name:'Dorado',val:'#B7770D', bg:'#FEF6E4'},
+  {name:'Gris',  val:'#5E7A68', bg:'#F2F4F1'},
+];
+const MBD_ICONOS = ['🛍️','👤','🏭','👥','⚡','📊','💰','🏠','🚗','🍽️','📦','🔧','📱','🎯','💼','🌱','❤️','🎓','🏋️','📅'];
+
+async function mbdLoadData(){
+  try{
+    const [catSnap, itemSnap] = await Promise.all([
+      getDocs(col('categorias')),
+      getDocs(col('cat_items'))
+    ]);
+    S.mbd.categorias = catSnap.docs.map(d=>({...d.data(),_id:d.id}));
+    S.mbd.items = itemSnap.docs.map(d=>({...d.data(),_id:d.id}));
+  }catch(e){ console.warn('mbd load:', e.message); }
+}
+window.mbdLoadData=mbdLoadData;
+
+function renderMbd(filtro=''){
+  const list = g('mbd-list'); if(!list) return;
+  let cats = [...S.mbd.categorias].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
+  if(filtro){
+    const f=filtro.toLowerCase();
+    cats = cats.filter(c=>{
+      if((c.nombre||'').toLowerCase().includes(f)) return true;
+      const items=S.mbd.items.filter(i=>i.catId===c._id);
+      return items.some(i=>(i.nombre||'').toLowerCase().includes(f));
+    });
+  }
+  if(!cats.length){
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">📁</div><div class="empty-title">${filtro?'Sin resultados':'Sin categorías'}</div><div class="empty-sub">${filtro?'Probá con otro término':'Creá tu primera categoría para organizar tu negocio.'}</div></div>`;
+    return;
+  }
+  list.innerHTML = cats.map(cat=>{
+    const items = S.mbd.items.filter(i=>i.catId===cat._id).sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
+    const tipoBadge = cat.tipo==='ingreso'?'<span class="mbd-tipo-badge ing">Ingreso</span>':cat.tipo==='gasto'?'<span class="mbd-tipo-badge gas">Gasto</span>':'<span class="mbd-tipo-badge amb">Ambos</span>';
+    return `<div class="mbd-cat-section" id="mbd-cat-${cat._id}">
+      <div class="mbd-cat-header" data-catid="${cat._id}">
+        <div class="mbd-cat-icon" style="background:${cat.bg||'var(--surface2)'}">
+          ${cat.icono||'📁'}
+        </div>
+        <div class="mbd-cat-info">
+          <div class="mbd-cat-name">${cat.nombre||'—'}</div>
+          <div class="mbd-cat-meta">${items.length} ítem${items.length!==1?'s':''} · ${tipoBadge}</div>
+        </div>
+        <div class="mbd-cat-actions">
+          <button class="rpl" data-edit-cat="${cat._id}" style="background:transparent;border:none;cursor:pointer;color:var(--t4);padding:4px;display:flex;"><span class="material-icons-round" style="font-size:18px">edit</span></button>
+          <span class="material-icons-round mbd-cat-chevron">expand_more</span>
+        </div>
+      </div>
+      <div class="mbd-items">
+        ${items.map(item=>`
+          <div class="mbd-item" data-itemid="${item._id}">
+            <button class="mbd-item-del rpl" data-del-item="${item._id}" data-del-cat="${cat._id}">
+              <span class="material-icons-round">remove</span>
+            </button>
+            <div style="flex:1;">
+              <div class="mbd-item-name">${item.nombre||'—'}</div>
+              ${item.extra&&Object.keys(item.extra).length?`<div class="mbd-item-sub">${Object.values(item.extra).filter(Boolean).slice(0,2).join(' · ')}</div>`:''}
+            </div>
+            <button class="mbd-item-edit rpl" data-edit-item="${item._id}" data-cat-id="${cat._id}">
+              <span class="material-icons-round" style="font-size:18px">edit</span>
+            </button>
+          </div>`).join('')}
+        <button class="mbd-add-item rpl" data-add-item="${cat._id}" data-cat-nombre="${(cat.nombre||'').replace(/"/g,'&quot;')}">
+          <span class="material-icons-round">add</span>
+          <span class="mbd-add-item-lbl">Agregar ítem</span>
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Listeners toggle
+  list.querySelectorAll('.mbd-cat-header').forEach(h=>{
+    h.addEventListener('click',e=>{
+      if(e.target.closest('[data-edit-cat]')) return; // no toggle si click en editar
+      const sec=document.getElementById('mbd-cat-'+h.dataset.catid);
+      sec?.classList.toggle('open');
+    });
+  });
+  // Editar categoría
+  list.querySelectorAll('[data-edit-cat]').forEach(btn=>{
+    btn.addEventListener('click',e=>{e.stopPropagation();mbdEditCat(btn.dataset.editCat);});
+  });
+  // Eliminar ítem
+  list.querySelectorAll('[data-del-item]').forEach(btn=>{
+    btn.addEventListener('click',()=>mbdDelItem(btn.dataset.delItem, btn.dataset.delCat));
+  });
+  // Editar ítem
+  list.querySelectorAll('[data-edit-item]').forEach(btn=>{
+    btn.addEventListener('click',()=>mbdEditItem(btn.dataset.editItem, btn.dataset.catId));
+  });
+  // Agregar ítem
+  list.querySelectorAll('[data-add-item]').forEach(btn=>{
+    btn.addEventListener('click',()=>mbdAddItem(btn.dataset.addItem, btn.dataset.catNombre));
+  });
+}
+window.renderMbd=renderMbd;
+
+// ── CRUD CATEGORÍAS ──
+function mbdNewCat(){
+  const ts = new Date().toISOString();
+  openEdit('📁 Nueva categoría', `
+    <div class="m3-field"><input class="m3-inp" id="mbd-cat-nombre" placeholder=" " maxlength="40"><label class="m3-lbl">Nombre de la categoría *</label></div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);margin-bottom:8px;">Tipo</div>
+      <div style="display:flex;gap:8px;">
+        <button class="tipo-pill ing rpl" id="mbd-tipo-ing" style="flex:1;" onclick="mbdSelTipo('ingreso')"><span class="material-icons-round">trending_up</span>Ingreso</button>
+        <button class="tipo-pill gas rpl" id="mbd-tipo-gas" style="flex:1;" onclick="mbdSelTipo('gasto')"><span class="material-icons-round">trending_down</span>Gasto</button>
+        <button class="tipo-pill rpl sel" id="mbd-tipo-amb" style="flex:1;background:var(--surface2);border-color:var(--border);" onclick="mbdSelTipo('ambos')">⟺ Ambos</button>
+      </div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);margin-bottom:8px;">Ícono</div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">${MBD_ICONOS.map(ic=>`<button class="rpl mbd-ic-btn" data-ic="${ic}" style="font-size:22px;width:40px;height:40px;border-radius:10px;border:2px solid var(--border);background:var(--surface2);cursor:pointer;">${ic}</button>`).join('')}</div>
+    </div>
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--t4);margin-bottom:8px;">Color</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;">${MBD_COLORS.map(c=>`<button class="rpl mbd-col-btn" data-val="${c.val}" data-bg="${c.bg}" style="width:30px;height:30px;border-radius:50%;background:${c.val};border:3px solid transparent;cursor:pointer;" title="${c.name}"></button>`).join('')}</div>
+    </div>
+    <input type="hidden" id="mbd-tipo-sel" value="ambos">
+    <input type="hidden" id="mbd-ic-sel" value="📁">
+    <input type="hidden" id="mbd-col-sel" value="#5E7A68">
+    <input type="hidden" id="mbd-bg-sel" value="var(--surface2)">
+    <button class="btn-save rpl" id="mbd-cat-save">Crear categoría</button>
+  `);
+  // Ícono selector
+  document.querySelectorAll('.mbd-ic-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.mbd-ic-btn').forEach(x=>x.style.borderColor='var(--border)');
+      b.style.borderColor='var(--bosque)';
+      const hi=g('mbd-ic-sel');if(hi)hi.value=b.dataset.ic;
+    });
+  });
+  // Color selector
+  document.querySelectorAll('.mbd-col-btn').forEach(b=>{
+    b.addEventListener('click',()=>{
+      document.querySelectorAll('.mbd-col-btn').forEach(x=>x.style.borderColor='transparent');
+      b.style.borderColor='#fff';
+      const hc=g('mbd-col-sel');if(hc)hc.value=b.dataset.val;
+      const hb=g('mbd-bg-sel');if(hb)hb.value=b.dataset.bg;
+    });
+  });
+  g('mbd-cat-save').addEventListener('click',async()=>{
+    const nombre=g('mbd-cat-nombre')?.value.trim();
+    if(!nombre){toast('El nombre es obligatorio');return;}
+    const data={
+      nombre, tipo:g('mbd-tipo-sel')?.value||'ambos',
+      icono:g('mbd-ic-sel')?.value||'📁',
+      color:g('mbd-col-sel')?.value||'#5E7A68',
+      bg:g('mbd-bg-sel')?.value||'var(--surface2)',
+      creadoEn:ts, actualizadoEn:ts
+    };
+    saving();
+    try{
+      const ref=await addDoc(col('categorias'),data);
+      S.mbd.categorias.push({...data,_id:ref.id});
+      closeEdit(); toast('✅ Categoría creada'); renderMbd();
+    }catch(e){console.error(e);toast('Error al guardar');}
+  });
+}
+window.mbdNewCat=mbdNewCat;
+
+let mbdTipoSel='ambos';
+function mbdSelTipo(tipo){
+  mbdTipoSel=tipo;
+  ['ing','gas','amb'].forEach(t=>{
+    const btn=g('mbd-tipo-'+t);
+    if(!btn)return;
+    btn.classList.remove('sel');
+    btn.style.background='var(--surface2)';
+    btn.style.borderColor='var(--border)';
+  });
+  const map={ingreso:'ing',gasto:'gas',ambos:'amb'};
+  const btn=g('mbd-tipo-'+map[tipo]);
+  if(btn){
+    btn.classList.add('sel');
+    if(tipo==='ingreso'){btn.style.background='var(--green-bg)';btn.style.borderColor='var(--bosque)';}
+    else if(tipo==='gasto'){btn.style.background='var(--red-bg)';btn.style.borderColor='var(--red)';}
+    else{btn.style.background='var(--surface3)';btn.style.borderColor='var(--t4)';}
+  }
+  const hi=g('mbd-tipo-sel');if(hi)hi.value=tipo;
+}
+window.mbdSelTipo=mbdSelTipo;
+
+function mbdEditCat(catId){
+  const cat=S.mbd.categorias.find(c=>c._id===catId);if(!cat)return;
+  openEdit('✏️ Editar categoría',`
+    <div class="m3-field"><input class="m3-inp" id="mbd-cat-nombre" value="${(cat.nombre||'').replace(/"/g,'&quot;')}" placeholder=" " maxlength="40"><label class="m3-lbl">Nombre *</label></div>
+    <button class="btn-save rpl" id="mbd-cat-save" style="margin-bottom:8px;">Guardar cambios</button>
+    <button class="btn-save rpl" id="mbd-cat-del" style="background:var(--red-bg);color:var(--red);box-shadow:none;">🗑️ Eliminar categoría y sus ítems</button>
+  `);
+  g('mbd-cat-save').addEventListener('click',async()=>{
+    const nombre=g('mbd-cat-nombre')?.value.trim();if(!nombre)return;
+    saving();
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/categorias/${catId}`),{nombre,actualizadoEn:new Date().toISOString()});
+      cat.nombre=nombre;
+      closeEdit();toast('✅ Actualizado');renderMbd();
+    }catch(e){console.error(e);toast('Error');}
+  });
+  g('mbd-cat-del').addEventListener('click',async()=>{
+    if(!confirm(`¿Eliminar "${cat.nombre}" y todos sus ítems?`))return;
+    saving();
+    try{
+      // Eliminar ítems de la categoría
+      const its=S.mbd.items.filter(i=>i.catId===catId);
+      for(const it of its) await deleteDoc(doc(db,`usuarios/${S.uid}/cat_items/${it._id}`));
+      await deleteDoc(doc(db,`usuarios/${S.uid}/categorias/${catId}`));
+      S.mbd.categorias=S.mbd.categorias.filter(c=>c._id!==catId);
+      S.mbd.items=S.mbd.items.filter(i=>i.catId!==catId);
+      closeEdit();toast('Categoría eliminada');renderMbd();
+    }catch(e){console.error(e);toast('Error');}
+  });
+}
+window.mbdEditCat=mbdEditCat;
+
+// ── CRUD ÍTEMS ──
+function mbdAddItem(catId, catNombre){
+  const cat=S.mbd.categorias.find(c=>c._id===catId);
+  openEdit(`➕ Agregar a "${catNombre||'categoría'}"`,`
+    <div class="m3-field"><input class="m3-inp" id="mbd-item-nombre" placeholder=" "><label class="m3-lbl">Nombre *</label></div>
+    <div class="m3-field"><input class="m3-inp" id="mbd-item-extra1" placeholder=" "><label class="m3-lbl">Dato extra (precio, teléfono, etc.)</label></div>
+    <div class="m3-field"><input class="m3-inp" id="mbd-item-extra2" placeholder=" "><label class="m3-lbl">Dato extra 2 (opcional)</label></div>
+    <button class="btn-save rpl" id="mbd-item-save">Agregar ítem</button>
+  `);
+  setTimeout(()=>g('mbd-item-nombre')?.focus(),200);
+  g('mbd-item-save').addEventListener('click',async()=>{
+    const nombre=g('mbd-item-nombre')?.value.trim();if(!nombre){toast('El nombre es obligatorio');return;}
+    const extra={};
+    const e1=g('mbd-item-extra1')?.value.trim();if(e1)extra.dato1=e1;
+    const e2=g('mbd-item-extra2')?.value.trim();if(e2)extra.dato2=e2;
+    const ts=new Date().toISOString();
+    const data={nombre,catId,catNombre:cat?.nombre||catNombre,tipo:cat?.tipo||'ambos',extra,creadoEn:ts,actualizadoEn:ts};
+    saving();
+    try{
+      const ref=await addDoc(col('cat_items'),data);
+      S.mbd.items.push({...data,_id:ref.id});
+      closeEdit();toast('✅ Ítem agregado');renderMbd();
+      // Re-abrir la sección
+      setTimeout(()=>document.getElementById('mbd-cat-'+catId)?.classList.add('open'),100);
+    }catch(e){console.error(e);toast('Error');}
+  });
+}
+window.mbdAddItem=mbdAddItem;
+
+function mbdEditItem(itemId, catId){
+  const item=S.mbd.items.find(i=>i._id===itemId);if(!item)return;
+  openEdit(`✏️ Editar ítem`,`
+    <div class="m3-field"><input class="m3-inp" id="mbd-item-nombre" value="${(item.nombre||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Nombre *</label></div>
+    <div class="m3-field"><input class="m3-inp" id="mbd-item-extra1" value="${(item.extra?.dato1||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Dato extra</label></div>
+    <div class="m3-field"><input class="m3-inp" id="mbd-item-extra2" value="${(item.extra?.dato2||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Dato extra 2</label></div>
+    <button class="btn-save rpl" id="mbd-item-save">Guardar cambios</button>
+  `);
+  g('mbd-item-save').addEventListener('click',async()=>{
+    const nombre=g('mbd-item-nombre')?.value.trim();if(!nombre)return;
+    const extra={};
+    const e1=g('mbd-item-extra1')?.value.trim();if(e1)extra.dato1=e1;
+    const e2=g('mbd-item-extra2')?.value.trim();if(e2)extra.dato2=e2;
+    const upd={nombre,extra,actualizadoEn:new Date().toISOString()};
+    saving();
+    try{
+      await updateDoc(doc(db,`usuarios/${S.uid}/cat_items/${itemId}`),upd);
+      Object.assign(item,upd);
+      closeEdit();toast('✅ Actualizado');renderMbd();
+      setTimeout(()=>document.getElementById('mbd-cat-'+catId)?.classList.add('open'),100);
+    }catch(e){console.error(e);toast('Error');}
+  });
+}
+window.mbdEditItem=mbdEditItem;
+
+async function mbdDelItem(itemId, catId){
+  if(!confirm('¿Eliminar este ítem?'))return;
+  try{
+    await deleteDoc(doc(db,`usuarios/${S.uid}/cat_items/${itemId}`));
+    S.mbd.items=S.mbd.items.filter(i=>i._id!==itemId);
+    renderMbd();
+    setTimeout(()=>document.getElementById('mbd-cat-'+catId)?.classList.add('open'),100);
+  }catch(e){console.error(e);}
+}
+window.mbdDelItem=mbdDelItem;
+
+// ── PICKER DESDE MBD ──
+// Abre picker usando los datos de Mi Base de Datos
+// tipo: 'ingreso'|'gasto'|'ambos'|null (todos)
+function openMbdPicker({tipo, onSelect, titulo, sinCats}){
+  let cats = S.mbd.categorias;
+  if(tipo&&tipo!=='ambos') cats=cats.filter(c=>c.tipo===tipo||c.tipo==='ambos');
+  if(sinCats) cats=cats.filter(c=>!sinCats.includes(c._id));
+  // Nivel 1: categorías
+  openPicker({
+    title: titulo||'Categoría',
+    items: cats.sort((a,b)=>a.nombre.localeCompare(b.nombre,'es')).map(c=>({
+      id:c._id, name:`${c.icono||'📁'} ${c.nombre}`,
+      sub: S.mbd.items.filter(i=>i.catId===c._id).length+' ítems'
+    })),
+    selected:'',
+    onSelect:(catId)=>{
+      const cat=cats.find(c=>c._id===catId);if(!cat)return;
+      const items=S.mbd.items.filter(i=>i.catId===catId).sort((a,b)=>a.nombre.localeCompare(b.nombre,'es'));
+      setTimeout(()=>{
+        openPicker({
+          title: `${cat.icono||'📁'} ${cat.nombre}`,
+          items: items.map(i=>({id:i._id, name:i.nombre, sub:i.extra?.dato1||''})),
+          selected:'',
+          onSelect:(itemId,itemName)=>{
+            if(onSelect) onSelect({catId, catNombre:cat.nombre, itemId, itemName, tipo:cat.tipo});
+          },
+          onAdd:{
+            label:`Agregar a ${cat.nombre}`,
+            fn:(nombre)=>{
+              if(!nombre)return;
+              mbdAddItemQuick(catId, cat.nombre, cat.tipo, nombre, onSelect);
+            }
+          }
+        });
+      },60);
+    },
+    onAdd:{
+      label:'Nueva categoría',
+      fn:(nombre)=>{
+        if(!nombre)return;
+        mbdNewCatQuick(nombre,'ambos',onSelect);
+      }
+    }
+  });
+}
+window.openMbdPicker=openMbdPicker;
+
+async function mbdAddItemQuick(catId, catNombre, catTipo, nombre, cb){
+  const ts=new Date().toISOString();
+  const data={nombre,catId,catNombre,tipo:catTipo||'ambos',extra:{},creadoEn:ts,actualizadoEn:ts};
+  try{
+    const ref=await addDoc(col('cat_items'),data);
+    S.mbd.items.push({...data,_id:ref.id});
+    toast(`✅ "${nombre}" guardado en ${catNombre}`);
+    if(cb) cb({catId,catNombre,itemId:ref.id,itemName:nombre});
+  }catch(e){console.error(e);}
+}
+
+async function mbdNewCatQuick(nombre,tipo,cb){
+  const ts=new Date().toISOString();
+  const data={nombre,tipo,icono:'📁',color:'#5E7A68',bg:'var(--surface2)',creadoEn:ts,actualizadoEn:ts};
+  try{
+    const ref=await addDoc(col('categorias'),data);
+    S.mbd.categorias.push({...data,_id:ref.id});
+    toast(`✅ Categoría "${nombre}" creada`);
+  }catch(e){console.error(e);}
+}
 
 </script>
 </body>
