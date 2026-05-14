@@ -1003,16 +1003,18 @@ window.mnCargarSugerencias = mnCargarSugerencias;
 // CAT PICKER GRID — picker estilo app referencia
 // ══════════════════════════════════════════════
 let _catPickerCb = null;
-let _catPickerMode = 'cat'; // 'cat' | 'item'
+let _catPickerMode = 'cat';
 let _catPickerSelCat = null;
+let _catPickerShowHistory = false;
 
-function openCatPicker({ title, mode, onSelect, onAdd, filterCat }) {
+function openCatPicker({ title, mode, onSelect, onAdd, filterCat, showHistory }) {
   // mode: 'cat' = elegir categoría principal
   //       'item' = elegir ítem dentro de una categoría
   //       'any' = elegir categoría principal y luego ítem
   _catPickerCb = onSelect;
   _catPickerMode = mode || 'any';
   _catPickerSelCat = filterCat || null;
+  _catPickerShowHistory = showHistory || false;
 
   if(g('cat-picker-title')) g('cat-picker-title').textContent = title || 'Categoría';
   if(g('cat-picker-search')) g('cat-picker-search').value = '';
@@ -1020,10 +1022,10 @@ function openCatPicker({ title, mode, onSelect, onAdd, filterCat }) {
   g('cat-picker-overlay').classList.add('on');
   g('cat-picker-sheet').classList.add('on');
 
-  renderCatPickerBody('', _catPickerSelCat);
+  renderCatPickerBody('', _catPickerSelCat, _catPickerShowHistory);
 
   // Buscar
-  g('cat-picker-search').oninput = () => renderCatPickerBody(g('cat-picker-search').value, _catPickerSelCat);
+  g('cat-picker-search').oninput = () => renderCatPickerBody(g('cat-picker-search').value, _catPickerSelCat, _catPickerShowHistory);
 }
 window.openCatPicker = openCatPicker;
 
@@ -1034,7 +1036,7 @@ function closeCatPicker() {
 }
 window.closeCatPicker = closeCatPicker;
 
-function renderCatPickerBody(filtro, filterCat) {
+function renderCatPickerBody(filtro, filterCat, showHistory) {
   const body = g('cat-picker-body'); if(!body) return;
   const f = (filtro||'').toLowerCase();
   let html = '';
@@ -1116,14 +1118,54 @@ function renderCatPickerBody(filtro, filterCat) {
 
     // Si no hay categorías
     if(!cats.length){
-      html = `<div style="padding:32px 16px;text-align:center;">
-        <div style="font-size:32px;margin-bottom:8px;">📁</div>
-        <div style="font-size:14px;color:var(--t3);">Primero creá categorías en Mi Negocio</div>
-      </div>`;
+      if(showHistory){
+        // Finanzas: mostrar historial aunque no haya MBD
+        const hist=[...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'es'));
+        if(hist.length){
+          html += `<div class="cat-picker-section-lbl">Usadas antes</div><div class="cat-picker-grid">`;
+          hist.forEach(nombre=>{
+            html += `<div class="cat-picker-item rpl cat-hist-item" data-nombre="${nombre.replace(/"/g,'&quot;')}">
+              <div class="cat-picker-icon" style="background:var(--surface2);">📊</div>
+              <div class="cat-picker-name">${nombre}</div>
+            </div>`;
+          });
+          html += `</div>`;
+        } else {
+          html = `<div style="padding:32px 16px;text-align:center;"><div style="font-size:32px;margin-bottom:8px;">💸</div><div style="font-size:14px;color:var(--t3);">Sin categorías aún. Creá una en Mi Negocio.</div></div>`;
+        }
+      } else {
+        html = `<div style="padding:32px 16px;text-align:center;">
+          <div style="font-size:32px;margin-bottom:8px;">📁</div>
+          <div style="font-size:14px;color:var(--t3);">Primero creá categorías en Mi Negocio</div>
+        </div>`;
+      }
+    }
+    // Historial adicional para finanzas (cuando hay MBD + historial)
+    if(showHistory && cats.length){
+      const catNombres=new Set(S.mbd.items.map(i=>i.nombre));
+      const hist=[...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].filter(h=>!catNombres.has(h)).sort((a,b)=>a.localeCompare(b,'es'));
+      if(hist.length){
+        html += `<div class="cat-picker-section-lbl">Usadas antes</div><div class="cat-picker-grid">`;
+        hist.forEach(nombre=>{
+          html += `<div class="cat-picker-item rpl cat-hist-item" data-nombre="${nombre.replace(/"/g,'&quot;')}">
+            <div class="cat-picker-icon" style="background:var(--surface2);">📊</div>
+            <div class="cat-picker-name">${nombre}</div>
+          </div>`;
+        });
+        html += `</div>`;
+      }
     }
   }
 
   body.innerHTML = html;
+
+  // Listeners para historial de finanzas
+  body.querySelectorAll('.cat-hist-item[data-nombre]').forEach(el => {
+    el.addEventListener('click', () => {
+      if(_catPickerCb) _catPickerCb({ nombre: el.dataset.nombre, itemId:'', catId:'', catNombre:'' });
+      closeCatPicker();
+    });
+  });
 
   // Listeners para ítems
   body.querySelectorAll('.cat-picker-item[data-item-id]').forEach(el => {
@@ -1185,44 +1227,32 @@ window.openCliPicker = openCliPicker;
 
 // Picker de categoría de producto (para pedidos)
 function openPedCatPicker() {
-  // Muestra todas las categorías principales para elegir
+  // Muestra categorías principales como lista simple
   const cats = [...S.mbd.categorias].sort((a,b)=>(a.nombre||'').localeCompare(b.nombre||'','es'));
-  const items_for_picker = cats.map(c=>({id:c._id, name:`${c.icono||'📁'} ${c.nombre}`}));
   openPicker({
     title: 'Categoría de producto',
-    items: items_for_picker,
-    selected: g('s-ped-cat')?.value||'',
-    onSelect: (id, name) => {
+    items: cats.map(c=>({id:c._id, name:`${c.icono||'📁'} ${c.nombre}`, sub:S.mbd.items.filter(i=>i.catId===c._id).length+' ítems'})),
+    selected: '',
+    onSelect: (id) => {
       const cat = S.mbd.categorias.find(c=>c._id===id);
-      const n = cat?.nombre || name;
-      g('s-ped-cat').value = n;
+      if(!cat) return;
+      g('s-ped-cat').value = cat._id; // guardar el ID
       const lbl = g('ped-cat-trigger-lbl');
-      if(lbl){ lbl.textContent=n; lbl.style.color='var(--t1)'; }
+      if(lbl){ lbl.textContent=`${cat.icono||''} ${cat.nombre}`; lbl.style.color='var(--t1)'; }
       g('ped-cat-trigger').classList.add('filled');
-      if(g('s-ped-prod-trigger-lbl')){ g('s-ped-prod-trigger-lbl').textContent='Seleccionar producto…'; g('s-ped-prod-trigger-lbl').style.color='var(--t4)'; }
-      if(g('s-ped-prod')) g('s-ped-prod').value='';
+      if(g('ped-prod-trigger-lbl')){ g('ped-prod-trigger-lbl').textContent='Seleccionar producto…'; g('ped-prod-trigger-lbl').style.color='var(--t4)'; }
     },
-    onAdd: {
-      label: 'Nueva categoría',
-      fn: async (nombre) => {
-        if(!nombre) return;
-        const cat = await mnGetOrCreateCat(nombre, '📦', '#EBF0EC');
-        g('s-ped-cat').value = cat.nombre;
-        const lbl = g('ped-cat-trigger-lbl');
-        if(lbl){ lbl.textContent=cat.nombre; lbl.style.color='var(--t1)'; }
-        g('ped-cat-trigger')?.classList.add('filled');
-      }
-    }
+    onAdd: { label:'Nueva categoría', fn: async(nombre)=>{ if(!nombre) return; const cat=await mnGetOrCreateCat(nombre,'📦','#EBF0EC'); g('s-ped-cat').value=cat._id; const lbl=g('ped-cat-trigger-lbl'); if(lbl){lbl.textContent=`${cat.icono||''} ${cat.nombre}`;lbl.style.color='var(--t1)';}g('ped-cat-trigger')?.classList.add('filled'); }}
   });
 }
 window.openPedCatPicker = openPedCatPicker;
 
 // Picker de producto (para pedidos) — filtra por categoría seleccionada
 function openPedProdPicker() {
-  const catNombre = g('s-ped-cat')?.value || '';
-  const catObj = S.mbd.categorias.find(c=>c.nombre===catNombre);
+  const catId = g('s-ped-cat')?.value || '';
+  const catObj = S.mbd.categorias.find(c=>c._id===catId);
   openCatPicker({
-    title: catNombre ? `Productos en "${catNombre}"` : 'Producto',
+    title: catObj ? `${catObj.icono||''} ${catObj.nombre}` : 'Producto',
     filterCat: catObj?._id || null,
     onSelect: (result) => {
       addPedProd(result.nombre);
@@ -1238,13 +1268,15 @@ function openFinCatPicker() {
   openCatPicker({
     title: 'Categoría',
     onSelect: (result) => {
-      // Usar el nombre del ítem como categoría de la finanza
       const nombre = result.nombre;
       g('s-fin-cat').value = nombre;
       const lbl = g('fin-cat-trigger-lbl');
       if(lbl){ lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
       g('fin-cat-trigger')?.classList.add('filled');
     },
+    // Sin onAdd — finanzas NO crea categorías en Mi Negocio
+    // Solo muestra las existentes + historial de movimientos pasados
+    showHistory: true,
   });
 }
 window.openFinCatPicker = openFinCatPicker;
