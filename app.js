@@ -130,36 +130,62 @@ function toast(msg) {
 
 /**
  * fetchDirectorio()
- * Inicia la escucha en tiempo real (onSnapshot).
- * Cualquier cambio en Firestore actualiza S.directorio
- * y re-renderiza Mi Negocio automáticamente.
+ * ─────────────────
+ * FIX 1: Devuelve una Promise que resuelve con el PRIMER snapshot.
+ * Esto permite que inicializarOTTO() haga `await fetchDirectorio()`
+ * y garantice que S.directorio esté lleno ANTES de renderizar.
+ *
+ * Snapshots posteriores llaman _despuesDeActualizarDirectorio()
+ * que propaga el cambio a Mi Negocio Y al picker si está abierto.
  */
 function fetchDirectorio() {
-  if (S.dirUnsub) S.dirUnsub();
+  return new Promise((resolve) => {
+    if (S.dirUnsub) S.dirUnsub();
 
-  const q = query(dirCol(), where('activo','==',true));
+    let primerLlamada = true;
+    const q = query(dirCol(), where('activo','==',true));
 
-  S.dirUnsub = onSnapshot(q, snap => {
-    S.directorio = snap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
-      .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
-    // Propagación neuronal: re-render del directorio al instante
-    renderDirectorioGrid();
-  }, err => {
-    console.warn('[Directorio] onSnapshot error:', err.message);
-    _fetchDirectorioFallback();
+    S.dirUnsub = onSnapshot(q,
+      snap => {
+        S.directorio = snap.docs
+          .map(d => ({ id: d.id, ...d.data() }))
+          .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
+
+        if (primerLlamada) {
+          primerLlamada = false;
+          resolve(); // desbloquea el await en inicializarOTTO()
+        } else {
+          // Snapshots posteriores: propagación neuronal completa
+          _despuesDeActualizarDirectorio();
+        }
+      },
+      err => {
+        console.warn('[Directorio] onSnapshot error:', err.message);
+        // Fallback: getDocs si falla el listener
+        getDocs(dirCol()).then(snap => {
+          S.directorio = snap.docs
+            .map(d => ({ id: d.id, ...d.data() }))
+            .filter(e => e.activo !== false)
+            .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
+          resolve();
+        }).catch(() => resolve()); // resolver igual para no bloquear el arranque
+      }
+    );
   });
 }
 
-async function _fetchDirectorioFallback() {
-  try {
-    const snap = await getDocs(dirCol());
-    S.directorio = snap.docs
-      .map(d => ({ id: d.id, ...d.data() }))
-      .filter(e => e.activo !== false)
-      .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
-    renderDirectorioGrid();
-  } catch(e) { console.error('[Directorio] fallback:', e); }
+/**
+ * _despuesDeActualizarDirectorio()
+ * FIX 2: Propagación neuronal en cada update del directorio.
+ * Actualiza Mi Negocio Y re-renderiza el picker si está abierto.
+ */
+function _despuesDeActualizarDirectorio() {
+  // Siempre actualizar el EntityGrid de Mi Negocio
+  renderDirectorioGrid();
+  // Si el picker dp está abierto en pantalla, actualizar su lista también
+  if (g('dp-sheet')?.classList.contains('on')) {
+    _dpRenderList();
+  }
 }
 
 // ── Accesos en memoria ──────────────────────────
@@ -2055,66 +2081,127 @@ async function loginGoogle(){try{await signInWithPopup(auth,gProv);}catch(e){con
 async function logoutOtto(){try{await signOut(auth);}catch(e){}g('app').classList.remove('on');g('login').classList.add('on');g('loading').style.display='none';}
 
 // ══════════════════════════════════════════════════
-// 28. INIT — onAuthStateChanged
 // ══════════════════════════════════════════════════
+// 28. inicializarOTTO() + onAuthStateChanged
+// ══════════════════════════════════════════════════
+
+/**
+ * inicializarOTTO(user)
+ * ─────────────────────
+ * FIX 3: Función de arranque central con orden garantizado.
+ *
+ * El problema anterior era que fetchDirectorio() (async/onSnapshot)
+ * se llamaba pero loadAllData() bloqueaba con await, y el re-render
+ * final podía ejecutarse antes o después del primer snapshot del
+ * directorio — no había coordinación.
+ *
+ * Orden correcto:
+ *   1. UI básica visible (skeleton)
+ *   2. await fetchDirectorio()  ← espera el PRIMER snapshot
+ *   3. await Promise.allSettled([loadAllData, perfil, notas])
+ *   4. _renderTodo()            ← render completo con TODO disponible
+ *   5. Onboarding si corresponde
+ *   6. renderSlider() (puede ser lento, no bloquea)
+ */
+async function inicializarOTTO(user) {
+  S.uid    = user.uid;
+  S.nombre = user.displayName || user.email.split('@')[0];
+
+  // ── Paso 1: UI básica y mostrar app ──────────────
+  if(g('menu-av'))  g('menu-av').textContent   = S.nombre[0].toUpperCase();
+  if(g('menu-name'))g('menu-name').textContent = S.nombre;
+  if(g('menu-neg')) g('menu-neg').textContent  = '…';
+  if(g('home-hola'))g('home-hola').textContent = `Hola, ${S.nombre.split(' ')[0]} 👋`;
+
+  g('loading').style.display = 'none';
+  g('login').classList.remove('on');
+  g('app').classList.add('on');
+
+  // ── Paso 2: Directorio — esperar primer snapshot ─
+  // fetchDirectorio() ahora devuelve una Promise que resuelve
+  // cuando llega el primer snapshot. S.directorio queda lleno.
+  await fetchDirectorio();
+
+  // ── Paso 3: Resto de datos en paralelo ───────────
+  await Promise.allSettled([
+    loadAllData(),
+    _cargarPerfil(),
+    _cargarNotas(),
+  ]);
+
+  // ── Paso 4: Render completo ───────────────────────
+  // En este punto: S.directorio ✓, S.movs ✓, S.pedidos ✓,
+  // S.eventos ✓, S.tareas ✓, S.perfil ✓, S.notas ✓
+  _renderTodo();
+
+  // ── Paso 5: Onboarding si es nuevo usuario ────────
+  if (!S.perfil?.onboardingDone)
+    setTimeout(() => { g('onboarding').classList.add('on'); showOb('ob0'); }, 400);
+
+  // ── Paso 6: Slider OTTO (no bloquea) ─────────────
+  renderSlider();
+}
+
+async function _cargarPerfil() {
+  try {
+    const snap = await getDocs(col('perfil'));
+    if (!snap.empty) {
+      S.perfil  = snap.docs[0].data();
+      S.negocio = S.perfil.negocio || S.nombre;
+    }
+  } catch(e) { console.warn('perfil:', e.message); }
+}
+
+async function _cargarNotas() {
+  try {
+    const ns = await getDocs(col('notas'));
+    if (!ns.empty) {
+      const d = ns.docs[0].data();
+      S.notas = d.notas || [];
+      if (!S.notas.length && d.texto)
+        S.notas = [{ id:'n0', texto:d.texto, fecha:new Date().toISOString() }];
+    }
+  } catch(e) { console.warn('notas:', e.message); }
+}
+
+/** Render completo de todas las secciones */
+function _renderTodo() {
+  const p = S.perfil, neg = p?.negocio || S.negocio || '';
+  if (neg) {
+    ['hd-negocio','menu-neg','perfil-neg'].forEach(id => {
+      const el = g(id); if (el) el.textContent = neg;
+    });
+    if (g('perfil-rubro'))
+      g('perfil-rubro').textContent = (p?.emoji||'💼')+' '+(p?.rubro||'Mi negocio');
+    if (g('otto-hola-nombre'))
+      g('otto-hola-nombre').textContent = S.nombre.split(' ')[0];
+  }
+  renderDirectorioGrid();
+  renderHomeBal();
+  updateBanner();
+  renderWeek();
+  renderMovsFin();
+  renderPedWeek();
+  renderPeds();
+  renderProduceDia();
+  renderEvs();
+  renderTasks();
+  renderAgeCalGoogle();
+  renderCalMes('task', taskMesOffset, 'taskFecha', null,
+    ds => S.tareas.some(t => t.fecha===ds && !t.done));
+  renderNotas();
+  renderOttoStats();
+}
+
+// ── Punto de entrada de autenticación ───────────
 onAuthStateChanged(auth, async user => {
   if (user) {
-    S.uid    = user.uid;
-    S.nombre = user.displayName || user.email.split('@')[0];
-
-    // Actualizar UI básica
-    if(g('menu-av'))  g('menu-av').textContent=S.nombre[0].toUpperCase();
-    if(g('menu-name'))g('menu-name').textContent=S.nombre;
-    if(g('home-hola'))g('home-hola').textContent=`Hola, ${S.nombre.split(' ')[0]} 👋`;
-
-    // Mostrar app inmediatamente
-    g('loading').style.display='none';
-    g('login').classList.remove('on');
-    g('app').classList.add('on');
-
-    // Render vacío inmediato
-    renderHomeBal(); updateBanner(); renderWeek();
-    renderMovsFin(); renderPedWeek(); renderPeds();
-    renderProduceDia(); renderEvs(); renderTasks();
-    renderAgeCalGoogle();
-    renderCalMes('task','taskMesOffset','taskFecha',null,
-      ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
-    renderNotas();
-
-    // ── DIRECTORIO — iniciar escucha neuronal en tiempo real ──
-    fetchDirectorio();
-
-    // Cargar datos transaccionales en background
-    try { await loadAllData(); } catch(e) { console.warn('loadAllData:', e.message); }
-
-    // Cargar perfil y notas
-    try {
-      const snap=await getDocs(col('perfil'));
-      if(!snap.empty){S.perfil=snap.docs[0].data();S.negocio=S.perfil.negocio||S.nombre;}
-    } catch(e){}
-    try {
-      const ns=await getDocs(col('notas'));
-      if(!ns.empty){const d=ns.docs[0].data();S.notas=d.notas||[];if(!S.notas.length&&d.texto)S.notas=[{id:'n0',texto:d.texto,fecha:new Date().toISOString()}];}
-    } catch(e){}
-
-    // Re-render con datos reales
-    renderDirectorioGrid();
-    renderHomeBal(); updateBanner(); renderWeek();
-    renderMovsFin(); renderPedWeek(); renderPeds();
-    renderProduceDia(); renderEvs(); renderTasks();
-    renderAgeCalGoogle();
-    renderCalMes('task','taskMesOffset','taskFecha',null,
-      ds=>S.tareas.some(t=>t.fecha===ds&&!t.done));
-    renderNotas(); renderSlider();
-
-    // Onboarding si es la primera vez
-    if(!S.perfil?.onboardingDone)
-      setTimeout(()=>{g('onboarding').classList.add('on');showOb('ob0');},500);
-
+    await inicializarOTTO(user);
   } else {
-    g('loading').style.display='none';
+    g('loading').style.display = 'none';
     g('login').classList.add('on');
-    if(S.dirUnsub){S.dirUnsub();S.dirUnsub=null;}
+    // Cancelar listener del directorio al hacer logout
+    if (S.dirUnsub) { S.dirUnsub(); S.dirUnsub = null; }
   }
 });
 
