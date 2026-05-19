@@ -500,26 +500,31 @@ function _mnCatBlock(cat, items) {
       const catColor = cat.color || '#234136';
       const itemColor = e.color_fondo || catColor;
       const ini = (e.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-      const meta = [e.metadata?.telefono, e.metadata?.email].filter(Boolean).join(' · ');
       const hasEmoji = e.icono && e.icono !== '👤' && e.icono !== '👥';
-      // Subcategoría del ítem si tiene
       const subcat = e.subcatId ? getCatById(e.subcatId) : null;
+      const meta = [
+        subcat ? `${subcat.icono||''} ${subcat.nombre}` : null,
+        e.metadata?.telefono || e.metadata?.email || null,
+      ].filter(Boolean).join(' · ');
       html += `
         <div class="dir-entity-card rpl" data-id="${e._id || e.id}">
           <div class="dir-entity-avatar" style="background:${itemColor};">
             ${hasEmoji
-              ? e.icono
-              : `<span style="font-size:15px;font-weight:700;color:#fff;">${ini}</span>`}
+              ? `<span style="font-size:16px;">${e.icono}</span>`
+              : `<span style="font-size:13px;font-weight:700;color:#fff;">${ini}</span>`}
           </div>
-          <div class="dir-entity-name">${e.nombre}</div>
-          ${subcat ? `<div class="dir-entity-meta" style="color:${subcat.color||catColor};">${subcat.icono||''} ${subcat.nombre}</div>` : ''}
-          ${meta && !subcat ? `<div class="dir-entity-meta">${meta}</div>` : ''}
+          <div style="flex:1;min-width:0;">
+            <div class="dir-entity-name">${e.nombre}</div>
+            ${meta ? `<div class="dir-entity-meta">${meta}</div>` : ''}
+          </div>
           <div class="dir-entity-actions">
-            <button class="dir-edit-btn rpl" data-id="${e._id || e.id}">
-              <span class="material-icons-round">edit</span>
+            <button class="dir-edit-btn rpl" data-id="${e._id || e.id}"
+              style="background:transparent;border:none;cursor:pointer;color:var(--t4);padding:4px;display:flex;">
+              <span class="material-icons-round" style="font-size:16px">edit</span>
             </button>
-            <button class="dir-del-btn rpl" data-id="${e._id || e.id}">
-              <span class="material-icons-round">delete_outline</span>
+            <button class="dir-del-btn rpl" data-id="${e._id || e.id}"
+              style="background:transparent;border:none;cursor:pointer;color:var(--t5);padding:4px;display:flex;">
+              <span class="material-icons-round" style="font-size:16px">delete_outline</span>
             </button>
           </div>
         </div>`;
@@ -1360,14 +1365,20 @@ function _openFinCatDosNiveles(items) {
 // ══════════════════════════════════════════════════
 // 12. PICKER GENÉRICO DE LISTA (para categorías, productos, etc.)
 // ══════════════════════════════════════════════════
-function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd }) {
+function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd, emptyMsg }) {
   const sorted = [...(items||[])].sort((a,b)=>(a.name||'').localeCompare(b.name||'','es'));
+  const placeholder = onAdd ? 'Buscar o escribir nuevo…' : 'Buscar…';
+
   let html = `
     <input id="pg-search" autocomplete="off"
       style="width:100%;margin-bottom:12px;padding:10px 14px;border:1.5px solid var(--border);
              border-radius:var(--rfull);font-family:var(--font);font-size:14px;color:var(--t1);outline:none;"
-      placeholder="Buscar…">
+      placeholder="${placeholder}">
     <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:340px;overflow-y:auto;">`;
+
+  if (!sorted.length && emptyMsg) {
+    html += `<div style="padding:20px 12px;text-align:center;font-size:13px;color:var(--t4);">${emptyMsg}</div>`;
+  }
 
   sorted.forEach(item => {
     html += `
@@ -1386,6 +1397,11 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd })
       </div>`;
   });
   html += `</div>`;
+  if (onAdd) {
+    html += `<div style="font-size:12px;color:var(--t4);margin-top:8px;text-align:center;">
+      Escribí y presioná Enter para agregar uno nuevo
+    </div>`;
+  }
 
   openEdit(title, html);
 
@@ -1419,23 +1435,18 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd })
 // 13. PICKER PRODUCTOS (para pedidos)
 // ══════════════════════════════════════════════════
 function openPedProdPicker() {
-  // Buscar la categoría "Servicios" dinámicamente por nombre
-  const catServicios = getCatsPrincipales().find(c =>
-    c.nombre.toLowerCase() === 'servicios'
-  );
-  // Si existe la categoría Servicios, mostrar sus items
-  // Si no, mostrar todos los items del directorio como productos posibles
-  const items = catServicios
-    ? dirGetByCat(catServicios._id).map(e => ({ id: e._id || e.id, name: e.nombre }))
-    : dirGetAll().map(e => ({ id: e._id || e.id, name: e.nombre }));
+  // Mostrar TODOS los ítems del directorio como productos posibles
+  // + texto libre para productos que no están en el directorio
+  const items = dirGetAll().map(e => ({ id: e._id || e.id, name: e.nombre }));
 
   _openPickerLista({
     title:    'Agregar producto',
     items,
     selected: '',
     onSelect: (_, nombre) => { addPedProd(nombre); closeEdit(); },
-    addLabel: 'Escribí el nombre del producto y presioná Enter',
+    addLabel: 'Escribí el nombre y presioná Enter',
     onAdd:    nombre => { if (nombre) addPedProd(nombre); },
+    emptyMsg: 'Escribí el nombre del producto y presioná Enter para agregarlo.',
   });
 }
 
