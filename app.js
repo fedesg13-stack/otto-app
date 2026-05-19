@@ -48,12 +48,22 @@ const gProv  = new GoogleAuthProvider();
 // ══════════════════════════════════════════════════
 // 2. CONFIGURACIÓN DEL DIRECTORIO
 // ══════════════════════════════════════════════════
-const DIR_CATS = {
-  Clientes:    { icono:'👤', bg:'#E8F0FE', color:'#1967D2', plural:'clientes',    label:'cliente'    },
-  Empleados:   { icono:'👥', bg:'#E6F4EA', color:'#137333', plural:'empleados',   label:'empleado'   },
-  Proveedores: { icono:'🏭', bg:'#FEF7E0', color:'#B06000', plural:'proveedores', label:'proveedor'  },
-  Servicios:   { icono:'⚡', bg:'#F3E8FD', color:'#7627BB', plural:'servicios',   label:'servicio'   },
+// DIR_CATS ya no es fijo — las categorías viven en Firestore
+// Se usa solo como fallback para datos legacy
+const DIR_CATS_LEGACY = {
+  Clientes:    { icono:'👤', color:'#1967D2', bg:'#E8F0FE', label:'cliente'   },
+  Empleados:   { icono:'👥', color:'#137333', bg:'#E6F4EA', label:'empleado'  },
+  Proveedores: { icono:'🏭', color:'#B06000', bg:'#FEF7E0', label:'proveedor' },
+  Servicios:   { icono:'⚡', color:'#7627BB', bg:'#F3E8FD', label:'servicio'  },
 };
+
+// Categorías por defecto para usuarios nuevos (se guardan en Firestore al primer login)
+const CATS_DEFAULT = [
+  { nombre:'Clientes',    icono:'👤', color:'#1967D2', orden:0 },
+  { nombre:'Empleados',   icono:'👥', color:'#137333', orden:1 },
+  { nombre:'Proveedores', icono:'🏭', color:'#B06000', orden:2 },
+  { nombre:'Servicios',   icono:'⚡', color:'#7627BB', orden:3 },
+];
 const PALETA = [
   // Verdes
   {bg:'#1B5E20', c:'#FFFFFF'}, {bg:'#2E7D32', c:'#FFFFFF'},
@@ -106,6 +116,12 @@ let S = {
   // Directorio en memoria (sincronizado por onSnapshot)
   directorio: [],
   dirUnsub:   null,
+  // Categorías dinámicas (sincronizadas por onSnapshot)
+  // Estructura: [{ _id, nombre, icono, color, parentId, orden }]
+  // parentId=null → categoría principal
+  // parentId='xyz' → subcategoría de xyz
+  categorias: [],
+  catsUnsub:  null,
 };
 
 // ══════════════════════════════════════════════════
@@ -140,6 +156,91 @@ function toast(msg) {
   const t = g('toast'); if (!t) return;
   t.textContent = msg; t.classList.add('on');
   setTimeout(() => t.classList.remove('on'), 3000);
+}
+
+// ══════════════════════════════════════════════════
+// 5b. CATEGORÍAS DINÁMICAS
+// Firestore: usuarios/{uid}/categorias/{id}
+// { nombre, icono, color, parentId, orden, activo }
+// parentId=null → categoría principal
+// parentId='id' → subcategoría
+// ══════════════════════════════════════════════════
+
+const catsCol = () => collection(db, `usuarios/${S.uid}/categorias`);
+
+// ── Acceso en memoria ─────────────────────────────
+const getCatsPrincipales = () =>
+  S.categorias.filter(c => !c.parentId).sort((a,b) => (a.orden||0)-(b.orden||0));
+
+const getSubcats = (parentId) =>
+  S.categorias.filter(c => c.parentId === parentId).sort((a,b) => (a.orden||0)-(b.orden||0));
+
+const getCatById = (id) => S.categorias.find(c => c._id === id) || null;
+
+// ── Listener en tiempo real ───────────────────────
+function fetchCategorias() {
+  return new Promise((resolve) => {
+    if (S.catsUnsub) S.catsUnsub();
+    let primero = true;
+    const q = query(catsCol(), where('activo','==',true));
+    S.catsUnsub = onSnapshot(q, snap => {
+      S.categorias = snap.docs.map(d => ({ ...d.data(), _id: d.id }));
+      if (primero) { primero = false; resolve(); }
+      else { renderDirectorioGrid(); }
+    }, async err => {
+      console.warn('[Cats] onSnapshot:', err.message);
+      try {
+        const snap = await getDocs(catsCol());
+        S.categorias = snap.docs.map(d => ({ ...d.data(), _id: d.id })).filter(c => c.activo !== false);
+      } catch(e) {}
+      resolve();
+    });
+  });
+}
+
+// ── Inicializar categorías default para usuarios nuevos ──
+async function initCategoriasDefault() {
+  const snap = await getDocs(catsCol());
+  if (!snap.empty) return; // ya tiene categorías
+  // Crear las 4 categorías principales por defecto
+  for (const cat of CATS_DEFAULT) {
+    await addDoc(catsCol(), {
+      ...cat, parentId: null, activo: true,
+      creadoEn: serverTimestamp(),
+    });
+  }
+}
+
+// ── CRUD categorías ───────────────────────────────
+async function saveCategoria({ nombre, icono, color, parentId = null }) {
+  if (!nombre?.trim()) throw new Error('El nombre es obligatorio');
+  const orden = S.categorias.filter(c => c.parentId === parentId).length;
+  const ref = await addDoc(catsCol(), {
+    nombre: nombre.trim(), icono: icono || '📁',
+    color: color || '#1976D2',
+    parentId, orden, activo: true,
+    creadoEn: serverTimestamp(),
+  });
+  return { _id: ref.id, nombre: nombre.trim(), icono, color, parentId, orden };
+}
+
+async function updateCategoria(id, cambios) {
+  await updateDoc(doc(db, `usuarios/${S.uid}/categorias/${id}`), {
+    ...cambios, actualizadoEn: serverTimestamp(),
+  });
+}
+
+async function deleteCategoria(id) {
+  // Soft-delete la categoría y todas sus subcategorías
+  const batch = [];
+  batch.push(updateDoc(doc(db, `usuarios/${S.uid}/categorias/${id}`),
+    { activo: false, actualizadoEn: serverTimestamp() }));
+  // Subcategorías hijas
+  S.categorias.filter(c => c.parentId === id).forEach(sub => {
+    batch.push(updateDoc(doc(db, `usuarios/${S.uid}/categorias/${sub._id}`),
+      { activo: false, actualizadoEn: serverTimestamp() }));
+  });
+  await Promise.all(batch);
 }
 
 // ══════════════════════════════════════════════════
@@ -231,13 +332,14 @@ const dirSearch   = q     => {
  * Devuelve el objeto con su id asignado por Firestore.
  * onSnapshot actualiza S.directorio y el grid automáticamente.
  */
-async function saveEntidad({ nombre, categoria_principal, icono, color_fondo, metadata = {} }) {
-  const defs = DIR_CATS[categoria_principal] || DIR_CATS.Clientes;
+async function saveEntidad({ nombre, categoria_principal, icono, color_fondo, subcatId, metadata = {} }) {
+  const catDin = getCatById(categoria_principal);
   const data = {
     nombre:              nombre.trim(),
     categoria_principal,
-    icono:       icono       || defs.icono,
-    color_fondo: color_fondo || defs.bg,
+    subcatId:            subcatId || null,
+    icono:       icono       || catDin?.icono || '👤',
+    color_fondo: color_fondo || catDin?.color || '#234136',
     metadata,
     activo:        true,
     creadoEn:      serverTimestamp(),
@@ -265,6 +367,10 @@ async function deleteEntidad(id) {
 // ══════════════════════════════════════════════════
 // 6. MI NEGOCIO — EntityGrid
 // ══════════════════════════════════════════════════
+// ══════════════════════════════════════════════════
+// 6. MI NEGOCIO — Sistema de categorías dinámicas
+// ══════════════════════════════════════════════════
+
 function renderDirectorioGrid(filtro) {
   const p   = S.perfil;
   const neg = p?.negocio || S.negocio || '';
@@ -273,72 +379,139 @@ function renderDirectorioGrid(filtro) {
       const el = g(id); if (el) el.textContent = neg;
     });
     if (g('perfil-rubro'))
-      g('perfil-rubro').textContent = (p?.emoji||'💼') + ' ' + (p?.rubro||'Mi negocio');
+      g('perfil-rubro').textContent = (p?.emoji||'💼')+' '+(p?.rubro||'Mi negocio');
   }
 
   const wrap = g('mn-sections'); if (!wrap) return;
   const f = (filtro || g('mn-search-inp')?.value || '').toLowerCase();
+  const principales = getCatsPrincipales();
 
-  let html = '';
-  Object.entries(DIR_CATS).forEach(([catKey, catDef]) => {
-    let items = dirGetByCat(catKey);
-    if (f) items = items.filter(e =>
-      (e.nombre||'').toLowerCase().includes(f) ||
-      (e.metadata?.telefono||'').includes(f) ||
-      (e.metadata?.email||'').toLowerCase().includes(f)
-    );
-    html += _mnCatBlock(catKey, catDef, items);
-  });
-
-  if (!html.trim()) {
+  if (!principales.length) {
     wrap.innerHTML = `
       <div style="margin:32px 16px;padding:28px 20px;background:var(--surface);
                   border-radius:18px;border:1.5px dashed var(--border);text-align:center;">
         <div style="font-size:40px;margin-bottom:10px;">🗂️</div>
         <div style="font-size:16px;font-weight:700;color:var(--t1);margin-bottom:6px;">
-          Directorio vacío
+          Sin categorías
         </div>
-        <div style="font-size:13px;color:var(--t3);">
-          Usá el botón + de cada categoría para agregar tu primer contacto.
+        <div style="font-size:13px;color:var(--t3);margin-bottom:16px;">
+          Tocá el botón de abajo para crear tu primera categoría.
         </div>
       </div>`;
+    _mnAddBotonNuevaCat(wrap);
     return;
   }
+
+  let html = '';
+  principales.forEach(cat => {
+    let items = dirGetByCat(cat._id);
+    if (f) items = items.filter(e =>
+      (e.nombre||'').toLowerCase().includes(f) ||
+      (e.metadata?.telefono||'').includes(f) ||
+      (e.metadata?.email||'').toLowerCase().includes(f)
+    );
+    html += _mnCatBlock(cat, items);
+  });
+
   wrap.innerHTML = html;
+  _mnAddBotonNuevaCat(wrap);
   _mnBindEvents();
 }
 
-function _mnCatBlock(catKey, catDef, items) {
+function _mnAddBotonNuevaCat(wrap) {
+  const div = document.createElement('div');
+  div.style.cssText = 'padding:0 12px 24px;';
+  div.innerHTML = `
+    <button class="dir-add-btn rpl" id="mn-nueva-cat"
+      style="border-color:var(--bosque);color:var(--bosque);font-weight:700;">
+      <span class="material-icons-round">create_new_folder</span>
+      Nueva categoría principal
+    </button>`;
+  wrap.appendChild(div);
+  g('mn-nueva-cat')?.addEventListener('click', () => _mnOpenCrearCat(null));
+}
+
+function _mnCatBlock(cat, items) {
+  const color = cat.color || '#234136';
+  // Color de fondo suave basado en el color principal
+  const bg = color + '18'; // transparencia
+
   let html = `
-    <div class="dir-cat-block" data-cat="${catKey}">
+    <div class="dir-cat-block" data-cat-id="${cat._id}">
       <div class="dir-cat-hdr">
-        <div class="dir-cat-icon-wrap" style="background:${catDef.bg};color:${catDef.color};">${catDef.icono}</div>
-        <span class="dir-cat-label" style="color:${catDef.color};">${catKey}</span>
+        <div class="dir-cat-icon-wrap" style="background:${color};color:#fff;">${cat.icono||'📁'}</div>
+        <span class="dir-cat-label" style="color:${color};">${cat.nombre}</span>
         <span class="dir-cat-count">${items.length}</span>
+        <div style="display:flex;gap:4px;margin-left:auto;">
+          <button class="rpl mn-cat-edit" data-cat-id="${cat._id}"
+            style="background:transparent;border:none;cursor:pointer;color:var(--t4);padding:4px;display:flex;">
+            <span class="material-icons-round" style="font-size:16px">edit</span>
+          </button>
+          <button class="rpl mn-cat-del" data-cat-id="${cat._id}"
+            style="background:transparent;border:none;cursor:pointer;color:var(--t5);padding:4px;display:flex;">
+            <span class="material-icons-round" style="font-size:16px">delete_outline</span>
+          </button>
+        </div>
       </div>`;
+
+  // Subcategorías como chips horizontales
+  const subcats = getSubcats(cat._id);
+  if (subcats.length) {
+    html += `<div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 4px 10px;">`;
+    subcats.forEach(sub => {
+      html += `
+        <div style="display:inline-flex;align-items:center;gap:4px;background:${sub.color||color}22;
+                    border:1px solid ${sub.color||color}44;border-radius:var(--rfull);
+                    padding:4px 10px;font-size:12px;font-weight:600;color:${sub.color||color};">
+          ${sub.icono||'•'} ${sub.nombre}
+          <button class="rpl mn-subcat-edit" data-cat-id="${sub._id}"
+            style="background:transparent;border:none;cursor:pointer;color:${sub.color||color};opacity:.7;padding:1px;display:flex;">
+            <span class="material-icons-round" style="font-size:13px">edit</span>
+          </button>
+          <button class="rpl mn-subcat-del" data-cat-id="${sub._id}"
+            style="background:transparent;border:none;cursor:pointer;color:var(--red);opacity:.7;padding:1px;display:flex;">
+            <span class="material-icons-round" style="font-size:13px">close</span>
+          </button>
+        </div>`;
+    });
+    html += `</div>`;
+  }
+
+  // Botón agregar subcategoría
+  html += `
+    <button class="rpl mn-add-subcat" data-cat-id="${cat._id}"
+      style="display:flex;align-items:center;gap:5px;background:transparent;border:none;
+             cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;
+             color:${color};padding:0 4px 8px;opacity:.8;">
+      <span class="material-icons-round" style="font-size:14px">add</span>
+      Agregar subcategoría
+    </button>`;
 
   if (items.length) {
     html += `<div class="dir-entity-grid">`;
     items.forEach(e => {
-      const bg  = e.color_fondo || catDef.bg;
-      const ico = e.icono       || catDef.icono;
+      const catColor = cat.color || '#234136';
+      const itemColor = e.color_fondo || catColor;
       const ini = (e.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
       const meta = [e.metadata?.telefono, e.metadata?.email].filter(Boolean).join(' · ');
-      const showEmoji = ico !== '👤' && ico !== '👥';
+      const hasEmoji = e.icono && e.icono !== '👤' && e.icono !== '👥';
+      // Subcategoría del ítem si tiene
+      const subcat = e.subcatId ? getCatById(e.subcatId) : null;
       html += `
-        <div class="dir-entity-card rpl" data-id="${e.id}">
-          <div class="dir-entity-avatar" style="background:${bg};">
-            ${showEmoji
-              ? ico
-              : `<span style="font-size:15px;font-weight:700;color:${catDef.color};">${ini}</span>`}
+        <div class="dir-entity-card rpl" data-id="${e._id || e.id}">
+          <div class="dir-entity-avatar" style="background:${itemColor};">
+            ${hasEmoji
+              ? e.icono
+              : `<span style="font-size:15px;font-weight:700;color:#fff;">${ini}</span>`}
           </div>
           <div class="dir-entity-name">${e.nombre}</div>
-          ${meta ? `<div class="dir-entity-meta">${meta}</div>` : ''}
+          ${subcat ? `<div class="dir-entity-meta" style="color:${subcat.color||catColor};">${subcat.icono||''} ${subcat.nombre}</div>` : ''}
+          ${meta && !subcat ? `<div class="dir-entity-meta">${meta}</div>` : ''}
           <div class="dir-entity-actions">
-            <button class="dir-edit-btn rpl" data-id="${e.id}">
+            <button class="dir-edit-btn rpl" data-id="${e._id || e.id}">
               <span class="material-icons-round">edit</span>
             </button>
-            <button class="dir-del-btn rpl" data-id="${e.id}">
+            <button class="dir-del-btn rpl" data-id="${e._id || e.id}">
               <span class="material-icons-round">delete_outline</span>
             </button>
           </div>
@@ -348,9 +521,9 @@ function _mnCatBlock(catKey, catDef, items) {
   }
 
   html += `
-      <button class="dir-add-btn rpl" data-add-cat="${catKey}">
+      <button class="dir-add-btn rpl" data-add-cat="${cat._id}">
         <span class="material-icons-round">add_circle_outline</span>
-        Agregar ${(DIR_CATS[catKey]?.label || catKey.slice(0,-1)).toLowerCase()}
+        Agregar en ${cat.nombre}
       </button>
     </div>`;
   return html;
@@ -358,29 +531,175 @@ function _mnCatBlock(catKey, catDef, items) {
 
 function _mnBindEvents() {
   const wrap = g('mn-sections'); if (!wrap) return;
+
+  // Agregar ítem en categoría
   wrap.querySelectorAll('[data-add-cat]').forEach(btn => {
-    btn.addEventListener('click', () => _mnOpenCrear(btn.dataset.addCat));
+    btn.addEventListener('click', () => _mnOpenCrearItem(btn.dataset.addCat));
   });
+  // Editar ítem
   wrap.querySelectorAll('.dir-edit-btn').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); _mnOpenEditar(btn.dataset.id); });
+    btn.addEventListener('click', e => { e.stopPropagation(); _mnOpenEditarItem(btn.dataset.id); });
   });
+  // Eliminar ítem
   wrap.querySelectorAll('.dir-del-btn').forEach(btn => {
     btn.addEventListener('click', e => { e.stopPropagation(); _mnConfirmarEliminar(btn.dataset.id); });
   });
+  // Click en card = editar ítem
   wrap.querySelectorAll('.dir-entity-card').forEach(card => {
-    card.addEventListener('click', () => _mnOpenEditar(card.dataset.id));
+    card.addEventListener('click', () => _mnOpenEditarItem(card.dataset.id));
+  });
+  // Editar categoría principal
+  wrap.querySelectorAll('.mn-cat-edit').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); _mnOpenEditarCat(btn.dataset.catId); });
+  });
+  // Eliminar categoría principal
+  wrap.querySelectorAll('.mn-cat-del').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); _mnConfirmarEliminarCat(btn.dataset.catId); });
+  });
+  // Agregar subcategoría
+  wrap.querySelectorAll('.mn-add-subcat').forEach(btn => {
+    btn.addEventListener('click', () => _mnOpenCrearCat(btn.dataset.catId));
+  });
+  // Editar subcategoría
+  wrap.querySelectorAll('.mn-subcat-edit').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); _mnOpenEditarCat(btn.dataset.catId); });
+  });
+  // Eliminar subcategoría
+  wrap.querySelectorAll('.mn-subcat-del').forEach(btn => {
+    btn.addEventListener('click', e => { e.stopPropagation(); _mnConfirmarEliminarCat(btn.dataset.catId); });
   });
 }
 
-function _mnOpenCrear(catKey) {
-  const defs = DIR_CATS[catKey];
-  let selIcono = defs.icono, selColor = defs.bg;
+// ── CRUD categorías (principal o sub) ────────────
+function _mnOpenCrearCat(parentId) {
+  const parent = parentId ? getCatById(parentId) : null;
+  const titulo = parentId ? `Nueva subcategoría de ${parent?.nombre||''}` : 'Nueva categoría principal';
+  let selColor = parent?.color || '#1976D2';
 
-  openEdit(`${defs.icono} Nuevo ${catKey.slice(0,-1).toLowerCase()}`, `
+  openEdit(titulo, `
     <div class="m3-field" style="margin-bottom:14px;">
-      <input class="m3-inp" id="mnd-nombre" placeholder=" " maxlength="60">
+      <input class="m3-inp" id="mcat-nombre" placeholder=" " maxlength="40" autocomplete="off">
       <label class="m3-lbl">Nombre *</label>
     </div>
+    <div class="m3-field" style="margin-bottom:14px;">
+      <input class="m3-inp" id="mcat-icono" value="${parent?.icono||'📁'}" placeholder=" " maxlength="4"
+        style="font-size:28px;text-align:center;padding:10px 12px 4px;cursor:pointer;">
+      <label class="m3-lbl">Ícono (tocá para elegir emoji)</label>
+    </div>
+    <span class="sec-lbl">Color</span>
+    <div id="mcat-color-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+      ${PALETA.map(p => `
+        <button class="rpl mcat-col-btn" data-bg="${p.bg}" data-c="${p.c}"
+          style="width:34px;height:34px;border-radius:50%;background:${p.bg};cursor:pointer;
+                 border:3px solid ${p.bg===selColor?'#234136':'transparent'};"></button>
+      `).join('')}
+    </div>
+    <button class="btn-save rpl" id="mcat-save">
+      Guardar <span class="material-icons-round" style="font-size:18px">check</span>
+    </button>`);
+
+  setTimeout(() => g('mcat-nombre')?.focus(), 200);
+
+  document.querySelectorAll('.mcat-col-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.mcat-col-btn').forEach(x => x.style.borderColor='transparent');
+      b.style.borderColor='#234136'; selColor=b.dataset.bg;
+    });
+  });
+
+  g('mcat-save').addEventListener('click', async () => {
+    const nombre = g('mcat-nombre')?.value.trim();
+    if (!nombre) { g('mcat-nombre').style.borderColor='var(--red)'; return; }
+    const icono = g('mcat-icono')?.value || '📁';
+    const btn = g('mcat-save'); btn.textContent='Guardando…'; btn.disabled=true;
+    try {
+      await saveCategoria({ nombre, icono, color: selColor, parentId });
+      closeEdit(); toast(`✅ ${nombre} creado`);
+    } catch(e) { console.error(e); btn.textContent='Error'; btn.disabled=false; }
+  });
+}
+
+function _mnOpenEditarCat(id) {
+  const cat = getCatById(id); if (!cat) return;
+  let selColor = cat.color || '#1976D2';
+
+  openEdit(`✏️ ${cat.nombre}`, `
+    <div class="m3-field" style="margin-bottom:14px;">
+      <input class="m3-inp" id="mcat-nombre" value="${(cat.nombre||'').replace(/"/g,'&quot;')}" placeholder=" " maxlength="40">
+      <label class="m3-lbl">Nombre *</label>
+    </div>
+    <div class="m3-field" style="margin-bottom:14px;">
+      <input class="m3-inp" id="mcat-icono" value="${cat.icono||'📁'}" placeholder=" " maxlength="4"
+        style="font-size:28px;text-align:center;padding:10px 12px 4px;cursor:pointer;">
+      <label class="m3-lbl">Ícono</label>
+    </div>
+    <span class="sec-lbl">Color</span>
+    <div id="mcat-color-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+      ${PALETA.map(p => `
+        <button class="rpl mcat-col-btn" data-bg="${p.bg}"
+          style="width:34px;height:34px;border-radius:50%;background:${p.bg};cursor:pointer;
+                 border:3px solid ${p.bg===selColor?'#234136':'transparent'};"></button>
+      `).join('')}
+    </div>
+    <button class="btn-save rpl" id="mcat-save" style="margin-bottom:8px;">
+      Guardar cambios <span class="material-icons-round" style="font-size:18px">check</span>
+    </button>
+    <button class="btn-save rpl" id="mcat-del" style="background:var(--red-bg);color:var(--red);box-shadow:none;">
+      🗑️ Eliminar ${cat.parentId ? 'subcategoría' : 'categoría'}
+    </button>`);
+
+  setTimeout(() => g('mcat-nombre')?.focus(), 200);
+
+  document.querySelectorAll('.mcat-col-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.mcat-col-btn').forEach(x => x.style.borderColor='transparent');
+      b.style.borderColor='#234136'; selColor=b.dataset.bg;
+    });
+  });
+
+  g('mcat-save').addEventListener('click', async () => {
+    const nombre = g('mcat-nombre')?.value.trim(); if (!nombre) return;
+    const btn = g('mcat-save'); btn.textContent='Guardando…'; btn.disabled=true;
+    try {
+      await updateCategoria(id, { nombre, icono: g('mcat-icono')?.value||cat.icono, color: selColor });
+      closeEdit(); toast(`✅ ${nombre} actualizado`);
+    } catch(e) { console.error(e); btn.textContent='Error'; btn.disabled=false; }
+  });
+
+  g('mcat-del').addEventListener('click', () => { closeEdit(); _mnConfirmarEliminarCat(id); });
+}
+
+function _mnConfirmarEliminarCat(id) {
+  const cat = getCatById(id); if (!cat) return;
+  const tieneItems = dirGetByCat(id).length;
+  const tieneSubs  = getSubcats(id).length;
+  let msg = `¿Eliminar "${cat.nombre}"?`;
+  if (tieneItems) msg += `\n\n⚠️ Tiene ${tieneItems} contacto${tieneItems>1?'s':''} asociados.`;
+  if (tieneSubs)  msg += `\n⚠️ Tiene ${tieneSubs} subcategoría${tieneSubs>1?'s':''} que también se eliminarán.`;
+  msg += '\n\nLos registros históricos conservarán los datos.';
+  if (!confirm(msg)) return;
+  deleteCategoria(id).then(() => toast('Eliminado')).catch(console.error);
+}
+
+// ── CRUD ítems del directorio ─────────────────────
+function _mnOpenCrearItem(catId) {
+  const cat = getCatById(catId); if (!cat) return;
+  const subcats = getSubcats(catId);
+  let selIcono = cat.icono || '👤';
+  let selColor = cat.color || '#1976D2';
+  let selSubcat = '';
+
+  openEdit(`${cat.icono||'+'} Nuevo en ${cat.nombre}`, `
+    <div class="m3-field" style="margin-bottom:14px;">
+      <input class="m3-inp" id="mnd-nombre" placeholder=" " maxlength="60" autocomplete="off">
+      <label class="m3-lbl">Nombre *</label>
+    </div>
+    ${subcats.length ? `
+    <span class="field-trigger-lbl" style="margin-top:4px;">Subcategoría (opcional)</span>
+    <select class="m3-select" id="mnd-subcat" style="margin-bottom:12px;">
+      <option value="">Sin subcategoría</option>
+      ${subcats.map(s => `<option value="${s._id}">${s.icono||''} ${s.nombre}</option>`).join('')}
+    </select>` : ''}
     <div class="m3-field" style="margin-bottom:14px;">
       <input class="m3-inp" id="mnd-tel" placeholder=" " type="tel">
       <label class="m3-lbl">Teléfono</label>
@@ -394,7 +713,7 @@ function _mnOpenCrear(catKey) {
       <label class="m3-lbl">Nota</label>
     </div>
     <div class="m3-field" style="margin-bottom:14px;">
-      <input class="m3-inp emoji-inp" id="mnd-icono" value="${selIcono}" placeholder=" " maxlength="4"
+      <input class="m3-inp" id="mnd-icono" value="${selIcono}" placeholder=" " maxlength="4"
         style="font-size:28px;text-align:center;padding:10px 12px 4px;cursor:pointer;">
       <label class="m3-lbl">Ícono (tocá para elegir emoji)</label>
     </div>
@@ -403,7 +722,7 @@ function _mnOpenCrear(catKey) {
       ${PALETA.map(p => `
         <button class="rpl mnd-col-btn" data-bg="${p.bg}"
           style="width:34px;height:34px;border-radius:50%;background:${p.bg};cursor:pointer;
-                 border:3px solid ${p.bg===selColor ? '#234136' : 'transparent'};"></button>
+                 border:3px solid ${p.bg===selColor?'#234136':'transparent'};"></button>
       `).join('')}
     </div>
     <button class="btn-save rpl" id="mnd-save">
@@ -411,13 +730,11 @@ function _mnOpenCrear(catKey) {
     </button>`);
 
   setTimeout(() => g('mnd-nombre')?.focus(), 200);
-
-  // Leer icono del input nativo
-  g('mnd-icono')?.addEventListener('input', e => { selIcono = e.target.value || defs?.icono || '👤'; });
+  g('mnd-icono')?.addEventListener('input', e => { selIcono = e.target.value || cat.icono || '👤'; });
   document.querySelectorAll('.mnd-col-btn').forEach(b => {
     b.addEventListener('click', () => {
-      document.querySelectorAll('.mnd-col-btn').forEach(x => x.style.borderColor = 'transparent');
-      b.style.borderColor = '#234136'; selColor = b.dataset.bg;
+      document.querySelectorAll('.mnd-col-btn').forEach(x => x.style.borderColor='transparent');
+      b.style.borderColor='#234136'; selColor=b.dataset.bg;
     });
   });
 
@@ -428,31 +745,38 @@ function _mnOpenCrear(catKey) {
     const btn = g('mnd-save'); btn.textContent='Guardando…'; btn.disabled=true;
     try {
       await saveEntidad({
-        nombre, categoria_principal: catKey,
+        nombre, categoria_principal: catId,
+        subcatId: g('mnd-subcat')?.value || null,
         icono: selIcono, color_fondo: selColor,
         metadata: {
-          telefono: g('mnd-tel')?.value.trim()   || null,
+          telefono: g('mnd-tel')?.value.trim() || null,
           email:    g('mnd-email')?.value.trim() || null,
-          nota:     g('mnd-nota')?.value.trim()  || null,
+          nota:     g('mnd-nota')?.value.trim() || null,
         },
       });
       closeEdit(); toast(`✅ ${nombre} guardado`);
-    } catch(e) {
-      console.error(e); btn.textContent='Error — reintentar'; btn.disabled=false;
-    }
+    } catch(e) { console.error(e); btn.textContent='Error — reintentar'; btn.disabled=false; }
   });
 }
 
-function _mnOpenEditar(id) {
+function _mnOpenEditarItem(id) {
   const e = dirGetById(id); if (!e) return;
-  const defs = DIR_CATS[e.categoria_principal] || DIR_CATS.Clientes;
-  let selIcono = e.icono || defs.icono, selColor = e.color_fondo || defs.bg;
+  const cat = getCatById(e.categoria_principal) || { icono:'👤', color:'#234136', nombre:'Sin categoría' };
+  const subcats = getSubcats(cat._id||e.categoria_principal);
+  let selIcono = e.icono || cat.icono || '👤';
+  let selColor = e.color_fondo || cat.color || '#234136';
 
   openEdit(`✏️ ${e.nombre}`, `
     <div class="m3-field" style="margin-bottom:14px;">
       <input class="m3-inp" id="mnd-nombre" value="${(e.nombre||'').replace(/"/g,'&quot;')}" placeholder=" " maxlength="60">
       <label class="m3-lbl">Nombre *</label>
     </div>
+    ${subcats.length ? `
+    <span class="field-trigger-lbl" style="margin-top:4px;">Subcategoría</span>
+    <select class="m3-select" id="mnd-subcat" style="margin-bottom:12px;">
+      <option value="">Sin subcategoría</option>
+      ${subcats.map(s => `<option value="${s._id}" ${e.subcatId===s._id?'selected':''}>${s.icono||''} ${s.nombre}</option>`).join('')}
+    </select>` : ''}
     <div class="m3-field" style="margin-bottom:14px;">
       <input class="m3-inp" id="mnd-tel" value="${(e.metadata?.telefono||'').replace(/"/g,'&quot;')}" placeholder=" " type="tel">
       <label class="m3-lbl">Teléfono</label>
@@ -466,29 +790,27 @@ function _mnOpenEditar(id) {
       <label class="m3-lbl">Nota</label>
     </div>
     <div class="m3-field" style="margin-bottom:14px;">
-      <input class="m3-inp emoji-inp" id="mnd-icono" value="${selIcono}" placeholder=" " maxlength="4"
+      <input class="m3-inp" id="mnd-icono" value="${selIcono}" placeholder=" " maxlength="4"
         style="font-size:28px;text-align:center;padding:10px 12px 4px;cursor:pointer;">
-      <label class="m3-lbl">Ícono (tocá para elegir emoji)</label>
+      <label class="m3-lbl">Ícono</label>
     </div>
     <span class="sec-lbl">Color</span>
     <div id="mnd-color-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
       ${PALETA.map(p => `
         <button class="rpl mnd-col-btn" data-bg="${p.bg}"
           style="width:34px;height:34px;border-radius:50%;background:${p.bg};cursor:pointer;
-                 border:3px solid ${p.bg===selColor ? '#234136' : 'transparent'};"></button>
+                 border:3px solid ${p.bg===selColor?'#234136':'transparent'};"></button>
       `).join('')}
     </div>
     <button class="btn-save rpl" id="mnd-save" style="margin-bottom:8px;">
-      Guardar cambios <span class="material-icons-round" style="font-size:18px">check</span>
+      Guardar <span class="material-icons-round" style="font-size:18px">check</span>
     </button>
     <button class="btn-save rpl" id="mnd-del" style="background:var(--red-bg);color:var(--red);box-shadow:none;">
       🗑️ Eliminar
     </button>`);
 
   setTimeout(() => g('mnd-nombre')?.focus(), 200);
-
-  // Leer icono del input nativo
-  g('mnd-icono')?.addEventListener('input', e => { selIcono = e.target.value || defs?.icono || '👤'; });
+  g('mnd-icono')?.addEventListener('input', ev => { selIcono = ev.target.value || cat.icono || '👤'; });
   document.querySelectorAll('.mnd-col-btn').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('.mnd-col-btn').forEach(x=>x.style.borderColor='transparent');
@@ -503,30 +825,30 @@ function _mnOpenEditar(id) {
     try {
       await updateEntidad(id, {
         nombre, icono: selIcono, color_fondo: selColor,
+        subcatId: g('mnd-subcat')?.value || null,
         metadata: {
           ...e.metadata,
-          telefono: g('mnd-tel')?.value.trim()   || null,
+          telefono: g('mnd-tel')?.value.trim() || null,
           email:    g('mnd-email')?.value.trim() || null,
-          nota:     g('mnd-nota')?.value.trim()  || null,
+          nota:     g('mnd-nota')?.value.trim() || null,
         },
       });
       closeEdit(); toast(`✅ ${nombre} actualizado`);
-    } catch(err) { console.error(err); btn.textContent='Error — reintentar'; btn.disabled=false; }
+    } catch(err) { console.error(err); btn.textContent='Error'; btn.disabled=false; }
   });
 
-  g('mnd-del').addEventListener('click', () => {
-    closeEdit(); _mnConfirmarEliminar(id);
-  });
+  g('mnd-del').addEventListener('click', () => { closeEdit(); _mnConfirmarEliminar(id); });
 }
 
 function _mnConfirmarEliminar(id) {
   const e = dirGetById(id); if (!e) return;
-  if (!confirm(`¿Eliminar "${e.nombre}"?\n\nLos registros históricos conservarán los datos.`)) return;
+  if (!confirm(`¿Eliminar "${e.nombre}"?\nLos registros históricos conservarán los datos.`)) return;
   deleteEntidad(id).then(() => toast(`Eliminado: ${e.nombre}`)).catch(console.error);
 }
 
 // ══════════════════════════════════════════════════
 // 7. PICKER DIRECTORIO (dp-*)
+
 //    Componente bottom-sheet conectado al directorio
 // ══════════════════════════════════════════════════
 let _dpCategoria  = null;
@@ -541,15 +863,16 @@ function dpOpen({ categoria, titulo, selectedId, onSelect }) {
   _dpSelectedId = selectedId || null;
   _dpOnSelect   = onSelect;
   _dpQuery      = '';
-  _dpSelIcono   = DIR_CATS[categoria]?.icono || '👤';
-  _dpSelColor   = DIR_CATS[categoria]?.bg    || '#E8F0FE';
 
-  const defs = DIR_CATS[categoria];
-  g('dp-title').textContent = titulo || (defs
-    ? `Seleccionar ${defs.plural}`
-    : 'Directorio');
+  // Buscar la cat dinámica para defaults de ícono/color
+  const catDin = categoria ? getCatById(categoria) : null;
+  _dpSelIcono   = catDin?.icono  || '👤';
+  _dpSelColor   = catDin?.color  || '#1976D2';
 
-  g('dp-search').value = '';
+  g('dp-title').textContent = titulo
+    || (catDin ? `Seleccionar en ${catDin.nombre}` : 'Directorio');
+
+  if (g('dp-search')) g('dp-search').value = '';
   g('dp-search-clear').classList.remove('on');
   g('dp-create-modal').classList.remove('on');
 
@@ -567,7 +890,8 @@ function dpClose() {
 function _dpRenderList() {
   const list = g('dp-list');
   const q    = _dpQuery.trim().toLowerCase();
-  const defs = DIR_CATS[_dpCategoria];
+  // Buscar la categoría dinámica por id o por nombre (compatibilidad)
+  const cat = _dpCategoria ? getCatById(_dpCategoria) || getCatsPrincipales().find(c=>c.nombre===_dpCategoria) : null;
 
   let items = _dpCategoria ? dirGetByCat(_dpCategoria) : dirGetAll();
   if (q) items = items.filter(e =>
@@ -576,14 +900,14 @@ function _dpRenderList() {
     (e.metadata?.email||'').toLowerCase().includes(q)
   );
   items = [...items].sort((a,b) => {
-    if (a.id === _dpSelectedId) return -1;
-    if (b.id === _dpSelectedId) return  1;
+    if ((a._id||a.id) === _dpSelectedId) return -1;
+    if ((b._id||b.id) === _dpSelectedId) return  1;
     return (a.nombre||'').localeCompare(b.nombre||'','es');
   });
 
   const labelNuevo = q
     ? `Crear "${_dpQuery.trim()}"`
-    : `Nuevo ${defs ? defs.plural.slice(0,-1) : 'elemento'}`;
+    : `Nuevo en ${cat?.nombre || 'directorio'}`;
 
   let html = `
     <div class="dp-add-row" id="dp-add-btn">
@@ -629,13 +953,13 @@ function _dpRenderList() {
 
 function _dpItemHTML(e) {
   const isSel = e.id === _dpSelectedId;
-  const bg    = e.color_fondo || DIR_CATS[e.categoria_principal]?.bg || '#F7F8F6';
+  const bg    = e.color_fondo || getCatById(e.categoria_principal)?.color || '#234136';
   const meta  = [e.metadata?.telefono, e.metadata?.email].filter(Boolean).join(' · ')
               || e.categoria_principal || '';
   return `
     <div class="dp-item${isSel?' dp-sel':''}" data-id="${e.id}">
       <div class="dp-avatar" style="background:${bg};">
-        ${e.icono || DIR_CATS[e.categoria_principal]?.icono || '👤'}
+        ${e.icono || getCatById(e.categoria_principal)?.icono || '👤'}
       </div>
       <div class="dp-item-info">
         <div class="dp-item-name">${e.nombre}</div>
@@ -646,8 +970,8 @@ function _dpItemHTML(e) {
 }
 
 function _dpOpenCreate(nombreInicial = '') {
-  const defs = DIR_CATS[_dpCategoria];
-  g('dp-create-title').textContent = `Nuevo ${defs?.plural?.slice(0,-1)||'elemento'}`;
+  const catDin = getCatById(_dpCategoria);
+  g('dp-create-title').textContent = `Nuevo en ${catDin?.nombre||'directorio'}`;
   g('dp-create-nombre').value = nombreInicial;
   g('dp-create-tel').value    = '';
   g('dp-create-email').value  = '';
@@ -666,7 +990,7 @@ function _dpOpenCreate(nombreInicial = '') {
         </span>
       </div>`;
     g('dp-emoji-inp')?.addEventListener('input', e => {
-      _dpSelIcono = e.target.value || (DIR_CATS[_dpCategoria]?.icono || '👤');
+      _dpSelIcono = e.target.value || getCatById(_dpCategoria)?.icono || '👤';
     });
   }
 
@@ -699,7 +1023,7 @@ async function _dpGuardarNuevo() {
   try {
     const nueva = await saveEntidad({
       nombre,
-      categoria_principal: _dpCategoria || 'Clientes',
+      categoria_principal: _dpCategoria || getCatsPrincipales()[0]?._id || 'default',
       icono:       _dpSelIcono,
       color_fondo: _dpSelColor,
       metadata: {
@@ -868,41 +1192,124 @@ const closeEdit = () => {
 
 // ══════════════════════════════════════════════════
 // 11. PICKER CATEGORÍAS FINANZAS
-//     (histórico + servicios/proveedores del directorio)
+//     Dos niveles: categoría principal → subcategoría
 // ══════════════════════════════════════════════════
 function openFinCatPicker() {
-  // Solo items de Mi Negocio + categorías ya usadas. Sin sugerencias fijas.
-  const directItems = [
-    ...dirGetByCat('Servicios').map(e   => ({ id:'dir:'+e.id, name:`${e.icono||'⚡'} ${e.nombre}`, sub:'servicio' })),
-    ...dirGetByCat('Proveedores').map(e => ({ id:'dir:'+e.id, name:`${e.icono||'🏭'} ${e.nombre}`, sub:'proveedor' })),
-    ...dirGetByCat('Clientes').map(e    => ({ id:'dir:'+e.id, name:`${e.icono||'👤'} ${e.nombre}`, sub:'cliente' })),
-  ];
+  const principales = getCatsPrincipales();
   const usadas = [...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].sort();
+
+  // Construir items agrupados: primero las categorías del directorio (con subs),
+  // después las categorías usadas anteriormente que no estén en el directorio
+  const dirCatNames = new Set(principales.map(c=>c.nombre));
+
   const items = [
-    ...directItems,
-    ...usadas.filter(c => !directItems.some(e=>e.name.includes(c)))
-             .map(c => ({ id:'hist:'+c, name:c, sub:'usada antes' })),
+    // Categorías principales del directorio
+    ...principales.map(cat => ({
+      id:       'cat:'+cat._id,
+      name:     `${cat.icono||'📁'} ${cat.nombre}`,
+      sub:      getSubcats(cat._id).length ? `${getSubcats(cat._id).length} subcategorías` : 'categoría principal',
+      color:    cat.color,
+      hasSubcats: getSubcats(cat._id).length > 0,
+      catId:    cat._id,
+    })),
+    // Categorías históricas no presentes en el directorio
+    ...usadas
+      .filter(c => !principales.some(p => c.startsWith(p.nombre) || c === p.nombre))
+      .map(c => ({ id:'hist:'+c, name:c, sub:'usada antes' })),
   ];
-  _openPickerLista({
-    title: 'Categoría',
-    items,
-    selected: g('s-fin-cat')?.value || '',
-    onSelect: (id, nombre) => {
-      const limpio = nombre.replace(/^[^\w\s]+ /, '').trim();
-      const lbl    = g('fin-cat-trigger-lbl');
-      if (lbl) { lbl.textContent=limpio; lbl.style.color='var(--t1)'; }
-      if (g('s-fin-cat')) g('s-fin-cat').value = limpio;
-      g('fin-cat-trigger')?.classList.add('filled');
-    },
-    addLabel: 'Categoría personalizada',
-    onAdd: nombre => {
-      if (!nombre) return;
-      const lbl = g('fin-cat-trigger-lbl');
-      if (lbl) { lbl.textContent=nombre; lbl.style.color='var(--t1)'; }
-      if (g('s-fin-cat')) g('s-fin-cat').value = nombre;
-      g('fin-cat-trigger')?.classList.add('filled');
-    },
+
+  _openFinCatDosNiveles(items);
+}
+
+function _openFinCatDosNiveles(items) {
+  // Generar HTML con separador visual por categoría principal
+  let html = `
+    <input id="pg-search" autocomplete="off"
+      style="width:100%;margin-bottom:12px;padding:10px 14px;border:1.5px solid var(--border);
+             border-radius:var(--rfull);font-family:var(--font);font-size:14px;color:var(--t1);outline:none;"
+      placeholder="Buscar categoría…">
+    <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:380px;overflow-y:auto;">`;
+
+  items.forEach(item => {
+    const color = item.color || 'var(--bosque)';
+    html += `
+      <div class="rpl pg-item" data-id="${item.id}" data-name="${(item.name||'').replace(/"/g,'&quot;')}"
+        data-has-subcats="${item.hasSubcats||false}" data-cat-id="${item.catId||''}"
+        style="padding:11px 12px;border-radius:var(--r10);cursor:pointer;
+               display:flex;align-items:center;gap:10px;transition:background .1s;">
+        ${item.color ? `<div style="width:10px;height:10px;border-radius:50%;background:${item.color};flex-shrink:0;"></div>` : ''}
+        <div style="flex:1;">
+          <div style="font-size:14px;font-weight:600;color:var(--t1);">${item.name}</div>
+          ${item.sub ? `<div style="font-size:11px;color:var(--t4);margin-top:1px;">${item.sub}</div>` : ''}
+        </div>
+        ${item.hasSubcats ? `<span class="material-icons-round" style="font-size:16px;color:var(--t4)">chevron_right</span>` : ''}
+      </div>`;
+
+    // Si tiene subcategorías, mostrarlas indentadas
+    if (item.hasSubcats && item.catId) {
+      const subcats = getSubcats(item.catId);
+      subcats.forEach(sub => {
+        html += `
+          <div class="rpl pg-item pg-subcat" data-id="subcat:${sub._id}" data-name="${(sub.nombre||'').replace(/"/g,'&quot;')}"
+            data-parent="${item.name.replace(/^[^\w\s]+ /,'').trim()}"
+            style="padding:8px 12px 8px 32px;border-radius:var(--r10);cursor:pointer;
+                   display:flex;align-items:center;gap:8px;transition:background .1s;">
+            <div style="width:6px;height:6px;border-radius:50%;background:${sub.color||item.color};flex-shrink:0;"></div>
+            <div style="font-size:13px;font-weight:500;color:var(--t2);">${sub.icono||''} ${sub.nombre}</div>
+          </div>`;
+      });
+    }
   });
+
+  html += `</div>
+    <div style="font-size:12px;color:var(--t4);margin-top:8px;text-align:center;">
+      Presioná Enter para crear una categoría personalizada
+    </div>`;
+
+  openEdit('Categoría', html);
+
+  const searchEl = g('pg-search');
+  const listEl   = g('pg-list');
+
+  searchEl.addEventListener('input', () => {
+    const q = searchEl.value.toLowerCase();
+    listEl.querySelectorAll('.pg-item').forEach(el => {
+      el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+    });
+  });
+
+  const seleccionar = (nombre, parent) => {
+    // Si tiene padre (subcategoría), el valor es "Padre / Subcat"
+    const valor = parent ? `${parent} / ${nombre}` : nombre;
+    const lbl = g('fin-cat-trigger-lbl');
+    if (lbl) { lbl.textContent=valor; lbl.style.color='var(--t1)'; }
+    if (g('s-fin-cat')) g('s-fin-cat').value = valor;
+    g('fin-cat-trigger')?.classList.add('filled');
+    closeEdit();
+  };
+
+  listEl.querySelectorAll('.pg-item').forEach(el => {
+    el.addEventListener('mouseenter', () => el.style.background='var(--surface2)');
+    el.addEventListener('mouseleave', () => el.style.background='');
+    el.addEventListener('click', () => {
+      if (el.classList.contains('pg-subcat')) {
+        seleccionar(el.dataset.name, el.dataset.parent);
+      } else if (el.dataset.hasSubcats === 'true') {
+        // No hacer nada — expandir/colapsar visual (ya están visibles)
+        // Solo seleccionar si no tiene subcats o se quiere la categoría principal
+        seleccionar(el.dataset.name.replace(/^[^\w\s]+ /, '').trim(), null);
+      } else {
+        seleccionar(el.dataset.name.replace(/^[^\w\s]+ /, '').trim(), null);
+      }
+    });
+  });
+
+  searchEl.addEventListener('keydown', e => {
+    if (e.key==='Enter' && searchEl.value.trim()) {
+      seleccionar(searchEl.value.trim(), null);
+    }
+  });
+  searchEl.focus();
 }
 
 // ══════════════════════════════════════════════════
@@ -1900,10 +2307,11 @@ function buildOttoContext(){
   const pedDetalle=activos.map(p=>`${p.cli}|${p.fecha}${p.hora?' '+p.hora:''}|${(p.items||[]).map(i=>`${i.q}x${i.p}`).join(',')}`).join(' || ');
   const evs=S.eventos.filter(e=>e.fecha>=hoy()).sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(e=>`${e.tit}|${e.fecha}${e.hora?' '+e.hora:''}${e.prio==='urgente'?' URGENTE':''}`).join(' | ');
   const tasks=S.tareas.map(t=>`[${t.done?'✓':'○'}]${t.tit}${t.fecha?' '+t.fecha:''}${t.prio==='urgente'?' URGENTE':''}`).join(' | ');
-  const clientes=dirGetByCat('Clientes').map(e=>e.nombre).join(', ');
-  const proveedores=dirGetByCat('Proveedores').map(e=>e.nombre).join(', ');
-  const empleados=dirGetByCat('Empleados').map(e=>e.nombre).join(', ');
-  const servicios=dirGetByCat('Servicios').map(e=>e.nombre).join(', ');
+  // Directorio dinámico: agrupar por categoría principal
+  const dirResumen=getCatsPrincipales().map(cat=>{
+    const items=dirGetByCat(cat._id).map(e=>e.nombre).join(', ');
+    return `${cat.nombre}: ${items||'—'}`;
+  }).join(' | ');
   const cliCount={};S.pedidos.forEach(p=>{if(p.cli)cliCount[p.cli]=(cliCount[p.cli]||0)+1;});
   const topClis=Object.entries(cliCount).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,c])=>`${n}(${c})`).join(', ');
   const prodCount={};S.pedidos.forEach(p=>(p.items||[]).forEach(i=>{prodCount[i.p]=(prodCount[i.p]||0)+i.q;}));
@@ -1926,10 +2334,7 @@ ${evs||'ninguno'}
 === TAREAS (${S.tareas.filter(t=>!t.done).length} pendientes) ===
 ${tasks||'ninguna'}
 === DIRECTORIO ===
-Clientes: ${clientes||'—'}
-Empleados: ${empleados||'—'}
-Proveedores: ${proveedores||'—'}
-Servicios: ${servicios||'—'}
+${dirResumen||'—'}
 === NOTAS ===
 ${notasTexto||'—'}`;
 }
@@ -2120,6 +2525,11 @@ async function inicializarOTTO(user) {
   // cuando llega el primer snapshot. S.directorio queda lleno.
   await fetchDirectorio();
 
+  // ── Paso 2b: Categorías dinámicas ────────────────
+  await fetchCategorias();
+  // Si es usuario nuevo, crear las 4 categorías por defecto
+  await initCategoriasDefault();
+
   // ── Paso 3: Resto de datos en paralelo ───────────
   await Promise.allSettled([
     loadAllData(),
@@ -2128,7 +2538,7 @@ async function inicializarOTTO(user) {
   ]);
 
   // ── Paso 4: Render completo ───────────────────────
-  // En este punto: S.directorio ✓, S.movs ✓, S.pedidos ✓,
+  // En este punto: S.directorio ✓, S.categorias ✓, S.movs ✓, S.pedidos ✓,
   // S.eventos ✓, S.tareas ✓, S.perfil ✓, S.notas ✓
   _renderTodo();
 
@@ -2259,27 +2669,53 @@ g('s-task-save')?.addEventListener('click', saveTask);
 g('s-task-tit')?.addEventListener('keydown', e=>{if(e.key==='Enter')saveTask();});
 
 // ── PICKERS CONECTADOS AL DIRECTORIO ──
-// Cliente en pedido
-dpBindTrigger({
+// Los pickers buscan la categoría dinámica por nombre al abrirse
+// Así funcionan aunque el usuario renombre sus categorías
+
+function _dpBindDinamico({ triggerId, lblId, hiddenIdId, hiddenNombreId,
+                           catNombre, titulo, onSelect }) {
+  const trigger = g(triggerId); if (!trigger) return;
+  trigger.addEventListener('click', () => {
+    // Buscar la categoría dinámica por nombre en tiempo real
+    const cat = getCatsPrincipales().find(c =>
+      c.nombre.toLowerCase() === catNombre.toLowerCase()
+    );
+    const catId = cat?._id || catNombre; // fallback al nombre si no existe
+    dpOpen({
+      categoria:  catId,
+      titulo:     titulo || (cat ? `Seleccionar en ${cat.nombre}` : titulo),
+      selectedId: g(hiddenIdId)?.value || null,
+      onSelect: ent => {
+        const lbl = g(lblId);
+        if (lbl) { lbl.textContent=ent.nombre; lbl.style.color='var(--t1)'; }
+        trigger.classList.add('filled');
+        if (g(hiddenIdId)) g(hiddenIdId).value = ent._id || ent.id;
+        if (hiddenNombreId && g(hiddenNombreId)) g(hiddenNombreId).value = ent.nombre;
+        if (onSelect) onSelect(ent);
+      },
+    });
+  });
+}
+
+// Picker de cliente en pedido — busca la cat "Clientes" dinámicamente
+_dpBindDinamico({
   triggerId: 'ped-cli-trigger', lblId: 'ped-cli-trigger-lbl',
   hiddenIdId: 's-ped-cli-id', hiddenNombreId: 's-ped-cli',
-  categoria: 'Clientes', titulo: 'Seleccionar cliente',
+  catNombre: 'Clientes', titulo: 'Seleccionar cliente',
 });
-// Empleado en pedido
-dpBindTrigger({
+// Picker de empleado en pedido
+_dpBindDinamico({
   triggerId: 'ped-emp-trigger', lblId: 'ped-emp-trigger-lbl',
   hiddenIdId: 's-ped-emp-id',
-  categoria: 'Empleados', titulo: 'Seleccionar empleado',
+  catNombre: 'Empleados', titulo: 'Seleccionar empleado',
 });
-// Proveedor en finanza
-// picker proveedor en finanza eliminado — usar categoría de Mi Negocio
-// Cliente en agenda
-dpBindTrigger({
+// Picker de cliente en agenda
+_dpBindDinamico({
   triggerId: 'age-cli-trigger', lblId: 'age-cli-trigger-lbl',
   hiddenIdId: 's-age-cli-id', hiddenNombreId: 's-age-cli',
-  categoria: 'Clientes', titulo: 'Cliente (opcional)',
+  catNombre: 'Clientes', titulo: 'Cliente (opcional)',
 });
-// Categoría de finanza (histórico + directorio)
+// Categoría de finanza (dos niveles con categorías dinámicas)
 g('fin-cat-trigger')?.addEventListener('click', openFinCatPicker);
 // Productos en pedido
 g('ped-prod-trigger')?.addEventListener('click', openPedProdPicker);
