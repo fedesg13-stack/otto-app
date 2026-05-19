@@ -49,18 +49,36 @@ const gProv  = new GoogleAuthProvider();
 // 2. CONFIGURACIÓN DEL DIRECTORIO
 // ══════════════════════════════════════════════════
 const DIR_CATS = {
-  Clientes:    { icono:'👤', bg:'#E8F0FE', color:'#1967D2', plural:'clientes'    },
-  Empleados:   { icono:'👥', bg:'#E6F4EA', color:'#137333', plural:'empleados'   },
-  Proveedores: { icono:'🏭', bg:'#FEF7E0', color:'#B06000', plural:'proveedores' },
-  Servicios:   { icono:'⚡', bg:'#F3E8FD', color:'#7627BB', plural:'servicios'   },
+  Clientes:    { icono:'👤', bg:'#E8F0FE', color:'#1967D2', plural:'clientes',    label:'cliente'    },
+  Empleados:   { icono:'👥', bg:'#E6F4EA', color:'#137333', plural:'empleados',   label:'empleado'   },
+  Proveedores: { icono:'🏭', bg:'#FEF7E0', color:'#B06000', plural:'proveedores', label:'proveedor'  },
+  Servicios:   { icono:'⚡', bg:'#F3E8FD', color:'#7627BB', plural:'servicios',   label:'servicio'   },
 };
 const PALETA = [
-  {bg:'#E8F0FE',c:'#1967D2'},{bg:'#E6F4EA',c:'#137333'},
-  {bg:'#FEF7E0',c:'#B06000'},{bg:'#F3E8FD',c:'#7627BB'},
-  {bg:'#FCE8E6',c:'#C5221F'},{bg:'#E8F5F5',c:'#00796B'},
-  {bg:'#FFF3E0',c:'#E65100'},{bg:'#EDE7F6',c:'#4527A0'},
-  {bg:'#E0F7FA',c:'#00838F'},{bg:'#F1F8E9',c:'#33691E'},
-  {bg:'#FFF8E1',c:'#F57F17'},{bg:'#F9F0FF',c:'#6200EA'},
+  // Verdes
+  {bg:'#1B5E20', c:'#FFFFFF'}, {bg:'#2E7D32', c:'#FFFFFF'},
+  {bg:'#388E3C', c:'#FFFFFF'}, {bg:'#66BB6A', c:'#1B5E20'},
+  // Azules
+  {bg:'#0D47A1', c:'#FFFFFF'}, {bg:'#1565C0', c:'#FFFFFF'},
+  {bg:'#1976D2', c:'#FFFFFF'}, {bg:'#42A5F5', c:'#0D47A1'},
+  // Rojos / Naranjas
+  {bg:'#B71C1C', c:'#FFFFFF'}, {bg:'#E53935', c:'#FFFFFF'},
+  {bg:'#E64A19', c:'#FFFFFF'}, {bg:'#FF7043', c:'#B71C1C'},
+  // Amarillos / Ámbar
+  {bg:'#F57F17', c:'#FFFFFF'}, {bg:'#F9A825', c:'#4E342E'},
+  {bg:'#FFD600', c:'#4E342E'}, {bg:'#FFEE58', c:'#4E342E'},
+  // Púrpuras
+  {bg:'#4A148C', c:'#FFFFFF'}, {bg:'#6A1B9A', c:'#FFFFFF'},
+  {bg:'#7B1FA2', c:'#FFFFFF'}, {bg:'#AB47BC', c:'#4A148C'},
+  // Teales / Cyan
+  {bg:'#004D40', c:'#FFFFFF'}, {bg:'#00695C', c:'#FFFFFF'},
+  {bg:'#00897B', c:'#FFFFFF'}, {bg:'#26A69A', c:'#004D40'},
+  // Rosas
+  {bg:'#880E4F', c:'#FFFFFF'}, {bg:'#AD1457', c:'#FFFFFF'},
+  {bg:'#E91E63', c:'#FFFFFF'}, {bg:'#F06292', c:'#880E4F'},
+  // Grises / Oscuros
+  {bg:'#212121', c:'#FFFFFF'}, {bg:'#37474F', c:'#FFFFFF'},
+  {bg:'#546E7A', c:'#FFFFFF'}, {bg:'#78909C', c:'#212121'},
 ];
 const ICONOS = [
   '👤','👥','🏭','⚡','🏪','🏬','🏢','🏠','🚗','🚚',
@@ -332,7 +350,7 @@ function _mnCatBlock(catKey, catDef, items) {
   html += `
       <button class="dir-add-btn rpl" data-add-cat="${catKey}">
         <span class="material-icons-round">add_circle_outline</span>
-        Agregar ${catKey.slice(0,-1).toLowerCase()}
+        Agregar ${(DIR_CATS[catKey]?.label || catKey.slice(0,-1)).toLowerCase()}
       </button>
     </div>`;
   return html;
