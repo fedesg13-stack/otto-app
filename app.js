@@ -308,7 +308,14 @@ function _despuesDeActualizarDirectorio() {
 }
 
 // ── Accesos en memoria ──────────────────────────
-const dirGetAll   = ()    => S.directorio;
+const dirGetAll   = ()    => {
+  // Filtrar items cuya categoría principal existe en el sistema dinámico
+  // o que no tienen categoría asignada (compatibilidad)
+  const catIds = new Set(S.categorias.map(c => c._id));
+  return S.directorio.filter(e =>
+    !e.categoria_principal || catIds.has(e.categoria_principal)
+  );
+};
 const dirGetById  = id    => S.directorio.find(e => e.id === id) || null;
 
 /**
@@ -907,7 +914,7 @@ function _dpRenderList() {
 
   const labelNuevo = q
     ? `Crear "${_dpQuery.trim()}"`
-    : `Nuevo en ${cat?.nombre || 'directorio'}`;
+    : `Agregar en ${cat?.nombre || 'directorio'}`;
 
   let html = `
     <div class="dp-add-row" id="dp-add-btn">
@@ -921,17 +928,19 @@ function _dpRenderList() {
   if (!items.length) {
     html += `
       <div class="dp-empty">
-        <div class="dp-empty-icon">${defs?.icono||'📁'}</div>
+        <div class="dp-empty-icon">${cat?.icono||'📁'}</div>
         <div class="dp-empty-txt">
-          ${q ? 'Sin resultados. Tocá "Crear" para agregar.' : `Sin ${defs?.plural||'entidades'} aún.`}
+          ${q
+            ? 'Sin resultados. Tocá "Agregar" para crear uno nuevo.'
+            : `Todavía no hay nadie en ${cat?.nombre||'esta categoría'}.<br>Tocá el botón de arriba para agregar el primero.`}
         </div>
       </div>`;
   } else {
-    if (_dpSelectedId && items[0]?.id === _dpSelectedId) {
+    if (_dpSelectedId && (items[0]?._id || items[0]?.id) === _dpSelectedId) {
       html += `<div class="dp-section-lbl">Seleccionado</div>`;
       html += _dpItemHTML(items[0]);
       if (items.length > 1) {
-        html += `<div class="dp-section-lbl">${defs?.label||'Directorio'}</div>`;
+        html += `<div class="dp-section-lbl">${cat?.nombre||'Directorio'}</div>`;
         items.slice(1).forEach(e => { html += _dpItemHTML(e); });
       }
     } else {
@@ -952,18 +961,20 @@ function _dpRenderList() {
 }
 
 function _dpItemHTML(e) {
-  const isSel = e.id === _dpSelectedId;
+  const isSel = (e._id || e.id) === _dpSelectedId;
   const bg    = e.color_fondo || getCatById(e.categoria_principal)?.color || '#234136';
+  // Solo metadata real — nunca el ID de Firestore
+  const catNombre = getCatById(e.categoria_principal)?.nombre || '';
   const meta  = [e.metadata?.telefono, e.metadata?.email].filter(Boolean).join(' · ')
-              || e.categoria_principal || '';
+              || catNombre || '';
   return `
-    <div class="dp-item${isSel?' dp-sel':''}" data-id="${e.id}">
+    <div class="dp-item${isSel?' dp-sel':''}" data-id="${e._id || e.id}">
       <div class="dp-avatar" style="background:${bg};">
         ${e.icono || getCatById(e.categoria_principal)?.icono || '👤'}
       </div>
       <div class="dp-item-info">
         <div class="dp-item-name">${e.nombre}</div>
-        <div class="dp-item-meta">${meta}</div>
+        ${meta ? `<div class="dp-item-meta">${meta}</div>` : ''}
       </div>
       <span class="dp-check material-icons-round">check_circle</span>
     </div>`;
@@ -1222,65 +1233,7 @@ function openFinCatPicker() {
 }
 
 function _openFinCatDosNiveles(items) {
-  // Generar HTML con separador visual por categoría principal
-  let html = `
-    <input id="pg-search" autocomplete="off"
-      style="width:100%;margin-bottom:12px;padding:10px 14px;border:1.5px solid var(--border);
-             border-radius:var(--rfull);font-family:var(--font);font-size:14px;color:var(--t1);outline:none;"
-      placeholder="Buscar categoría…">
-    <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:380px;overflow-y:auto;">`;
-
-  items.forEach(item => {
-    const color = item.color || 'var(--bosque)';
-    html += `
-      <div class="rpl pg-item" data-id="${item.id}" data-name="${(item.name||'').replace(/"/g,'&quot;')}"
-        data-has-subcats="${item.hasSubcats||false}" data-cat-id="${item.catId||''}"
-        style="padding:11px 12px;border-radius:var(--r10);cursor:pointer;
-               display:flex;align-items:center;gap:10px;transition:background .1s;">
-        ${item.color ? `<div style="width:10px;height:10px;border-radius:50%;background:${item.color};flex-shrink:0;"></div>` : ''}
-        <div style="flex:1;">
-          <div style="font-size:14px;font-weight:600;color:var(--t1);">${item.name}</div>
-          ${item.sub ? `<div style="font-size:11px;color:var(--t4);margin-top:1px;">${item.sub}</div>` : ''}
-        </div>
-        ${item.hasSubcats ? `<span class="material-icons-round" style="font-size:16px;color:var(--t4)">chevron_right</span>` : ''}
-      </div>`;
-
-    // Si tiene subcategorías, mostrarlas indentadas
-    if (item.hasSubcats && item.catId) {
-      const subcats = getSubcats(item.catId);
-      subcats.forEach(sub => {
-        html += `
-          <div class="rpl pg-item pg-subcat" data-id="subcat:${sub._id}" data-name="${(sub.nombre||'').replace(/"/g,'&quot;')}"
-            data-parent="${item.name.replace(/^[^\w\s]+ /,'').trim()}"
-            style="padding:8px 12px 8px 32px;border-radius:var(--r10);cursor:pointer;
-                   display:flex;align-items:center;gap:8px;transition:background .1s;">
-            <div style="width:6px;height:6px;border-radius:50%;background:${sub.color||item.color};flex-shrink:0;"></div>
-            <div style="font-size:13px;font-weight:500;color:var(--t2);">${sub.icono||''} ${sub.nombre}</div>
-          </div>`;
-      });
-    }
-  });
-
-  html += `</div>
-    <div style="font-size:12px;color:var(--t4);margin-top:8px;text-align:center;">
-      Presioná Enter para crear una categoría personalizada
-    </div>`;
-
-  openEdit('Categoría', html);
-
-  const searchEl = g('pg-search');
-  const listEl   = g('pg-list');
-
-  searchEl.addEventListener('input', () => {
-    const q = searchEl.value.toLowerCase();
-    listEl.querySelectorAll('.pg-item').forEach(el => {
-      el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
-    });
-  });
-
-  const seleccionar = (nombre, parent) => {
-    // Si tiene padre (subcategoría), el valor es "Padre / Subcat"
-    const valor = parent ? `${parent} / ${nombre}` : nombre;
+  const seleccionar = (valor) => {
     const lbl = g('fin-cat-trigger-lbl');
     if (lbl) { lbl.textContent=valor; lbl.style.color='var(--t1)'; }
     if (g('s-fin-cat')) g('s-fin-cat').value = valor;
@@ -1288,28 +1241,120 @@ function _openFinCatDosNiveles(items) {
     closeEdit();
   };
 
-  listEl.querySelectorAll('.pg-item').forEach(el => {
-    el.addEventListener('mouseenter', () => el.style.background='var(--surface2)');
-    el.addEventListener('mouseleave', () => el.style.background='');
-    el.addEventListener('click', () => {
-      if (el.classList.contains('pg-subcat')) {
-        seleccionar(el.dataset.name, el.dataset.parent);
-      } else if (el.dataset.hasSubcats === 'true') {
-        // No hacer nada — expandir/colapsar visual (ya están visibles)
-        // Solo seleccionar si no tiene subcats o se quiere la categoría principal
-        seleccionar(el.dataset.name.replace(/^[^\w\s]+ /, '').trim(), null);
-      } else {
-        seleccionar(el.dataset.name.replace(/^[^\w\s]+ /, '').trim(), null);
-      }
-    });
-  });
+  const renderNivel1 = () => {
+    const body = g('edit-body'); if (!body) return;
+    body.innerHTML = `
+      <input id="pg-search" autocomplete="off"
+        style="width:100%;margin-bottom:12px;padding:10px 14px;border:1.5px solid var(--border);
+               border-radius:var(--rfull);font-family:var(--font);font-size:14px;color:var(--t1);outline:none;"
+        placeholder="Buscar…">
+      <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:400px;overflow-y:auto;">
+        ${items.map(item => `
+          <div class="rpl pg-item" data-id="${item.id}"
+            data-name="${(item.name||'').replace(/"/g,'&quot;')}"
+            data-has-subcats="${item.hasSubcats||false}"
+            data-cat-id="${item.catId||''}"
+            data-cat-nombre="${(item.nombre||item.name||'').replace(/^[^\w\s]+ /,'').trim().replace(/"/g,'&quot;')}"
+            style="padding:12px;border-radius:var(--r10);cursor:pointer;
+                   display:flex;align-items:center;gap:10px;transition:background .12s;">
+            ${item.color
+              ? `<div style="width:12px;height:12px;border-radius:50%;background:${item.color};flex-shrink:0;"></div>`
+              : ''}
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:600;color:var(--t1);">${item.name}</div>
+              ${item.sub ? `<div style="font-size:11px;color:var(--t4);margin-top:2px;">${item.sub}</div>` : ''}
+            </div>
+            ${item.hasSubcats
+              ? `<span class="material-icons-round" style="font-size:18px;color:var(--t4)">chevron_right</span>`
+              : ''}
+          </div>`).join('')}
+      </div>
+      <div style="font-size:12px;color:var(--t4);margin-top:8px;text-align:center;">
+        Escribí y presioná Enter para una categoría personalizada
+      </div>`;
 
-  searchEl.addEventListener('keydown', e => {
-    if (e.key==='Enter' && searchEl.value.trim()) {
-      seleccionar(searchEl.value.trim(), null);
-    }
-  });
-  searchEl.focus();
+    const searchEl = g('pg-search');
+    searchEl.addEventListener('input', () => {
+      const q = searchEl.value.toLowerCase();
+      g('pg-list').querySelectorAll('.pg-item').forEach(el => {
+        el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
+    searchEl.addEventListener('keydown', e => {
+      if (e.key==='Enter' && searchEl.value.trim())
+        seleccionar(searchEl.value.trim());
+    });
+
+    g('pg-list').querySelectorAll('.pg-item').forEach(el => {
+      el.addEventListener('mouseenter', () => el.style.background='var(--surface2)');
+      el.addEventListener('mouseleave', () => el.style.background='');
+      el.addEventListener('click', () => {
+        const nombre = el.dataset.catNombre || el.dataset.name.replace(/^[^\w\s]+ /,'').trim();
+        if (el.dataset.hasSubcats === 'true' && el.dataset.catId) {
+          // Navegar al nivel 2
+          renderNivel2(el.dataset.catId, nombre, el.dataset.name.split(' ')[0]);
+        } else {
+          seleccionar(nombre);
+        }
+      });
+    });
+    searchEl.focus();
+  };
+
+  const renderNivel2 = (catId, catNombre, catIcono) => {
+    const subcats = getSubcats(catId);
+    const cat = getCatById(catId);
+    const body = g('edit-body'); if (!body) return;
+
+    body.innerHTML = `
+      <button id="pg-back"
+        style="display:flex;align-items:center;gap:6px;background:transparent;border:none;
+               cursor:pointer;font-family:var(--font);font-size:14px;font-weight:600;
+               color:var(--bosque);padding:0 0 14px 0;">
+        <span class="material-icons-round" style="font-size:18px">arrow_back</span>
+        ${catIcono||''} ${catNombre}
+      </button>
+      <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto;">
+        <!-- Opción: seleccionar la categoría principal directamente -->
+        <div class="rpl pg-item" data-valor="${catNombre}"
+          style="padding:12px;border-radius:var(--r10);cursor:pointer;
+                 display:flex;align-items:center;gap:10px;transition:background .12s;
+                 border:1.5px dashed var(--border);margin-bottom:4px;">
+          <div style="font-size:13px;color:var(--t3);font-style:italic;flex:1;">
+            Solo "${catNombre}" (sin subcategoría)
+          </div>
+        </div>
+        ${subcats.map(sub => `
+          <div class="rpl pg-item" data-valor="${catNombre} / ${sub.nombre}"
+            style="padding:12px;border-radius:var(--r10);cursor:pointer;
+                   display:flex;align-items:center;gap:10px;transition:background .12s;">
+            <div style="width:10px;height:10px;border-radius:50%;
+                        background:${sub.color||cat?.color||'#234136'};flex-shrink:0;"></div>
+            <div style="flex:1;">
+              <div style="font-size:14px;font-weight:600;color:var(--t1);">
+                ${sub.icono||''} ${sub.nombre}
+              </div>
+            </div>
+            <span class="material-icons-round" style="font-size:16px;color:var(--t4)">check</span>
+          </div>`).join('')}
+      </div>`;
+
+    g('pg-back').addEventListener('click', () => {
+      g('edit-title').textContent = 'Categoría';
+      renderNivel1();
+    });
+
+    g('pg-list').querySelectorAll('.pg-item').forEach(el => {
+      el.addEventListener('mouseenter', () => el.style.background='var(--surface2)');
+      el.addEventListener('mouseleave', () => el.style.background='');
+      el.addEventListener('click', () => seleccionar(el.dataset.valor));
+    });
+
+    g('edit-title').textContent = catNombre;
+  };
+
+  openEdit('Categoría', '');
+  renderNivel1();
 }
 
 // ══════════════════════════════════════════════════
@@ -1374,13 +1419,19 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd })
 // 13. PICKER PRODUCTOS (para pedidos)
 // ══════════════════════════════════════════════════
 function openPedProdPicker() {
-  // Productos desde Mi Negocio (categoría Servicios) + texto libre
-  const desdeMiNegocio = dirGetByCat('Servicios').map(e => ({
-    id: e._id || e.id, name: e.nombre,
-  }));
+  // Buscar la categoría "Servicios" dinámicamente por nombre
+  const catServicios = getCatsPrincipales().find(c =>
+    c.nombre.toLowerCase() === 'servicios'
+  );
+  // Si existe la categoría Servicios, mostrar sus items
+  // Si no, mostrar todos los items del directorio como productos posibles
+  const items = catServicios
+    ? dirGetByCat(catServicios._id).map(e => ({ id: e._id || e.id, name: e.nombre }))
+    : dirGetAll().map(e => ({ id: e._id || e.id, name: e.nombre }));
+
   _openPickerLista({
     title:    'Agregar producto',
-    items:    desdeMiNegocio,
+    items,
     selected: '',
     onSelect: (_, nombre) => { addPedProd(nombre); closeEdit(); },
     addLabel: 'Escribí el nombre del producto y presioná Enter',
@@ -2680,10 +2731,11 @@ function _dpBindDinamico({ triggerId, lblId, hiddenIdId, hiddenNombreId,
     const cat = getCatsPrincipales().find(c =>
       c.nombre.toLowerCase() === catNombre.toLowerCase()
     );
-    const catId = cat?._id || catNombre; // fallback al nombre si no existe
+    // Si no existe la categoría aún, catId=null → muestra todo el directorio + botón agregar
+    const catId = cat?._id || null;
     dpOpen({
       categoria:  catId,
-      titulo:     titulo || (cat ? `Seleccionar en ${cat.nombre}` : titulo),
+      titulo:     titulo || `Seleccionar ${catNombre}`,
       selectedId: g(hiddenIdId)?.value || null,
       onSelect: ent => {
         const lbl = g(lblId);
