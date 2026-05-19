@@ -375,14 +375,10 @@ function _mnOpenCrear(catKey) {
       <input class="m3-inp" id="mnd-nota" placeholder=" ">
       <label class="m3-lbl">Nota</label>
     </div>
-    <span class="sec-lbl" style="margin-top:4px;">Ícono</span>
-    <div id="mnd-icon-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-      ${ICONOS.map(ic => `
-        <button class="rpl mnd-ic-btn${ic===selIcono?' mnd-ic-sel':''}" data-ic="${ic}"
-          style="font-size:22px;width:42px;height:42px;border-radius:10px;cursor:pointer;
-                 border:2px solid ${ic===selIcono ? defs.color : 'var(--border)'};
-                 background:${ic===selIcono ? defs.bg : 'var(--surface2)'};">${ic}</button>
-      `).join('')}
+    <div class="m3-field" style="margin-bottom:14px;">
+      <input class="m3-inp emoji-inp" id="mnd-icono" value="${selIcono}" placeholder=" " maxlength="4"
+        style="font-size:28px;text-align:center;padding:10px 12px 4px;cursor:pointer;">
+      <label class="m3-lbl">Ícono (tocá para elegir emoji)</label>
     </div>
     <span class="sec-lbl">Color</span>
     <div id="mnd-color-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
@@ -398,15 +394,8 @@ function _mnOpenCrear(catKey) {
 
   setTimeout(() => g('mnd-nombre')?.focus(), 200);
 
-  document.querySelectorAll('.mnd-ic-btn').forEach(b => {
-    b.addEventListener('click', () => {
-      document.querySelectorAll('.mnd-ic-btn').forEach(x => {
-        x.style.borderColor = 'var(--border)'; x.style.background = 'var(--surface2)';
-      });
-      b.style.borderColor = defs.color; b.style.background = defs.bg;
-      selIcono = b.dataset.ic;
-    });
-  });
+  // Leer icono del input nativo
+  g('mnd-icono')?.addEventListener('input', e => { selIcono = e.target.value || defs?.icono || '👤'; });
   document.querySelectorAll('.mnd-col-btn').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('.mnd-col-btn').forEach(x => x.style.borderColor = 'transparent');
@@ -415,6 +404,7 @@ function _mnOpenCrear(catKey) {
   });
 
   g('mnd-save').addEventListener('click', async () => {
+    selIcono = g('mnd-icono')?.value?.trim() || selIcono;
     const nombre = g('mnd-nombre')?.value.trim();
     if (!nombre) { g('mnd-nombre').style.borderColor='var(--red)'; return; }
     const btn = g('mnd-save'); btn.textContent='Guardando…'; btn.disabled=true;
@@ -457,14 +447,10 @@ function _mnOpenEditar(id) {
       <input class="m3-inp" id="mnd-nota" value="${(e.metadata?.nota||'').replace(/"/g,'&quot;')}" placeholder=" ">
       <label class="m3-lbl">Nota</label>
     </div>
-    <span class="sec-lbl" style="margin-top:4px;">Ícono</span>
-    <div id="mnd-icon-grid" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;">
-      ${ICONOS.map(ic => `
-        <button class="rpl mnd-ic-btn${ic===selIcono?' mnd-ic-sel':''}" data-ic="${ic}"
-          style="font-size:22px;width:42px;height:42px;border-radius:10px;cursor:pointer;
-                 border:2px solid ${ic===selIcono ? defs.color : 'var(--border)'};
-                 background:${ic===selIcono ? defs.bg : 'var(--surface2)'};">${ic}</button>
-      `).join('')}
+    <div class="m3-field" style="margin-bottom:14px;">
+      <input class="m3-inp emoji-inp" id="mnd-icono" value="${selIcono}" placeholder=" " maxlength="4"
+        style="font-size:28px;text-align:center;padding:10px 12px 4px;cursor:pointer;">
+      <label class="m3-lbl">Ícono (tocá para elegir emoji)</label>
     </div>
     <span class="sec-lbl">Color</span>
     <div id="mnd-color-grid" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
@@ -483,14 +469,8 @@ function _mnOpenEditar(id) {
 
   setTimeout(() => g('mnd-nombre')?.focus(), 200);
 
-  document.querySelectorAll('.mnd-ic-btn').forEach(b => {
-    b.addEventListener('click', () => {
-      document.querySelectorAll('.mnd-ic-btn').forEach(x => {
-        x.style.borderColor='var(--border)'; x.style.background='var(--surface2)';
-      });
-      b.style.borderColor=defs.color; b.style.background=defs.bg; selIcono=b.dataset.ic;
-    });
-  });
+  // Leer icono del input nativo
+  g('mnd-icono')?.addEventListener('input', e => { selIcono = e.target.value || defs?.icono || '👤'; });
   document.querySelectorAll('.mnd-col-btn').forEach(b => {
     b.addEventListener('click', () => {
       document.querySelectorAll('.mnd-col-btn').forEach(x=>x.style.borderColor='transparent');
@@ -499,6 +479,7 @@ function _mnOpenEditar(id) {
   });
 
   g('mnd-save').addEventListener('click', async () => {
+    selIcono = g('mnd-icono')?.value?.trim() || selIcono;
     const nombre = g('mnd-nombre')?.value.trim(); if (!nombre) return;
     const btn=g('mnd-save'); btn.textContent='Guardando…'; btn.disabled=true;
     try {
@@ -653,17 +634,23 @@ function _dpOpenCreate(nombreInicial = '') {
   g('dp-create-tel').value    = '';
   g('dp-create-email').value  = '';
 
-  // Grid de iconos
+  // Input emoji nativo — el teclado del celular tiene el selector de emoji
   const iconGrid = g('dp-icon-grid');
-  iconGrid.innerHTML = ICONOS.map(ic => `
-    <button class="dp-icon-btn${ic===_dpSelIcono?' sel':''}" data-ic="${ic}">${ic}</button>
-  `).join('');
-  iconGrid.querySelectorAll('.dp-icon-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      iconGrid.querySelectorAll('.dp-icon-btn').forEach(b=>b.classList.remove('sel'));
-      btn.classList.add('sel'); _dpSelIcono = btn.dataset.ic;
+  if (iconGrid) {
+    iconGrid.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;">
+        <input id="dp-emoji-inp" value="${_dpSelIcono}" placeholder="😊" maxlength="4"
+          style="font-size:36px;text-align:center;width:72px;height:60px;
+                 border:1.5px solid #E2E8E5;border-radius:12px;background:#F7F8F6;
+                 outline:none;cursor:pointer;font-family:inherit;">
+        <span style="font-size:13px;color:#8FA898;line-height:1.4;">
+          Tocá el campo y usá<br>el teclado emoji 🎉
+        </span>
+      </div>`;
+    g('dp-emoji-inp')?.addEventListener('input', e => {
+      _dpSelIcono = e.target.value || (DIR_CATS[_dpCategoria]?.icono || '👤');
     });
-  });
+  }
 
   // Grid de colores
   const colorGrid = g('dp-color-grid');
@@ -799,10 +786,10 @@ function openSheet(tipo) {
     setTipo('gasto');
     const mi = g('s-fin-monto'); if (mi) { mi.value=''; setTimeout(()=>mi.focus(),300); }
     document.querySelectorAll('.quick-amt').forEach(b=>b.classList.remove('sel'));
-    ['s-fin-cat','s-fin-prov-id'].forEach(id=>{ if(g(id)) g(id).value=''; });
+    if(g('s-fin-cat')) g('s-fin-cat').value='';
     g('s-fin-fecha').value = today; if(g('s-fin-desc')) g('s-fin-desc').value='';
     _resetTrigger('fin-cat-trigger',  'fin-cat-trigger-lbl',  'Seleccionar categoría…');
-    _resetTrigger('fin-prov-trigger', 'fin-prov-trigger-lbl', 'Seleccionar proveedor…');
+    // proveedor eliminado del formulario
   }
   if (tipo === 'ped') {
     ['s-ped-cli-id','s-ped-cli','s-ped-emp-id'].forEach(id=>{ if(g(id)) g(id).value=''; });
@@ -866,22 +853,17 @@ const closeEdit = () => {
 //     (histórico + servicios/proveedores del directorio)
 // ══════════════════════════════════════════════════
 function openFinCatPicker() {
+  // Solo items de Mi Negocio + categorías ya usadas. Sin sugerencias fijas.
   const directItems = [
     ...dirGetByCat('Servicios').map(e   => ({ id:'dir:'+e.id, name:`${e.icono||'⚡'} ${e.nombre}`, sub:'servicio' })),
     ...dirGetByCat('Proveedores').map(e => ({ id:'dir:'+e.id, name:`${e.icono||'🏭'} ${e.nombre}`, sub:'proveedor' })),
+    ...dirGetByCat('Clientes').map(e    => ({ id:'dir:'+e.id, name:`${e.icono||'👤'} ${e.nombre}`, sub:'cliente' })),
   ];
   const usadas = [...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].sort();
-  const FIJAS  = [
-    'Ventas','Servicios prestados','Materias primas','Sueldos',
-    'Alquiler','Marketing','Transporte','Insumos','Herramientas',
-    'Impuestos','Otros gastos',
-  ];
   const items = [
     ...directItems,
     ...usadas.filter(c => !directItems.some(e=>e.name.includes(c)))
              .map(c => ({ id:'hist:'+c, name:c, sub:'usada antes' })),
-    ...FIJAS.filter(c => !usadas.includes(c) && !directItems.some(e=>e.name.includes(c)))
-            .map(c => ({ id:'fija:'+c, name:c, sub:'sugerencia' })),
   ];
   _openPickerLista({
     title: 'Categoría',
@@ -967,18 +949,16 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd })
 // 13. PICKER PRODUCTOS (para pedidos)
 // ══════════════════════════════════════════════════
 function openPedProdPicker() {
-  const FIJOS = [
-    'Torta personalizada','Budín','Facturas','Medialunas',
-    'Pan de campo','Alfajores','Scones','Muffins',
-    'Galletitas','Cheesecake','Brownie','Tarta',
-    'Pan lactal','Baguette',
-  ];
+  // Productos desde Mi Negocio (categoría Servicios) + texto libre
+  const desdeMiNegocio = dirGetByCat('Servicios').map(e => ({
+    id: e._id || e.id, name: e.nombre,
+  }));
   _openPickerLista({
     title:    'Agregar producto',
-    items:    FIJOS.map(p => ({ id:p, name:p })),
+    items:    desdeMiNegocio,
     selected: '',
-    onSelect: (_, nombre) => addPedProd(nombre),
-    addLabel: 'Producto personalizado',
+    onSelect: (_, nombre) => { addPedProd(nombre); closeEdit(); },
+    addLabel: 'Escribí el nombre del producto y presioná Enter',
     onAdd:    nombre => { if (nombre) addPedProd(nombre); },
   });
 }
@@ -2274,11 +2254,7 @@ dpBindTrigger({
   categoria: 'Empleados', titulo: 'Seleccionar empleado',
 });
 // Proveedor en finanza
-dpBindTrigger({
-  triggerId: 'fin-prov-trigger', lblId: 'fin-prov-trigger-lbl',
-  hiddenIdId: 's-fin-prov-id',
-  categoria: 'Proveedores', titulo: 'Seleccionar proveedor',
-});
+// picker proveedor en finanza eliminado — usar categoría de Mi Negocio
 // Cliente en agenda
 dpBindTrigger({
   triggerId: 'age-cli-trigger', lblId: 'age-cli-trigger-lbl',
