@@ -62,7 +62,7 @@ const CATS_DEFAULT = [
   { nombre:'Clientes',    icono:'👤', color:'#1967D2', orden:0 },
   { nombre:'Empleados',   icono:'👥', color:'#137333', orden:1 },
   { nombre:'Proveedores', icono:'🏭', color:'#B06000', orden:2 },
-  { nombre:'Servicios',   icono:'⚡', color:'#7627BB', orden:3 },
+  { nombre:'Productos',   icono:'📦', color:'#0D47A1', orden:3 },
 ];
 const PALETA = [
   // Verdes
@@ -461,38 +461,7 @@ function _mnCatBlock(cat, items) {
         </div>
       </div>`;
 
-  // Subcategorías como chips horizontales
-  const subcats = getSubcats(cat._id);
-  if (subcats.length) {
-    html += `<div style="display:flex;flex-wrap:wrap;gap:6px;padding:0 4px 10px;">`;
-    subcats.forEach(sub => {
-      html += `
-        <div style="display:inline-flex;align-items:center;gap:4px;background:${sub.color||color}22;
-                    border:1px solid ${sub.color||color}44;border-radius:var(--rfull);
-                    padding:4px 10px;font-size:12px;font-weight:600;color:${sub.color||color};">
-          ${sub.icono||'•'} ${sub.nombre}
-          <button class="rpl mn-subcat-edit" data-cat-id="${sub._id}"
-            style="background:transparent;border:none;cursor:pointer;color:${sub.color||color};opacity:.7;padding:1px;display:flex;">
-            <span class="material-icons-round" style="font-size:13px">edit</span>
-          </button>
-          <button class="rpl mn-subcat-del" data-cat-id="${sub._id}"
-            style="background:transparent;border:none;cursor:pointer;color:var(--red);opacity:.7;padding:1px;display:flex;">
-            <span class="material-icons-round" style="font-size:13px">close</span>
-          </button>
-        </div>`;
-    });
-    html += `</div>`;
-  }
 
-  // Botón agregar subcategoría
-  html += `
-    <button class="rpl mn-add-subcat" data-cat-id="${cat._id}"
-      style="display:flex;align-items:center;gap:5px;background:transparent;border:none;
-             cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;
-             color:${color};padding:0 4px 8px;opacity:.8;">
-      <span class="material-icons-round" style="font-size:14px">add</span>
-      Agregar subcategoría
-    </button>`;
 
   if (items.length) {
     html += `<div class="dir-entity-grid">`;
@@ -568,18 +537,7 @@ function _mnBindEvents() {
   wrap.querySelectorAll('.mn-cat-del').forEach(btn => {
     btn.addEventListener('click', e => { e.stopPropagation(); _mnConfirmarEliminarCat(btn.dataset.catId); });
   });
-  // Agregar subcategoría
-  wrap.querySelectorAll('.mn-add-subcat').forEach(btn => {
-    btn.addEventListener('click', () => _mnOpenCrearCat(btn.dataset.catId));
-  });
-  // Editar subcategoría
-  wrap.querySelectorAll('.mn-subcat-edit').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); _mnOpenEditarCat(btn.dataset.catId); });
-  });
-  // Eliminar subcategoría
-  wrap.querySelectorAll('.mn-subcat-del').forEach(btn => {
-    btn.addEventListener('click', e => { e.stopPropagation(); _mnConfirmarEliminarCat(btn.dataset.catId); });
-  });
+
 }
 
 // ── CRUD categorías (principal o sub) ────────────
@@ -696,7 +654,6 @@ function _mnConfirmarEliminarCat(id) {
 // ── CRUD ítems del directorio ─────────────────────
 function _mnOpenCrearItem(catId) {
   const cat = getCatById(catId); if (!cat) return;
-  const subcats = getSubcats(catId);
   let selIcono = cat.icono || '👤';
   let selColor = cat.color || '#1976D2';
   let selSubcat = '';
@@ -706,12 +663,7 @@ function _mnOpenCrearItem(catId) {
       <input class="m3-inp" id="mnd-nombre" placeholder=" " maxlength="60" autocomplete="off">
       <label class="m3-lbl">Nombre *</label>
     </div>
-    ${subcats.length ? `
-    <span class="field-trigger-lbl" style="margin-top:4px;">Subcategoría (opcional)</span>
-    <select class="m3-select" id="mnd-subcat" style="margin-bottom:12px;">
-      <option value="">Sin subcategoría</option>
-      ${subcats.map(s => `<option value="${s._id}">${s.icono||''} ${s.nombre}</option>`).join('')}
-    </select>` : ''}
+
     <div class="m3-field" style="margin-bottom:14px;">
       <input class="m3-inp" id="mnd-tel" placeholder=" " type="tel">
       <label class="m3-lbl">Teléfono</label>
@@ -758,7 +710,6 @@ function _mnOpenCrearItem(catId) {
     try {
       await saveEntidad({
         nombre, categoria_principal: catId,
-        subcatId: g('mnd-subcat')?.value || null,
         icono: selIcono, color_fondo: selColor,
         metadata: {
           telefono: g('mnd-tel')?.value.trim() || null,
@@ -774,7 +725,6 @@ function _mnOpenCrearItem(catId) {
 function _mnOpenEditarItem(id) {
   const e = dirGetById(id); if (!e) return;
   const cat = getCatById(e.categoria_principal) || { icono:'👤', color:'#234136', nombre:'Sin categoría' };
-  const subcats = getSubcats(cat._id||e.categoria_principal);
   let selIcono = e.icono || cat.icono || '👤';
   let selColor = e.color_fondo || cat.color || '#234136';
 
@@ -783,12 +733,7 @@ function _mnOpenEditarItem(id) {
       <input class="m3-inp" id="mnd-nombre" value="${(e.nombre||'').replace(/"/g,'&quot;')}" placeholder=" " maxlength="60">
       <label class="m3-lbl">Nombre *</label>
     </div>
-    ${subcats.length ? `
-    <span class="field-trigger-lbl" style="margin-top:4px;">Subcategoría</span>
-    <select class="m3-select" id="mnd-subcat" style="margin-bottom:12px;">
-      <option value="">Sin subcategoría</option>
-      ${subcats.map(s => `<option value="${s._id}" ${e.subcatId===s._id?'selected':''}>${s.icono||''} ${s.nombre}</option>`).join('')}
-    </select>` : ''}
+
     <div class="m3-field" style="margin-bottom:14px;">
       <input class="m3-inp" id="mnd-tel" value="${(e.metadata?.telefono||'').replace(/"/g,'&quot;')}" placeholder=" " type="tel">
       <label class="m3-lbl">Teléfono</label>
@@ -837,7 +782,6 @@ function _mnOpenEditarItem(id) {
     try {
       await updateEntidad(id, {
         nombre, icono: selIcono, color_fondo: selColor,
-        subcatId: g('mnd-subcat')?.value || null,
         metadata: {
           ...e.metadata,
           telefono: g('mnd-tel')?.value.trim() || null,
@@ -1435,18 +1379,44 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd, e
 // 13. PICKER PRODUCTOS (para pedidos)
 // ══════════════════════════════════════════════════
 function openPedProdPicker() {
-  // Mostrar TODOS los ítems del directorio como productos posibles
-  // + texto libre para productos que no están en el directorio
-  const items = dirGetAll().map(e => ({ id: e._id || e.id, name: e.nombre }));
+  // Buscar la categoría "Productos" dinámicamente
+  const catProductos = getCatsPrincipales().find(c =>
+    c.nombre.toLowerCase() === 'productos'
+  );
+  const productos = catProductos ? dirGetByCat(catProductos._id) : [];
+  const items = productos.map(e => ({ id: e._id || e.id, name: e.nombre }));
+
+  const titulo = catProductos ? 'Agregar producto' : 'Agregar producto';
 
   _openPickerLista({
-    title:    'Agregar producto',
+    title:    titulo,
     items,
     selected: '',
     onSelect: (_, nombre) => { addPedProd(nombre); closeEdit(); },
-    addLabel: 'Escribí el nombre y presioná Enter',
-    onAdd:    nombre => { if (nombre) addPedProd(nombre); },
-    emptyMsg: 'Escribí el nombre del producto y presioná Enter para agregarlo.',
+    addLabel: 'Producto nuevo',
+    onAdd: async nombre => {
+      if (!nombre?.trim()) return;
+      // Crear el producto en Mi Negocio automáticamente
+      let catId = catProductos?._id;
+      if (!catId) {
+        // Crear la categoría Productos si no existe
+        const nueva = await saveCategoria({
+          nombre: 'Productos', icono: '📦', color: '#0D47A1', parentId: null,
+        });
+        catId = nueva._id;
+      }
+      await saveEntidad({
+        nombre: nombre.trim(),
+        categoria_principal: catId,
+        icono: '📦',
+        color_fondo: '#0D47A1',
+        metadata: {},
+      });
+      addPedProd(nombre.trim());
+      closeEdit();
+      toast(`✅ "${nombre.trim()}" guardado en Mi Negocio`);
+    },
+    emptyMsg: 'No tenés productos cargados. Escribí el nombre y presioná Enter para crear uno.',
   });
 }
 
