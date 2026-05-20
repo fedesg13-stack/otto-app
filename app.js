@@ -1158,20 +1158,22 @@ function openFinCatPicker() {
   const principales = getCatsPrincipales();
   const usadas = [...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].sort();
 
-  // Construir items agrupados: primero las categorías del directorio (con subs),
-  // después las categorías usadas anteriormente que no estén en el directorio
+  // Todas las categorías principales navegan al nivel 2 (muestran sus ítems)
   const dirCatNames = new Set(principales.map(c=>c.nombre));
 
   const items = [
-    // Categorías principales del directorio
-    ...principales.map(cat => ({
-      id:       'cat:'+cat._id,
-      name:     `${cat.icono||'📁'} ${cat.nombre}`,
-      sub:      getSubcats(cat._id).length ? `${getSubcats(cat._id).length} subcategorías` : 'categoría principal',
-      color:    cat.color,
-      hasSubcats: getSubcats(cat._id).length > 0,
-      catId:    cat._id,
-    })),
+    ...principales.map(cat => {
+      const count = dirGetByCat(cat._id).length;
+      return {
+        id:        'cat:'+cat._id,
+        name:      `${cat.icono||'📁'} ${cat.nombre}`,
+        sub:       count ? `${count} ítem${count>1?'s':''}` : 'vacía',
+        color:     cat.color,
+        hasSubcats: true, // siempre navegar al nivel 2
+        catId:     cat._id,
+        nombre:    cat.nombre,
+      };
+    }),
     // Categorías históricas no presentes en el directorio
     ...usadas
       .filter(c => !principales.some(p => c.startsWith(p.nombre) || c === p.nombre))
@@ -1251,41 +1253,64 @@ function _openFinCatDosNiveles(items) {
   };
 
   const renderNivel2 = (catId, catNombre, catIcono) => {
-    const subcats = getSubcats(catId);
-    const cat = getCatById(catId);
-    const body = g('edit-body'); if (!body) return;
+    const cat   = getCatById(catId);
+    const items = dirGetByCat(catId);
+    const color = cat?.color || '#234136';
+    const body  = g('edit-body'); if (!body) return;
+
+    let itemsHtml = '';
+
+    if (!items.length) {
+      itemsHtml = `
+        <div style="padding:24px 12px;text-align:center;">
+          <div style="font-size:32px;margin-bottom:8px;">${cat?.icono||'📁'}</div>
+          <div style="font-size:13px;color:var(--t4);">
+            No hay ítems en ${catNombre}.<br>
+            <span style="color:var(--bosque);font-weight:600;">
+              Podés seleccionar solo la categoría.
+            </span>
+          </div>
+        </div>`;
+    } else {
+      itemsHtml = items.map(e => {
+        const bg  = e.color_fondo || color;
+        const ini = (e.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+        const hasEmoji = e.icono && e.icono !== '👤' && e.icono !== '👥';
+        return `
+          <div class="rpl pg-item" data-valor="${catNombre} / ${e.nombre}"
+            style="padding:10px 12px;border-radius:var(--r10);cursor:pointer;
+                   display:flex;align-items:center;gap:10px;transition:background .12s;">
+            <div style="width:32px;height:32px;border-radius:50%;background:${bg};
+                        display:flex;align-items:center;justify-content:center;
+                        font-size:14px;flex-shrink:0;">
+              ${hasEmoji
+                ? e.icono
+                : `<span style="font-size:11px;font-weight:700;color:#fff;">${ini}</span>`}
+            </div>
+            <div style="flex:1;font-size:14px;font-weight:600;color:var(--t1);">${e.nombre}</div>
+          </div>`;
+      }).join('');
+    }
 
     body.innerHTML = `
       <button id="pg-back"
         style="display:flex;align-items:center;gap:6px;background:transparent;border:none;
                cursor:pointer;font-family:var(--font);font-size:14px;font-weight:600;
-               color:var(--bosque);padding:0 0 14px 0;">
+               color:var(--bosque);padding:0 0 12px 0;">
         <span class="material-icons-round" style="font-size:18px">arrow_back</span>
         ${catIcono||''} ${catNombre}
       </button>
-      <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:420px;overflow-y:auto;">
-        <!-- Opción: seleccionar la categoría principal directamente -->
+      <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:400px;overflow-y:auto;">
+        <!-- Opción: solo la categoría principal, sin ítem específico -->
         <div class="rpl pg-item" data-valor="${catNombre}"
-          style="padding:12px;border-radius:var(--r10);cursor:pointer;
+          style="padding:10px 12px;border-radius:var(--r10);cursor:pointer;
                  display:flex;align-items:center;gap:10px;transition:background .12s;
-                 border:1.5px dashed var(--border);margin-bottom:4px;">
+                 border:1.5px dashed var(--border);margin-bottom:6px;">
           <div style="font-size:13px;color:var(--t3);font-style:italic;flex:1;">
-            Solo "${catNombre}" (sin subcategoría)
+            Solo "${catNombre}" (sin especificar)
           </div>
         </div>
-        ${subcats.map(sub => `
-          <div class="rpl pg-item" data-valor="${catNombre} / ${sub.nombre}"
-            style="padding:12px;border-radius:var(--r10);cursor:pointer;
-                   display:flex;align-items:center;gap:10px;transition:background .12s;">
-            <div style="width:10px;height:10px;border-radius:50%;
-                        background:${sub.color||cat?.color||'#234136'};flex-shrink:0;"></div>
-            <div style="flex:1;">
-              <div style="font-size:14px;font-weight:600;color:var(--t1);">
-                ${sub.icono||''} ${sub.nombre}
-              </div>
-            </div>
-            <span class="material-icons-round" style="font-size:16px;color:var(--t4)">check</span>
-          </div>`).join('')}
+        ${itemsHtml}
       </div>`;
 
     g('pg-back').addEventListener('click', () => {
