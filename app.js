@@ -1536,7 +1536,7 @@ async function saveMov() {
   try {
     const ref = await addDoc(col('movimientos'), data);
     S.movs.push({...data, _id:ref.id}); S.ottoCache=[];
-    closeSheet(); toast(S.tipo==='ingreso'?'✅ Ingreso guardado':'✅ Gasto guardado');
+    closeSheet(); toast(S.tipo==='ingreso'?'✅ Ingreso guardado':'✅ Gasto guardado'); navTo('fin');
     renderHomeBal(); renderMovsFin();
   } catch(e) { console.error(e); toast('Error al guardar'); }
 }
@@ -1625,7 +1625,7 @@ async function savePed() {
   try {
     const ref = await addDoc(col('pedidos'), data);
     S.pedidos.push({...data,_id:ref.id}); S.ottoCache=[];
-    closeSheet(); toast('✅ Pedido guardado');
+    closeSheet(); toast('✅ Pedido guardado'); navTo('ped');
     renderPeds(); renderPedWeek(); renderProduceDia();
   } catch(e) { console.error(e); toast('Error al guardar'); }
 }
@@ -1728,7 +1728,7 @@ async function saveEv() {
   try {
     const ref=await addDoc(col('eventos'),data);
     S.eventos.push({...data,_id:ref.id}); S.ottoCache=[];
-    closeSheet(); toast('✅ Agendado'); renderEvs(); renderAgeCalGoogle();
+    closeSheet(); toast('✅ Agendado'); navTo('age');
   } catch(e){console.error(e);toast('Error');}
 }
 
@@ -1769,7 +1769,7 @@ function editEv(id) {
 async function saveTask() {
   const tit=g('s-task-tit')?.value.trim(); if(!tit){toast('Ingresá una tarea');return;}
   const data={tit,done:false,fecha:g('s-task-fecha')?.value||'',prio:g('s-task-prio')?.value||'normal',desc:g('s-task-desc')?.value.trim()||'',creadoEn:new Date().toISOString()};
-  try{const ref=await addDoc(col('tareas'),data);S.tareas.push({...data,_id:ref.id});S.ottoCache=[];closeSheet();toast('✅ Tarea guardada');renderTasks();updateBanner();}
+  try{const ref=await addDoc(col('tareas'),data);S.tareas.push({...data,_id:ref.id});S.ottoCache=[];closeSheet();toast('✅ Tarea guardada');navTo('task');}
   catch(e){console.error(e);toast('Error');}
 }
 
