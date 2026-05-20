@@ -2995,14 +2995,14 @@ function compartirPedidosWsp() {
     return ha.localeCompare(hb) || (a.cli||'').localeCompare(b.cli||'','es');
   });
 
-  const lineaPedidos = pedidosOrdenados.map((p, i) => {
+  const lineaPedidos = pedidosOrdenados.map((p) => {
     const hora   = p.hora ? ` — ${p.hora}` : '';
     const items  = (p.items||[])
       .sort((a,b) => a.p.localeCompare(b.p,'es'))
       .map(i => `   ${i.q}× ${i.p}`)
       .join('\n');
     const notas  = p.notas ? `\n   📝 ${p.notas}` : '';
-    return `${i+1}. *${p.cli||'Sin cliente'}*${hora}\n${items}${notas}`;
+    return `*${p.cli||'Sin cliente'}*${hora}\n${items}${notas}`;
   }).join('\n\n');
 
   // ── Sección 2: Totales de producción ─────────────
@@ -3015,7 +3015,7 @@ function compartirPedidosWsp() {
 
   const lineaTotales = Object.entries(totales)
     .sort((a,b) => a[0].localeCompare(b[0],'es'))
-    .map(([prod, qty]) => `${prod.padEnd(25,' ')} × ${qty}`)
+    .map(([prod, qty]) => `${qty}× ${prod}`)
     .join('\n');
 
   // ── Armar mensaje completo ───────────────────────
@@ -3039,7 +3039,7 @@ ${lineaPedidos}
 
 ${lineaTotales}
 
-_Enviado desde OTTO_ 🤖`;
+_Enviado desde OTTO_`;
 
   const encoded = encodeURIComponent(msg);
   const url = empleado
