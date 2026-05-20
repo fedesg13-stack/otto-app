@@ -2970,6 +2970,86 @@ g('ped-modal-overlay')?.addEventListener('click', closePedModal);
 
 // Producción semanal
 g('ped-semana-btn')?.addEventListener('click', openProdSemanaModal);
+
+// ── Compartir pedidos por WhatsApp ───────────────
+function compartirPedidosWsp() {
+  const fecha   = S.pedFecha;
+  const activos = S.pedidos.filter(p => !p.archivado && (!fecha || p.fecha === fecha));
+
+  if (!activos.length) {
+    toast('No hay pedidos para compartir');
+    return;
+  }
+
+  // Formatear fecha legible
+  const fechaLabel = fecha
+    ? new Date(fecha+'T00:00:00').toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long'})
+        .replace(/^\w/, c => c.toUpperCase())
+    : 'Todos los pedidos activos';
+
+  // ── Sección 1: Pedidos individuales ──────────────
+  const pedidosOrdenados = [...activos].sort((a,b) => {
+    // Primero por hora, luego por cliente
+    const ha = a.hora || '99:99';
+    const hb = b.hora || '99:99';
+    return ha.localeCompare(hb) || (a.cli||'').localeCompare(b.cli||'','es');
+  });
+
+  const lineaPedidos = pedidosOrdenados.map((p, i) => {
+    const hora   = p.hora ? ` — ${p.hora}` : '';
+    const items  = (p.items||[])
+      .sort((a,b) => a.p.localeCompare(b.p,'es'))
+      .map(i => `   ${i.q}× ${i.p}`)
+      .join('\n');
+    const notas  = p.notas ? `\n   📝 ${p.notas}` : '';
+    return `${i+1}. *${p.cli||'Sin cliente'}*${hora}\n${items}${notas}`;
+  }).join('\n\n');
+
+  // ── Sección 2: Totales de producción ─────────────
+  const totales = {};
+  activos.forEach(p => {
+    (p.items||[]).forEach(i => {
+      totales[i.p] = (totales[i.p]||0) + i.q;
+    });
+  });
+
+  const lineaTotales = Object.entries(totales)
+    .sort((a,b) => a[0].localeCompare(b[0],'es'))
+    .map(([prod, qty]) => `${prod.padEnd(25,' ')} × ${qty}`)
+    .join('\n');
+
+  // ── Armar mensaje completo ───────────────────────
+  const empleado = (() => {
+    // Buscar el empleado en el directorio
+    const catEmpleados = getCatsPrincipales().find(c => c.nombre.toLowerCase() === 'empleados');
+    if (catEmpleados) {
+      const emp = dirGetByCat(catEmpleados._id)[0];
+      if (emp?.metadata?.telefono) return emp.metadata.telefono.replace(/\D/g,'');
+    }
+    return '';
+  })();
+
+  const msg =
+`📋 *PEDIDOS — ${fechaLabel}*
+
+${lineaPedidos}
+
+━━━━━━━━━━━━━━
+📦 *PRODUCCIÓN TOTAL*
+
+${lineaTotales}
+
+_Enviado desde OTTO_ 🤖`;
+
+  const encoded = encodeURIComponent(msg);
+  const url = empleado
+    ? `https://wa.me/${empleado}?text=${encoded}`
+    : `https://wa.me/?text=${encoded}`;
+
+  window.open(url, '_blank');
+}
+
+g('ped-wsp-btn')?.addEventListener('click', compartirPedidosWsp);
 g('prod-modal-overlay')?.addEventListener('click', closeProdModal);
 g('prod-modal-close')?.addEventListener('click', closeProdModal);
 g('prod-sem-prev')?.addEventListener('click', () => { pedSemanaOffset--; renderProdSemanaModal(); });
