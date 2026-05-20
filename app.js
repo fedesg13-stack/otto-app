@@ -1155,6 +1155,15 @@ const closeEdit = () => {
 //     Dos niveles: categoría principal → subcategoría
 // ══════════════════════════════════════════════════
 function openFinCatPicker() {
+  _openFinCatPickerConCallback(valor => {
+    const lbl = g('fin-cat-trigger-lbl');
+    if (lbl) { lbl.textContent=valor; lbl.style.color='var(--t1)'; }
+    if (g('s-fin-cat')) g('s-fin-cat').value = valor;
+    g('fin-cat-trigger')?.classList.add('filled');
+  });
+}
+
+function _openFinCatPickerConCallback(onSelect) {
   const principales = getCatsPrincipales();
   const usadas = [...new Set((S.movs||[]).map(m=>m.cat).filter(Boolean))].sort();
 
@@ -1180,15 +1189,12 @@ function openFinCatPicker() {
       .map(c => ({ id:'hist:'+c, name:c, sub:'usada antes' })),
   ];
 
-  _openFinCatDosNiveles(items);
+  _openFinCatDosNiveles(items, onSelect);
 }
 
-function _openFinCatDosNiveles(items) {
+function _openFinCatDosNiveles(items, onSelect) {
   const seleccionar = (valor) => {
-    const lbl = g('fin-cat-trigger-lbl');
-    if (lbl) { lbl.textContent=valor; lbl.style.color='var(--t1)'; }
-    if (g('s-fin-cat')) g('s-fin-cat').value = valor;
-    g('fin-cat-trigger')?.classList.add('filled');
+    if (onSelect) onSelect(valor);
     closeEdit();
   };
 
@@ -1507,6 +1513,8 @@ async function delMov(id) {
 
 function editMov(id) {
   const m = S.movs.find(m=>m._id===id); if (!m) return;
+  const catActual = m.cat || '';
+
   openEdit('✏️ Editar movimiento', `
     <div class="tipo-pills" style="margin-bottom:12px;">
       <button class="tipo-pill ing${m.tipo==='ingreso'?' sel':''} rpl" id="ep-pill-ing">
@@ -1517,10 +1525,26 @@ function editMov(id) {
       </button>
     </div>
     <div class="m3-field"><input class="m3-inp" id="ep-monto" type="number" value="${m.monto}" placeholder=" " inputmode="decimal"><label class="m3-lbl">Monto</label></div>
-    <div class="m3-field"><input class="m3-inp" id="ep-cat"   value="${m.cat||''}"   placeholder=" "><label class="m3-lbl">Categoría</label></div>
-    <div class="m3-field"><input class="m3-inp" id="ep-fecha" type="date" value="${m.fecha||''}" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-    <div class="m3-field"><input class="m3-inp" id="ep-desc"  value="${m.desc||''}"  placeholder=" "><label class="m3-lbl">Nota</label></div>
+    <span class="field-trigger-lbl" style="margin-top:4px;">Categoría</span>
+    <button class="field-trigger rpl${catActual?' filled':''}" id="ep-cat-trigger">
+      <span id="ep-cat-lbl" style="color:${catActual?'var(--t1)':'var(--t4)'};">
+        ${catActual || 'Seleccionar categoría…'}
+      </span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="ep-cat" value="${(m.cat||'').replace(/"/g,'&quot;')}">
+    <div class="m3-field" style="margin-top:12px;"><input class="m3-inp" id="ep-fecha" type="date" value="${m.fecha||''}" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+    <div class="m3-field"><input class="m3-inp" id="ep-desc" value="${(m.desc||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Nota</label></div>
     <button class="btn-save rpl" id="ep-save">Guardar cambios</button>`);
+
+  g('ep-cat-trigger').addEventListener('click', () => {
+    _openFinCatPickerConCallback(valor => {
+      if (g('ep-cat')) g('ep-cat').value = valor;
+      const lbl = g('ep-cat-lbl');
+      if (lbl) { lbl.textContent=valor; lbl.style.color='var(--t1)'; }
+      g('ep-cat-trigger')?.classList.add('filled');
+    });
+  });
 
   let tipoEdit = m.tipo;
   g('ep-pill-ing').addEventListener('click',()=>{ tipoEdit='ingreso'; g('ep-pill-ing').classList.add('sel'); g('ep-pill-gas').classList.remove('sel'); });
