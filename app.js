@@ -1195,7 +1195,6 @@ function _openFinCatPickerConCallback(onSelect) {
 function _openFinCatDosNiveles(items, onSelect) {
   const seleccionar = (valor) => {
     if (onSelect) onSelect(valor);
-    closeEdit();
   };
 
   const renderNivel1 = () => {
@@ -1513,52 +1512,54 @@ async function delMov(id) {
 
 function editMov(id) {
   const m = S.movs.find(m=>m._id===id); if (!m) return;
-  const catActual = m.cat || '';
 
-  openEdit('✏️ Editar movimiento', `
-    <div class="tipo-pills" style="margin-bottom:12px;">
-      <button class="tipo-pill ing${m.tipo==='ingreso'?' sel':''} rpl" id="ep-pill-ing">
-        <span class="material-icons-round">trending_up</span>Ingreso
+  const _render = (catVal) => {
+    const catActual = catVal !== undefined ? catVal : (m.cat || '');
+    g('edit-title').textContent = '✏️ Editar movimiento';
+    g('edit-body').innerHTML = `
+      <div class="tipo-pills" style="margin-bottom:12px;">
+        <button class="tipo-pill ing${m.tipo==='ingreso'?' sel':''} rpl" id="ep-pill-ing">
+          <span class="material-icons-round">trending_up</span>Ingreso
+        </button>
+        <button class="tipo-pill gas${m.tipo==='gasto'?' sel':''} rpl" id="ep-pill-gas">
+          <span class="material-icons-round">trending_down</span>Gasto
+        </button>
+      </div>
+      <div class="m3-field"><input class="m3-inp" id="ep-monto" type="number" value="${m.monto}" placeholder=" " inputmode="decimal"><label class="m3-lbl">Monto</label></div>
+      <span class="field-trigger-lbl" style="margin-top:4px;">Categoría</span>
+      <button class="field-trigger rpl${catActual?' filled':''}" id="ep-cat-trigger">
+        <span id="ep-cat-lbl" style="color:${catActual?'var(--t1)':'var(--t4)'};">
+          ${catActual || 'Seleccionar categoría…'}
+        </span>
+        <span class="material-icons-round">expand_more</span>
       </button>
-      <button class="tipo-pill gas${m.tipo==='gasto'?' sel':''} rpl" id="ep-pill-gas">
-        <span class="material-icons-round">trending_down</span>Gasto
-      </button>
-    </div>
-    <div class="m3-field"><input class="m3-inp" id="ep-monto" type="number" value="${m.monto}" placeholder=" " inputmode="decimal"><label class="m3-lbl">Monto</label></div>
-    <span class="field-trigger-lbl" style="margin-top:4px;">Categoría</span>
-    <button class="field-trigger rpl${catActual?' filled':''}" id="ep-cat-trigger">
-      <span id="ep-cat-lbl" style="color:${catActual?'var(--t1)':'var(--t4)'};">
-        ${catActual || 'Seleccionar categoría…'}
-      </span>
-      <span class="material-icons-round">expand_more</span>
-    </button>
-    <input type="hidden" id="ep-cat" value="${(m.cat||'').replace(/"/g,'&quot;')}">
-    <div class="m3-field" style="margin-top:12px;"><input class="m3-inp" id="ep-fecha" type="date" value="${m.fecha||''}" placeholder=" "><label class="m3-lbl">Fecha</label></div>
-    <div class="m3-field"><input class="m3-inp" id="ep-desc" value="${(m.desc||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Nota</label></div>
-    <button class="btn-save rpl" id="ep-save">Guardar cambios</button>`);
+      <input type="hidden" id="ep-cat" value="${catActual.replace(/"/g,'&quot;')}">
+      <div class="m3-field" style="margin-top:12px;"><input class="m3-inp" id="ep-fecha" type="date" value="${m.fecha||''}" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+      <div class="m3-field"><input class="m3-inp" id="ep-desc" value="${(m.desc||'').replace(/"/g,'&quot;')}" placeholder=" "><label class="m3-lbl">Nota</label></div>
+      <button class="btn-save rpl" id="ep-save">Guardar cambios</button>`;
 
-  g('ep-cat-trigger').addEventListener('click', () => {
-    _openFinCatPickerConCallback(valor => {
-      if (g('ep-cat')) g('ep-cat').value = valor;
-      const lbl = g('ep-cat-lbl');
-      if (lbl) { lbl.textContent=valor; lbl.style.color='var(--t1)'; }
-      g('ep-cat-trigger')?.classList.add('filled');
+    g('ep-cat-trigger').addEventListener('click', () => {
+      _openFinCatPickerConCallback(valor => { _render(valor); });
     });
-  });
 
-  let tipoEdit = m.tipo;
-  g('ep-pill-ing').addEventListener('click',()=>{ tipoEdit='ingreso'; g('ep-pill-ing').classList.add('sel'); g('ep-pill-gas').classList.remove('sel'); });
-  g('ep-pill-gas').addEventListener('click',()=>{ tipoEdit='gasto';   g('ep-pill-gas').classList.add('sel'); g('ep-pill-ing').classList.remove('sel'); });
-  g('ep-save').addEventListener('click', async () => {
-    const monto = parseFloat(g('ep-monto')?.value); if (!monto||monto<=0) return;
-    const upd = { tipo:tipoEdit, monto, cat:g('ep-cat')?.value.trim()||m.cat, fecha:g('ep-fecha')?.value||m.fecha, desc:g('ep-desc')?.value.trim()||'' };
-    try {
-      await updateDoc(docRef('movimientos',id), upd);
-      Object.assign(m,upd); S.ottoCache=[];
-      closeEdit(); toast('✅ Actualizado'); renderMovsFin(); renderHomeBal();
-    } catch(e) { console.error(e); toast('Error'); }
-  });
+    let tipoEdit = m.tipo;
+    g('ep-pill-ing').addEventListener('click',()=>{ tipoEdit='ingreso'; g('ep-pill-ing').classList.add('sel'); g('ep-pill-gas').classList.remove('sel'); });
+    g('ep-pill-gas').addEventListener('click',()=>{ tipoEdit='gasto';   g('ep-pill-gas').classList.add('sel'); g('ep-pill-ing').classList.remove('sel'); });
+    g('ep-save').addEventListener('click', async () => {
+      const monto = parseFloat(g('ep-monto')?.value); if (!monto||monto<=0) return;
+      const upd = { tipo:tipoEdit, monto, cat:g('ep-cat')?.value.trim()||m.cat, fecha:g('ep-fecha')?.value||m.fecha, desc:g('ep-desc')?.value.trim()||'' };
+      try {
+        await updateDoc(docRef('movimientos',id), upd);
+        Object.assign(m,upd); S.ottoCache=[];
+        closeEdit(); toast('✅ Actualizado'); renderMovsFin(); renderHomeBal();
+      } catch(e) { console.error(e); toast('Error'); }
+    });
+  };
+
+  openEdit('✏️ Editar movimiento', '');
+  _render();
 }
+
 
 // ══════════════════════════════════════════════════
 // 15. GUARDAR / ELIMINAR PEDIDOS
