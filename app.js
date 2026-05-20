@@ -3015,7 +3015,7 @@ function compartirPedidosWsp() {
 
   const lineaTotales = Object.entries(totales)
     .sort((a,b) => a[0].localeCompare(b[0],'es'))
-    .map(([prod, qty]) => `${qty}× ${prod}`)
+    .map(([prod, qty]) => `${prod} x *${qty}*`)
     .join('\n');
 
   // ── Armar mensaje completo ───────────────────────
