@@ -170,10 +170,12 @@ const catsCol = () => collection(db, `usuarios/${S.uid}/categorias`);
 
 // ── Acceso en memoria ─────────────────────────────
 const getCatsPrincipales = () =>
-  S.categorias.filter(c => !c.parentId).sort((a,b) => (a.orden||0)-(b.orden||0));
+  S.categorias.filter(c => !c.parentId)
+    .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
 
 const getSubcats = (parentId) =>
-  S.categorias.filter(c => c.parentId === parentId).sort((a,b) => (a.orden||0)-(b.orden||0));
+  S.categorias.filter(c => c.parentId === parentId)
+    .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
 
 const getCatById = (id) => S.categorias.find(c => c._id === id) || null;
 
@@ -322,7 +324,9 @@ const dirGetById  = id    => S.directorio.find(e => e.id === id) || null;
  * dirGetByCat(categoria)
  * Filtro por categoria_principal: 'Clientes'|'Empleados'|'Proveedores'|'Servicios'
  */
-const dirGetByCat = cat   => S.directorio.filter(e => e.categoria_principal === cat);
+const dirGetByCat = cat => S.directorio
+  .filter(e => e.categoria_principal === cat)
+  .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
 
 const dirSearch   = q     => {
   const lq = q.toLowerCase();
@@ -409,7 +413,15 @@ function renderDirectorioGrid(filtro) {
     return;
   }
 
-  let html = '';
+  let html = `
+    <div style="padding:0 12px 12px;">
+      <button class="dir-add-btn rpl" id="mn-nueva-cat"
+        style="border-color:var(--bosque);color:var(--bosque);font-weight:700;">
+        <span class="material-icons-round">create_new_folder</span>
+        Nueva categoría principal
+      </button>
+    </div>`;
+
   principales.forEach(cat => {
     let items = dirGetByCat(cat._id);
     if (f) items = items.filter(e =>
@@ -421,7 +433,7 @@ function renderDirectorioGrid(filtro) {
   });
 
   wrap.innerHTML = html;
-  _mnAddBotonNuevaCat(wrap);
+  g('mn-nueva-cat')?.addEventListener('click', () => _mnOpenCrearCat(null));
   _mnBindEvents();
 }
 
@@ -1797,17 +1809,30 @@ function editTask(id) {
 // 18. RENDER HOME
 // ══════════════════════════════════════════════════
 function renderHomeBal() {
-  const mes=new Date().toISOString().slice(0,7);
-  const mm=S.movs.filter(m=>m.fecha?.startsWith(mes));
-  const ing=mm.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
-  const gas=mm.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
-  const bal=ing-gas;
-  if(g('h-net'))  g('h-net').textContent=fmtARS(ing);
-  if(g('h-ing'))  g('h-ing').textContent='+'+fmtARS(ing);
-  const be=g('h-bal'); if(be){be.textContent=(bal>=0?'+':'')+fmtARS(bal);be.className='hero-card-val '+(bal>=0?'pos':'neg');}
-  if(g('fin-ing'))g('fin-ing').textContent='+'+fmtARS(ing);
-  if(g('fin-gas'))g('fin-gas').textContent=fmtARS(gas);
-  const ne=g('fin-net'); if(ne){ne.textContent=(bal>=0?'+':'')+fmtARS(bal);ne.className='fin-res-val '+(bal>=0?'pos':'neg');}
+  const mes  = new Date().toISOString().slice(0,7);
+  const hoyStr = hoy();
+  const mm   = S.movs.filter(m=>m.fecha?.startsWith(mes));
+  const ing  = mm.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
+  const gas  = mm.filter(m=>m.tipo==='gasto')  .reduce((s,m)=>s+m.monto,0);
+  const bal  = ing - gas; // ganancia = ingresos - gastos
+
+  // h-net: ganancia al día de hoy (balance del mes hasta hoy)
+  const hNet = g('h-net');
+  if (hNet) {
+    hNet.textContent = (bal>=0?'+':'')+fmtARS(bal);
+    hNet.style.color = bal>=0 ? 'rgba(255,255,255,1)' : '#FFB3B3';
+  }
+  // h-ing: ingresos del mes
+  if (g('h-ing')) g('h-ing').textContent = '+'+fmtARS(ing);
+  // h-bal: gastos del mes (siempre negativo)
+  const be = g('h-bal');
+  if (be) { be.textContent = '-'+fmtARS(gas); be.className = 'hero-card-val neg'; }
+
+  // Panel finanzas
+  if (g('fin-ing')) g('fin-ing').textContent = '+'+fmtARS(ing);
+  if (g('fin-gas')) g('fin-gas').textContent = fmtARS(gas);
+  const ne = g('fin-net');
+  if (ne) { ne.textContent=(bal>=0?'+':'')+fmtARS(bal); ne.className='fin-res-val '+(bal>=0?'pos':'neg'); }
 }
 
 function updateBanner() {
@@ -1866,7 +1891,7 @@ function renderMovsFin() {
     if(S.finFiltro==='ingreso')return m.tipo==='ingreso';
     if(S.finFiltro==='gasto')return m.tipo==='gasto';
     return true;
-  }).sort((a,b)=>(b.creadoEn||b.fecha||'').localeCompare(a.creadoEn||a.fecha||''));
+  }).sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''));
 
   const list=g('mov-list'); if(!list)return;
   if(!movsMes.length){
@@ -1875,7 +1900,8 @@ function renderMovsFin() {
   }
   const grupos={},fechasOrden=[];
   movsMes.forEach(m=>{const k=m.fecha||'Sin fecha';if(!grupos[k]){grupos[k]=[];fechasOrden.push(k);}grupos[k].push(m);});
-  const fechasUnicas=[...new Set(fechasOrden)];
+  // Ordenar fechas de más reciente a más antigua
+  const fechasUnicas=[...new Set(fechasOrden)].sort((a,b)=>b.localeCompare(a));
   list.innerHTML=fechasUnicas.map(f=>{
     const ms=grupos[f];
     const totalDia=ms.reduce((s,m)=>s+(m.tipo==='ingreso'?m.monto:-m.monto),0);
@@ -2404,48 +2430,132 @@ function addNota(){
 let chatHistory=[];
 
 function buildOttoContext(){
-  const _dn=new Date(),mes=`${_dn.getFullYear()}-${String(_dn.getMonth()+1).padStart(2,'0')}`;
-  const _dp=new Date(_dn.getFullYear(),_dn.getMonth()-1,1),mesPrev=`${_dp.getFullYear()}-${String(_dp.getMonth()+1).padStart(2,'0')}`;
-  const movsMes=S.movs.filter(m=>m.fecha?.startsWith(mes));
-  const ing=movsMes.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
-  const gas=movsMes.filter(m=>m.tipo==='gasto').reduce((s,m)=>s+m.monto,0);
-  const ingPrev=S.movs.filter(m=>m.tipo==='ingreso'&&m.fecha?.startsWith(mesPrev)).reduce((s,m)=>s+m.monto,0);
-  const gasPrev=S.movs.filter(m=>m.tipo==='gasto'  &&m.fecha?.startsWith(mesPrev)).reduce((s,m)=>s+m.monto,0);
-  const movDetalle=movsMes.slice(-50).map(m=>`${m.tipo==='ingreso'?'+':'-'}${fmtARS(m.monto)} [${m.cat}]${m.desc?' "'+m.desc+'"':''} ${m.fecha}`).join(' | ');
-  const activos=S.pedidos.filter(p=>!p.archivado);
-  const pedDetalle=activos.map(p=>`${p.cli}|${p.fecha}${p.hora?' '+p.hora:''}|${(p.items||[]).map(i=>`${i.q}x${i.p}`).join(',')}`).join(' || ');
-  const evs=S.eventos.filter(e=>e.fecha>=hoy()).sort((a,b)=>a.fecha.localeCompare(b.fecha)).map(e=>`${e.tit}|${e.fecha}${e.hora?' '+e.hora:''}${e.prio==='urgente'?' URGENTE':''}`).join(' | ');
-  const tasks=S.tareas.map(t=>`[${t.done?'✓':'○'}]${t.tit}${t.fecha?' '+t.fecha:''}${t.prio==='urgente'?' URGENTE':''}`).join(' | ');
-  // Directorio dinámico: agrupar por categoría principal
-  const dirResumen=getCatsPrincipales().map(cat=>{
-    const items=dirGetByCat(cat._id).map(e=>e.nombre).join(', ');
-    return `${cat.nombre}: ${items||'—'}`;
-  }).join(' | ');
-  const cliCount={};S.pedidos.forEach(p=>{if(p.cli)cliCount[p.cli]=(cliCount[p.cli]||0)+1;});
-  const topClis=Object.entries(cliCount).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,c])=>`${n}(${c})`).join(', ');
-  const prodCount={};S.pedidos.forEach(p=>(p.items||[]).forEach(i=>{prodCount[i.p]=(prodCount[i.p]||0)+i.q;}));
-  const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([n,c])=>`${n}(${c})`).join(', ');
-  const notasTexto=(S.notas||[]).map(n=>n.texto).filter(Boolean).join(' | ');
-  return `=== NEGOCIO ===
-Nombre: ${S.perfil?.negocio||S.negocio||'—'} | Rubro: ${S.perfil?.rubro||'—'} | Dueño: ${S.nombre||'—'}
-País: ${S.perfil?.pais||'Uruguay'} | Moneda: ${S.perfil?.moneda||'UYU $'}
+  const hoyStr = hoy();
+  const _dn = new Date();
+  const mes      = `${_dn.getFullYear()}-${String(_dn.getMonth()+1).padStart(2,'0')}`;
+  const mesPrev  = (() => { const d=new Date(_dn.getFullYear(),_dn.getMonth()-1,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; })();
+  const mes3atras= (() => { const d=new Date(_dn.getFullYear(),_dn.getMonth()-3,1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`; })();
+
+  const allMovs   = S.movs || [];
+  const movsMes   = allMovs.filter(m => m.fecha?.startsWith(mes));
+  const movsPrev  = allMovs.filter(m => m.fecha?.startsWith(mesPrev));
+  const movs3m    = allMovs.filter(m => m.fecha >= mes3atras+'-01');
+
+  const ing     = movsMes.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
+  const gas     = movsMes.filter(m=>m.tipo==='gasto')  .reduce((s,m)=>s+m.monto,0);
+  const ingPrev = movsPrev.filter(m=>m.tipo==='ingreso').reduce((s,m)=>s+m.monto,0);
+  const gasPrev = movsPrev.filter(m=>m.tipo==='gasto')  .reduce((s,m)=>s+m.monto,0);
+
+  const movDetalleMes = movsMes
+    .sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''))
+    .map(m=>`${m.fecha} ${m.tipo==='ingreso'?'INGRESO':'GASTO'} ${fmtARS(m.monto)} cat:"${m.cat||'Sin cat'}"${m.desc?' nota:"'+m.desc+'"':''}`)
+    .join('\n');
+
+  const movDetalle3m = movs3m
+    .sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''))
+    .map(m=>`${m.fecha} ${m.tipo==='ingreso'?'+':'-'}${fmtARS(m.monto)} [${m.cat||'?'}]${m.desc?' "'+m.desc+'"':''}`)
+    .join(' | ');
+
+  const catGastos={};
+  movsMes.filter(m=>m.tipo==='gasto').forEach(m=>{ catGastos[m.cat||'?']=(catGastos[m.cat||'?']||0)+m.monto; });
+  const resumenCatGastos=Object.entries(catGastos).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`${c}: ${fmtARS(v)}`).join(' | ');
+
+  const catIngresos={};
+  movsMes.filter(m=>m.tipo==='ingreso').forEach(m=>{ catIngresos[m.cat||'?']=(catIngresos[m.cat||'?']||0)+m.monto; });
+  const resumenCatIngresos=Object.entries(catIngresos).sort((a,b)=>b[1]-a[1]).map(([c,v])=>`${c}: ${fmtARS(v)}`).join(' | ');
+
+  const pedActivos   = S.pedidos.filter(p=>!p.archivado);
+  const pedArchivados= S.pedidos.filter(p=>p.archivado);
+
+  const pedDetalleActivos = pedActivos
+    .sort((a,b)=>(a.fecha||'').localeCompare(b.fecha||''))
+    .map(p=>`${p.fecha}${p.hora?' '+p.hora:''} cliente:"${p.cli||'?'}"${p.notas?' nota:"'+p.notas+'"':''} items:[${(p.items||[]).map(i=>`${i.q}x${i.p}`).join(',')}]`)
+    .join('\n');
+
+  const pedDetalleArchivados = pedArchivados
+    .sort((a,b)=>(b.fecha||'').localeCompare(a.fecha||''))
+    .slice(0,30)
+    .map(p=>`${p.fecha} "${p.cli||'?'}" [${(p.items||[]).map(i=>`${i.q}x${i.p}`).join(',')}]`)
+    .join(' | ');
+
+  const cliCount={};
+  S.pedidos.forEach(p=>{ if(p.cli) cliCount[p.cli]=(cliCount[p.cli]||0)+1; });
+  const topClis=Object.entries(cliCount).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([n,c])=>`${n}(${c})`).join(', ');
+
+  const prodCount={};
+  S.pedidos.forEach(p=>(p.items||[]).forEach(i=>{ prodCount[i.p]=(prodCount[i.p]||0)+i.q; }));
+  const topProds=Object.entries(prodCount).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([n,c])=>`${n}(${c}u)`).join(', ');
+
+  const evsProximos=S.eventos.filter(e=>e.fecha>=hoyStr)
+    .sort((a,b)=>a.fecha.localeCompare(b.fecha))
+    .map(e=>`${e.fecha}${e.hora?' '+e.hora:''} "${e.tit}"${e.cliente?' cliente:'+e.cliente:''}${e.prio==='urgente'?' URGENTE':''}${e.desc?' nota:"'+e.desc+'"':''}`)
+    .join('\n');
+
+  const evsPasados=S.eventos.filter(e=>e.fecha<hoyStr)
+    .sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,15)
+    .map(e=>`${e.fecha} "${e.tit}"${e.cliente?' ('+e.cliente+')':''}`)
+    .join(' | ');
+
+  const tareasPend=S.tareas.filter(t=>!t.done)
+    .sort((a,b)=>(a.fecha||'z').localeCompare(b.fecha||'z'))
+    .map(t=>`${t.prio==='urgente'?'URGENTE ':''}${t.tit}${t.fecha?' (para '+t.fecha+')':''}${t.desc?' "'+t.desc+'"':''}`)
+    .join('\n');
+
+  const tareasHechas=S.tareas.filter(t=>t.done).slice(0,10).map(t=>t.tit).join(', ');
+
+  const dirCompleto=getCatsPrincipales().map(cat=>{
+    const items=dirGetByCat(cat._id);
+    if(!items.length) return `${cat.nombre}: vacía`;
+    const detalle=items.map(e=>{
+      const meta=[e.metadata?.telefono,e.metadata?.email,e.metadata?.nota].filter(Boolean).join(', ');
+      return `"${e.nombre}"${meta?' ('+meta+')':''}`;
+    }).join(', ');
+    return `${cat.nombre} (${items.length}): ${detalle}`;
+  }).join('\n');
+
+  const notasCompletas=(S.notas||[]).filter(n=>n.texto?.trim())
+    .map(n=>`[${n.fecha?new Date(n.fecha).toLocaleDateString('es-AR',{day:'numeric',month:'short'}):'?'}] ${n.texto}`)
+    .join('\n');
+
+  return `=== PERFIL DEL NEGOCIO ===
+Nombre: ${S.perfil?.negocio||S.negocio||'—'}
+Rubro: ${S.perfil?.rubro||'—'} | País: ${S.perfil?.pais||'Uruguay'} | Moneda: ${S.perfil?.moneda||'UYU $'}
+Dueño: ${S.nombre||'—'} | Descripción: ${S.perfil?.descripcion||'—'}
 Fecha hoy: ${new Date().toLocaleDateString('es-AR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
-=== FINANZAS ${mes} ===
+
+=== FINANZAS MES ACTUAL (${mes}) ===
 Ingresos: ${fmtARS(ing)} | Gastos: ${fmtARS(gas)} | Balance: ${ing-gas>=0?'+':''}${fmtARS(ing-gas)}
-Mes anterior: Ingresos ${fmtARS(ingPrev)} | Gastos ${fmtARS(gasPrev)}
-Detalle: ${movDetalle||'ninguno'}
-=== PEDIDOS ===
-Activos (${activos.length}): ${pedDetalle||'ninguno'}
+Mes anterior: Ingresos ${fmtARS(ingPrev)} | Gastos ${fmtARS(gasPrev)} | Balance: ${ingPrev-gasPrev>=0?'+':''}${fmtARS(ingPrev-gasPrev)}
+Por categoría ingresos: ${resumenCatIngresos||'ninguna'}
+Por categoría gastos: ${resumenCatGastos||'ninguna'}
+Detalle día a día:
+${movDetalleMes||'ninguno'}
+
+=== HISTORIAL ÚLTIMOS 3 MESES ===
+${movDetalle3m||'ninguno'}
+
+=== PEDIDOS ACTIVOS (${pedActivos.length}) ===
+${pedDetalleActivos||'ninguno'}
+
+=== PEDIDOS ENTREGADOS (últimos 30) ===
+${pedDetalleArchivados||'ninguno'}
 Top clientes: ${topClis||'—'}
 Top productos: ${topProds||'—'}
-=== AGENDA (${S.eventos.filter(e=>e.fecha>=hoy()).length} próximos) ===
-${evs||'ninguno'}
-=== TAREAS (${S.tareas.filter(t=>!t.done).length} pendientes) ===
-${tasks||'ninguna'}
-=== DIRECTORIO ===
-${dirResumen||'—'}
+
+=== AGENDA PRÓXIMA (${S.eventos.filter(e=>e.fecha>=hoyStr).length} eventos) ===
+${evsProximos||'ninguno'}
+Eventos pasados recientes: ${evsPasados||'ninguno'}
+
+=== TAREAS ===
+Pendientes (${S.tareas.filter(t=>!t.done).length}):
+${tareasPend||'ninguna'}
+Completadas recientemente: ${tareasHechas||'ninguna'}
+
+=== DIRECTORIO COMPLETO ===
+${dirCompleto||'vacío'}
+
 === NOTAS ===
-${notasTexto||'—'}`;
+${notasCompletas||'sin notas'}`;
 }
 
 async function getOttoInsights(){
