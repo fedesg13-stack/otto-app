@@ -1160,6 +1160,7 @@ function openFinCatPicker() {
     if (lbl) { lbl.textContent=valor; lbl.style.color='var(--t1)'; }
     if (g('s-fin-cat')) g('s-fin-cat').value = valor;
     g('fin-cat-trigger')?.classList.add('filled');
+    closeEdit(); // cerrar el picker y volver al sheet de finanza
   });
 }
 
@@ -1263,39 +1264,24 @@ function _openFinCatDosNiveles(items, onSelect) {
     const color = cat?.color || '#234136';
     const body  = g('edit-body'); if (!body) return;
 
-    let itemsHtml = '';
-
-    if (!items.length) {
-      itemsHtml = `
-        <div style="padding:24px 12px;text-align:center;">
-          <div style="font-size:32px;margin-bottom:8px;">${cat?.icono||'📁'}</div>
-          <div style="font-size:13px;color:var(--t4);">
-            No hay ítems en ${catNombre}.<br>
-            <span style="color:var(--bosque);font-weight:600;">
-              Podés seleccionar solo la categoría.
-            </span>
+    const itemsHtml = items.map(e => {
+      const bg  = e.color_fondo || color;
+      const ini = (e.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+      const hasEmoji = e.icono && e.icono !== '👤' && e.icono !== '👥';
+      return `
+        <div class="rpl pg-item" data-valor="${catNombre} / ${e.nombre}"
+          style="padding:10px 12px;border-radius:var(--r10);cursor:pointer;
+                 display:flex;align-items:center;gap:10px;transition:background .12s;">
+          <div style="width:32px;height:32px;border-radius:50%;background:${bg};
+                      display:flex;align-items:center;justify-content:center;
+                      font-size:14px;flex-shrink:0;">
+            ${hasEmoji
+              ? e.icono
+              : `<span style="font-size:11px;font-weight:700;color:#fff;">${ini}</span>`}
           </div>
+          <div style="flex:1;font-size:14px;font-weight:600;color:var(--t1);">${e.nombre}</div>
         </div>`;
-    } else {
-      itemsHtml = items.map(e => {
-        const bg  = e.color_fondo || color;
-        const ini = (e.nombre||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-        const hasEmoji = e.icono && e.icono !== '👤' && e.icono !== '👥';
-        return `
-          <div class="rpl pg-item" data-valor="${catNombre} / ${e.nombre}"
-            style="padding:10px 12px;border-radius:var(--r10);cursor:pointer;
-                   display:flex;align-items:center;gap:10px;transition:background .12s;">
-            <div style="width:32px;height:32px;border-radius:50%;background:${bg};
-                        display:flex;align-items:center;justify-content:center;
-                        font-size:14px;flex-shrink:0;">
-              ${hasEmoji
-                ? e.icono
-                : `<span style="font-size:11px;font-weight:700;color:#fff;">${ini}</span>`}
-            </div>
-            <div style="flex:1;font-size:14px;font-weight:600;color:var(--t1);">${e.nombre}</div>
-          </div>`;
-      }).join('');
-    }
+    }).join('');
 
     body.innerHTML = `
       <button id="pg-back"
@@ -1305,12 +1291,27 @@ function _openFinCatDosNiveles(items, onSelect) {
         <span class="material-icons-round" style="font-size:18px">arrow_back</span>
         ${catIcono||''} ${catNombre}
       </button>
-      <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:400px;overflow-y:auto;">
-        <!-- Opción: solo la categoría principal, sin ítem específico -->
+
+      <!-- Agregar nuevo ítem en esta categoría -->
+      <div style="display:flex;gap:8px;margin-bottom:10px;">
+        <input id="pg-nuevo-inp" placeholder="Agregar nuevo en ${catNombre}…"
+          style="flex:1;padding:9px 14px;border:1.5px solid var(--border);
+                 border-radius:var(--rfull);font-family:var(--font);font-size:14px;
+                 color:var(--t1);outline:none;background:var(--surface);">
+        <button id="pg-nuevo-btn"
+          style="background:${color};color:#fff;border:none;border-radius:var(--rfull);
+                 padding:9px 14px;font-family:var(--font);font-size:13px;font-weight:700;
+                 cursor:pointer;white-space:nowrap;">
+          + Agregar
+        </button>
+      </div>
+
+      <div id="pg-list" style="display:flex;flex-direction:column;gap:2px;max-height:360px;overflow-y:auto;">
+        <!-- Opción: solo la categoría principal -->
         <div class="rpl pg-item" data-valor="${catNombre}"
           style="padding:10px 12px;border-radius:var(--r10);cursor:pointer;
                  display:flex;align-items:center;gap:10px;transition:background .12s;
-                 border:1.5px dashed var(--border);margin-bottom:6px;">
+                 border:1.5px dashed var(--border);margin-bottom:4px;">
           <div style="font-size:13px;color:var(--t3);font-style:italic;flex:1;">
             Solo "${catNombre}" (sin especificar)
           </div>
@@ -1321,6 +1322,32 @@ function _openFinCatDosNiveles(items, onSelect) {
     g('pg-back').addEventListener('click', () => {
       g('edit-title').textContent = 'Categoría';
       renderNivel1();
+    });
+
+    // Agregar nuevo ítem al directorio y seleccionarlo
+    const _agregarNuevo = async () => {
+      const nombre = g('pg-nuevo-inp')?.value.trim();
+      if (!nombre) return;
+      const btn = g('pg-nuevo-btn');
+      btn.textContent = '…'; btn.disabled = true;
+      try {
+        await saveEntidad({
+          nombre, categoria_principal: catId,
+          icono: cat?.icono || '📁',
+          color_fondo: color,
+          metadata: {},
+        });
+        seleccionar(`${catNombre} / ${nombre}`);
+        toast(`✅ "${nombre}" guardado en Mi Negocio`);
+      } catch(e) {
+        console.error(e);
+        btn.textContent = '+ Agregar'; btn.disabled = false;
+      }
+    };
+
+    g('pg-nuevo-btn').addEventListener('click', _agregarNuevo);
+    g('pg-nuevo-inp').addEventListener('keydown', e => {
+      if (e.key === 'Enter') _agregarNuevo();
     });
 
     g('pg-list').querySelectorAll('.pg-item').forEach(el => {
