@@ -113,6 +113,7 @@ let S = {
   movs: [], pedidos: [], eventos: [], tareas: [],
   notas: [],
   ottoCache: [], ottoCacheTime: 0,
+  chatGuardadoId: null, // id del doc de Firestore con el historial de chat
   // Directorio en memoria (sincronizado por onSnapshot)
   directorio: [],
   dirUnsub:   null,
@@ -879,6 +880,10 @@ function dpOpen({ categoria, titulo, selectedId, onSelect }) {
 function dpClose() {
   g('dp-overlay').classList.remove('on');
   g('dp-sheet').classList.remove('on');
+  // Resetear botón guardar por si quedó en estado "Guardando…"
+  const btn = g('dp-create-save');
+  if (btn) { btn.innerHTML = '<span class="material-icons-round">check</span>'; btn.disabled = false; }
+  g('dp-create-modal')?.classList.remove('on');
 }
 
 function _dpRenderList() {
@@ -1096,6 +1101,9 @@ function navTo(panel) {
   const p   = g('p-'+panel);          if (p)   p.classList.add('on');
   const btn = document.querySelector(`.menu-item[data-nav="${panel}"]`);
   if (btn) btn.classList.add('on');
+  // Mostrar FAB de OTTO solo cuando NO estamos en el panel de OTTO
+  const ottofab = g('otto-global-fab');
+  if (ottofab) ottofab.style.display = panel === 'otto' ? 'none' : 'flex';
   if (panel === 'user')  renderUserPanel();
   if (panel === 'age')   renderAgeCalGoogle();
   if (panel === 'task')  renderCalMes('task','taskMesOffset','taskFecha',null,
@@ -1272,7 +1280,13 @@ function _openFinCatDosNiveles(items, onSelect) {
     searchEl.addEventListener('input', () => {
       const q = searchEl.value.toLowerCase();
       g('pg-list').querySelectorAll('.pg-item').forEach(el => {
-        el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
+        // Buscar en nombre de categoría Y en nombres de sus ítems (nivel 2)
+        const catId = el.dataset.catId;
+        const matchNombre = el.dataset.name.toLowerCase().includes(q);
+        const matchItems = catId
+          ? dirGetByCat(catId).some(e => e.nombre.toLowerCase().includes(q))
+          : false;
+        el.style.display = (matchNombre || matchItems) ? '' : 'none';
       });
     });
     searchEl.addEventListener('keydown', e => {
@@ -1473,28 +1487,30 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd, e
 // ══════════════════════════════════════════════════
 // 13. PICKER PRODUCTOS (para pedidos)
 // ══════════════════════════════════════════════════
-function openPedProdPicker() {
+function openPedProdPicker(targetBox) {
   // Buscar la categoría "Productos" dinámicamente
-  const catProductos = getCatsPrincipales().find(c =>
+  // Si hay varias con el mismo nombre, usar la que tiene más ítems
+  const candidatas = getCatsPrincipales().filter(c =>
     c.nombre.toLowerCase() === 'productos'
   );
+  const catProductos = candidatas.length <= 1
+    ? candidatas[0]
+    : candidatas.map(c => ({ cat: c, count: dirGetByCat(c._id).length }))
+        .sort((a, b) => b.count - a.count)[0]?.cat;
+
   const productos = catProductos ? dirGetByCat(catProductos._id) : [];
   const items = productos.map(e => ({ id: e._id || e.id, name: e.nombre }));
 
-  const titulo = catProductos ? 'Agregar producto' : 'Agregar producto';
-
   _openPickerLista({
-    title:    titulo,
+    title:    'Agregar producto',
     items,
     selected: '',
-    onSelect: (_, nombre) => { addPedProd(nombre); closeEdit(); },
+    onSelect: (_, nombre) => { addPedProd(nombre, targetBox); closeEdit(); },
     addLabel: 'Producto nuevo',
     onAdd: async nombre => {
       if (!nombre?.trim()) return;
-      // Crear el producto en Mi Negocio automáticamente
       let catId = catProductos?._id;
       if (!catId) {
-        // Crear la categoría Productos si no existe
         const nueva = await saveCategoria({
           nombre: 'Productos', icono: '📦', color: '#0D47A1', parentId: null,
         });
@@ -1507,7 +1523,7 @@ function openPedProdPicker() {
         color_fondo: '#0D47A1',
         metadata: {},
       });
-      addPedProd(nombre.trim());
+      addPedProd(nombre.trim(), targetBox);
       closeEdit();
       toast(`✅ "${nombre.trim()}" guardado en Mi Negocio`);
     },
@@ -1524,18 +1540,20 @@ function addPedProd(nombre, box) {
     <span class="prod-row-name">${nombre}</span>
     <div class="prod-row-qty">
       <button class="qty-btn rpl" data-a="dec">−</button>
-      <span class="qty-num">1</span>
+      <input class="qty-num" type="number" value="1" min="1" inputmode="numeric"
+        style="width:36px;text-align:center;border:none;background:transparent;
+               font-family:var(--font);font-size:14px;font-weight:700;color:var(--t1);outline:none;">
       <button class="qty-btn rpl" data-a="inc">+</button>
     </div>
     <button class="prod-row-del rpl">
       <span class="material-icons-round" style="font-size:18px">close</span>
     </button>`;
   div.querySelector('[data-a="dec"]').addEventListener('click', () => {
-    const n=div.querySelector('.qty-num'), v=parseInt(n.textContent)-1;
-    if (v<1) div.remove(); else n.textContent=v;
+    const n=div.querySelector('.qty-num'), v=parseInt(n.value)-1;
+    if (v<1) div.remove(); else n.value=v;
   });
   div.querySelector('[data-a="inc"]').addEventListener('click', () => {
-    const n=div.querySelector('.qty-num'); n.textContent=parseInt(n.textContent)+1;
+    const n=div.querySelector('.qty-num'); n.value=parseInt(n.value)+1;
   });
   div.querySelector('.prod-row-del').addEventListener('click', () => div.remove());
   target.appendChild(div);
@@ -1633,12 +1651,30 @@ async function savePed() {
   const cliId  = g('s-ped-cli-id')?.value||'';
   const cliNom = g('s-ped-cli')?.value||'';
   if (!cliNom) { toast('Seleccioná un cliente'); return; }
+  // ── Detección de pedido duplicado ────────────────
+  const fechaIngresada = g('s-ped-fecha')?.value || hoy();
+  const duplicado = S.pedidos.find(p =>
+    !p.archivado &&
+    p.cliNom === cliNom &&
+    p.fecha === fechaIngresada
+  ) || S.pedidos.find(p =>
+    !p.archivado &&
+    (p.cli || '').toLowerCase() === cliNom.toLowerCase() &&
+    p.fecha === fechaIngresada
+  );
+  if (duplicado) {
+    const confirmar = confirm(`⚠️ Ya existe un pedido de "${cliNom}" para el ${fechaIngresada}.
+
+¿Querés guardarlo igual?`);
+    if (!confirmar) return;
+  }
+  // ─────────────────────────────────────────────────
   const empId  = g('s-ped-emp-id')?.value||'';
   const empNom = empId ? dirGetById(empId)?.nombre||'' : '';
   const items  = [];
   g('s-ped-prods')?.querySelectorAll('.prod-row').forEach(row => {
     const n=row.querySelector('.prod-row-name')?.textContent||'';
-    const q=parseInt(row.querySelector('.qty-num')?.textContent||'1');
+    const q=parseInt(row.querySelector('.qty-num')?.value||'1');
     if (n) items.push({p:n,q});
   });
   const data = {
@@ -1651,6 +1687,7 @@ async function savePed() {
   try {
     const ref = await addDoc(col('pedidos'), data);
     S.pedidos.push({...data,_id:ref.id}); S.ottoCache=[];
+    S.pedFecha = data.fecha; // navegar al día del pedido guardado
     closeSheet(); toast('✅ Pedido guardado'); navTo('ped');
     renderPeds(); renderPedWeek(); renderProduceDia();
   } catch(e) { console.error(e); toast('Error al guardar'); }
@@ -1711,23 +1748,24 @@ function editPed(id) {
   // Listeners qty en productos existentes
   g('ep-prods').querySelectorAll('.prod-row').forEach(row => {
     row.querySelector('[data-a="dec"]').addEventListener('click',()=>{
-      const n=row.querySelector('.qty-num'),v=parseInt(n.textContent)-1;
-      if(v<1) row.remove(); else n.textContent=v;
+      const n=row.querySelector('.qty-num'),v=parseInt(n.value||n.textContent)-1;
+      if(v<1) row.remove(); else { n.value ? n.value=v : n.textContent=v; }
     });
     row.querySelector('[data-a="inc"]').addEventListener('click',()=>{
-      const n=row.querySelector('.qty-num'); n.textContent=parseInt(n.textContent)+1;
+      const n=row.querySelector('.qty-num');
+      n.value ? n.value=parseInt(n.value)+1 : n.textContent=parseInt(n.textContent)+1;
     });
     row.querySelector('.prod-row-del').addEventListener('click',()=>row.remove());
   });
 
-  g('ep-add-prod').addEventListener('click',()=>openPedProdPicker());
+  g('ep-add-prod').addEventListener('click',()=>openPedProdPicker(g('ep-prods')));
 
   g('ep-save').addEventListener('click', async () => {
     const cli=g('ep-cli')?.value.trim(); if(!cli){toast('Ingresá el cliente');return;}
     const items=[];
     g('ep-prods').querySelectorAll('.prod-row').forEach(row=>{
       const n=row.querySelector('.prod-row-name')?.textContent||'';
-      const q=parseInt(row.querySelector('.qty-num')?.textContent||'1');
+      const q=parseInt(row.querySelector('.qty-num')?.value||'1');
       if(n) items.push({p:n,q});
     });
     const upd={cli, fecha:g('ep-fecha')?.value||p.fecha, hora:g('ep-hora')?.value||'', items, notas:g('ep-notas')?.value.trim()||''};
@@ -2274,20 +2312,52 @@ function renderEvs(){
   list.innerHTML=`<div class="mov-list">${evs.map(e=>{
     const diff=e.fecha?diffDias(e.fecha,today):null;
     const cuando=diff===0?'Hoy':diff===1?'Mañana':diff!=null&&diff<0?'Vencido':diff!=null?`En ${diff} días`:fmt(e.fecha);
-    return `<div class="card">
-      <div class="card-row">
+    const descHtml = e.desc ? `<div style="font-size:12px;color:var(--t3);margin-top:6px;padding:8px 10px;background:var(--surface2);border-radius:var(--r10);">📝 ${e.desc}</div>` : '';
+    const clienteHtml = e.cliente ? `<div style="font-size:12px;color:var(--t3);margin-top:4px;">👤 ${e.cliente}</div>` : '';
+    return `<div class="card ev-card" data-id="${e._id}" data-expanded="0" style="cursor:pointer;">
+      <div class="card-row" style="pointer-events:none;">
         <div class="card-icon" style="background:var(--amber-bg)"><span class="material-icons-round" style="color:var(--amber)">event</span></div>
-        <div class="card-info"><div class="card-title">${e.tit}${e.prio==='urgente'?' 🔴':''}</div><div class="card-sub">${e.cliente||''}${e.hora?' · '+e.hora:''}</div></div>
-        <div class="card-right"><div class="card-date" style="font-weight:600;color:var(--amber)">${cuando}</div></div>
+        <div class="card-info">
+          <div class="card-title">${e.tit}${e.prio==='urgente'?' 🔴':''}</div>
+          <div class="card-sub">${e.hora?e.hora+' · ':''}${e.cliente||''}</div>
+        </div>
+        <div class="card-right">
+          <div class="card-date" style="font-weight:600;color:var(--amber)">${cuando}</div>
+          <span class="material-icons-round" style="font-size:16px;color:var(--t4);margin-top:4px;">expand_more</span>
+        </div>
       </div>
-      <div class="card-actions">
+      <div class="ev-detail" style="display:none;padding:0 12px 4px;">
+        ${clienteHtml}${descHtml}
+      </div>
+      <div class="card-actions ev-actions" style="display:none;">
         <button class="card-action edit rpl" data-id="${e._id}" data-a="edit"><span class="material-icons-round">edit</span>Editar</button>
         <button class="card-action del  rpl" data-id="${e._id}" data-a="del" ><span class="material-icons-round">delete_outline</span>Eliminar</button>
       </div>
     </div>`;
   }).join('')}</div>`;
+  // Click en card = expandir/colapsar
+  list.querySelectorAll('.ev-card').forEach(card=>{
+    card.addEventListener('click', e=>{
+      if(e.target.closest('[data-a]')) return; // no colapsar si tocó un botón
+      const open = card.dataset.expanded==='1';
+      // Colapsar todos
+      list.querySelectorAll('.ev-card').forEach(c=>{
+        c.dataset.expanded='0';
+        c.querySelector('.ev-detail').style.display='none';
+        c.querySelector('.ev-actions').style.display='none';
+        c.querySelector('.material-icons-round[style*="expand"]').textContent='expand_more';
+      });
+      if(!open){
+        card.dataset.expanded='1';
+        card.querySelector('.ev-detail').style.display='block';
+        card.querySelector('.ev-actions').style.display='flex';
+        card.querySelector('.material-icons-round[style*="expand"]').textContent='expand_less';
+      }
+    });
+  });
   list.querySelectorAll('[data-a]').forEach(btn=>{
-    btn.addEventListener('click',()=>{
+    btn.addEventListener('click', e=>{
+      e.stopPropagation();
       if(btn.dataset.a==='edit')editEv(btn.dataset.id);
       else if(btn.dataset.a==='del'&&confirm('¿Eliminar evento?'))delEv(btn.dataset.id);
     });
@@ -2454,6 +2524,53 @@ function addNota(){
 // 25. OTTO IA
 // ══════════════════════════════════════════════════
 let chatHistory=[];
+
+// ── Chat OTTO persistido en Firestore ─────────────
+// Guarda el historial del chat en usuarios/{uid}/chat/historial
+// con una ventana deslizante de 7 días
+async function _guardarChat() {
+  if (!S.uid || !chatHistory.length) return;
+  try {
+    const ahora = new Date().toISOString();
+    // Limpiar mensajes más viejos de 7 días
+    const limite = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const mensajes = chatHistory.map((m, i) => ({
+      ...m,
+      ts: m.ts || ahora,
+    })).filter(m => !m.ts || m.ts >= limite);
+    await setDoc(
+      doc(db, `usuarios/${S.uid}/chat/historial`),
+      { mensajes, actualizadoEn: ahora },
+      { merge: false }
+    );
+  } catch(e) { console.warn('[Chat] guardar:', e.message); }
+}
+
+async function _cargarChat() {
+  if (!S.uid) return;
+  try {
+    const snap = await getDocs(col('chat'));
+    if (!snap.empty) {
+      const data = snap.docs[0].data();
+      const limite = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      chatHistory = (data.mensajes || []).filter(m => !m.ts || m.ts >= limite);
+      // Renderizar historial si hay mensajes
+      if (chatHistory.length) {
+        _renderChatHistory();
+      }
+    }
+  } catch(e) { console.warn('[Chat] cargar:', e.message); }
+}
+
+function _renderChatHistory() {
+  const box = g('chat-msgs'); if (!box) return;
+  box.innerHTML = chatHistory.map(m =>
+    m.role === 'user'
+      ? `<div class="otto-msg me"><div class="otto-msg-av">${S.nombre?.[0]?.toUpperCase()||'U'}</div><div class="otto-msg-bub me">${m.content}</div></div>`
+      : `<div class="otto-msg"><div class="otto-msg-av">O</div><div class="otto-msg-bub">${m.content}</div></div>`
+  ).join('');
+  setTimeout(() => { box.scrollTop = box.scrollHeight; }, 50);
+}
 
 function buildOttoContext(){
   const hoyStr = hoy();
@@ -2639,8 +2756,8 @@ async function sendMsg(){
   box.innerHTML+=`<div class="otto-msg me"><div class="otto-msg-av">${S.nombre?.[0]?.toUpperCase()||'U'}</div><div class="otto-msg-bub me">${msg}</div></div>`;
   const tid='t'+Date.now();
   box.innerHTML+=`<div class="otto-msg" id="${tid}"><div class="otto-msg-av">O</div><div class="otto-msg-bub"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-  box.scrollTop=99999;
-  chatHistory.push({role:'user',content:msg});
+  box.scrollTop = box.scrollHeight;
+  chatHistory.push({role:'user',content:msg, ts:new Date().toISOString()});
   const system=buildOttoContext()+'\n\nRespondé máximo 3 oraciones. Sin markdown. Sin asteriscos.';
   try{
     const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:500,system,messages:chatHistory.slice(-10)})});
@@ -2648,9 +2765,10 @@ async function sendMsg(){
     const reply=data.content?.[0]?.text||'No pude responder.';
     document.getElementById(tid)?.remove();
     box.innerHTML+=`<div class="otto-msg"><div class="otto-msg-av">O</div><div class="otto-msg-bub">${reply}</div></div>`;
-    box.scrollTop=99999;
-    chatHistory.push({role:'assistant',content:reply});
-    if(chatHistory.length>20)chatHistory=chatHistory.slice(-20);
+    setTimeout(()=>{ box.scrollTop = box.scrollHeight; }, 50);
+    chatHistory.push({role:'assistant',content:reply, ts:new Date().toISOString()});
+    if(chatHistory.length>40)chatHistory=chatHistory.slice(-40);
+    _guardarChat();
   }catch(e){
     document.getElementById(tid)?.remove();
     box.innerHTML+=`<div class="otto-msg"><div class="otto-msg-av">O</div><div class="otto-msg-bub">No me pude conectar.</div></div>`;
@@ -2667,7 +2785,7 @@ async function sendQuickMsg(){
   box.innerHTML+=`<div class="otto-msg me"><div class="otto-msg-av" style="background:var(--surface3);color:var(--t2)">${S.nombre?.[0]?.toUpperCase()||'U'}</div><div class="otto-msg-bub me">${msg}</div></div>`;
   const tid='q'+Date.now();
   box.innerHTML+=`<div class="otto-msg" id="${tid}"><div class="otto-msg-av">O</div><div class="otto-msg-bub"><div class="typing"><span></span><span></span><span></span></div></div></div>`;
-  box.scrollTop=99999;
+  box.scrollTop = box.scrollHeight;
   const system=buildOttoContext()+'\n\nRespondé máximo 2 oraciones. Sin markdown.';
   try{
     const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:300,system,messages:[{role:'user',content:msg}]})});
@@ -2780,6 +2898,7 @@ async function inicializarOTTO(user) {
     loadAllData(),
     _cargarPerfil(),
     _cargarNotas(),
+    _cargarChat(),
   ]);
 
   // ── Paso 4: Render completo ───────────────────────
@@ -2864,6 +2983,7 @@ onAuthStateChanged(auth, async user => {
 
 // Auth
 g('btnGoogle')?.addEventListener('click', loginGoogle);
+g('otto-global-fab')?.addEventListener('click', () => navTo('otto'));
 g('menu-logout')?.addEventListener('click', logoutOtto);
 
 // Navegación
