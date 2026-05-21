@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" interactive-widget=resizes-content>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="OTTO">
@@ -446,6 +446,24 @@
     <button class="nav-side-btn rpl" id="nav-menu-btn"><span class="material-icons-round">menu</span><span class="nav-side-lbl">Menú</span></button>
   </nav>
 
+  <!-- Botón flotante global para abrir OTTO desde cualquier panel -->
+  <button id="otto-global-fab" style="
+    position:fixed;bottom:80px;right:16px;
+    width:52px;height:52px;border-radius:50%;
+    background:var(--bosque);border:none;
+    box-shadow:0 4px 16px rgba(35,65,54,.35);
+    display:flex;align-items:center;justify-content:center;
+    cursor:pointer;z-index:200;
+    transition:transform .15s, box-shadow .15s;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="3100 5050 6420 2500"
+      style="width:22px;height:7px;filter:brightness(10);">
+      <g transform="translate(0,12540) scale(1,-1)" fill="#fff" stroke="none">
+        <path d="M3155 7360 c-666 -140 -1067 -824 -859 -1465 56 -172 145 -316 279 -451 177 -177 396 -290 634 -324 133 -20 363 -8 486 25 196 52 372 154 515 299 221 223 330 490 330 807 0 196 -34 338 -123 515 -161 320 -471 546 -830 604 -103 16 -330 11 -432 -10z m458 -309 c164 -43 345 -163 448 -299 240 -316 228 -736 -29 -1050 -90 -110 -281 -228 -432 -266 -395 -100 -827 114 -981 486 -47 115 -62 212 -56 362 5 136 27 227 78 329 119 233 358 409 621 456 79 15 261 5 351 -18z"/>
+        <path d="M8929 7364 c-141 -25 -322 -102 -449 -192 -89 -62 -225 -202 -285 -292 -247 -374 -254 -837 -18 -1234 59 -99 238 -283 338 -348 200 -129 398 -188 635 -188 382 0 706 161 935 465 68 90 151 265 181 380 36 138 44 340 19 486 -38 231 -146 439 -315 609 -165 167 -377 277 -614 319 -82 15 -335 12 -427 -5z m449 -313 c228 -66 427 -229 527 -436 59 -121 85 -232 85 -365 0 -231 -82 -429 -242 -588 -114 -112 -215 -173 -365 -218 -77 -23 -106 -27 -228 -27 -125 -1 -150 2 -228 26 -147 45 -261 113 -366 215 -246 242 -315 629 -167 937 117 244 326 410 591 469 97 22 294 15 393 -13z"/>
+        <path d="M4557 7346 c-68 -25 -97 -66 -97 -138 0 -58 30 -104 83 -128 39 -18 68 -20 368 -20 321 0 327 0 369 -23 30 -16 51 -37 67 -67 l23 -43 0 -757 c0 -835 -1 -818 63 -901 55 -72 206 -139 243 -108 12 10 14 153 14 889 l0 877 23 43 c16 30 37 51 67 67 l43 23 461 0 c449 0 462 -1 495 -21 46 -28 68 -56 80 -107 8 -28 11 -285 11 -795 -1 -850 -4 -810 76 -893 49 -50 106 -79 173 -90 36 -6 46 -4 58 11 11 16 13 177 13 900 l0 882 23 33 c12 19 38 43 57 54 33 20 55 21 377 26 325 5 343 6 369 26 50 37 69 72 69 124 0 52 -19 87 -69 124 -27 21 -28 21 -1724 23 -1402 2 -1704 0 -1735 -11z"/>
+      </g>
+    </svg>
+  </button>
 </div><!-- /app -->
 
 <!-- ══════════════════════════════════
