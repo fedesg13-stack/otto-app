@@ -216,6 +216,17 @@ async function initCategoriasDefault() {
 // ── CRUD categorías ───────────────────────────────
 async function saveCategoria({ nombre, icono, color, parentId = null }) {
   if (!nombre?.trim()) throw new Error('El nombre es obligatorio');
+  // ── Validar nombre duplicado ──────────────────────
+  const nombreNorm = nombre.trim().toLowerCase();
+  const duplicada = S.categorias.find(c =>
+    c.parentId === parentId &&
+    c.nombre.trim().toLowerCase() === nombreNorm
+  );
+  if (duplicada) {
+    toast(`⚠️ Ya existe "${duplicada.nombre}"`);
+    throw new Error('Categoría duplicada');
+  }
+  // ─────────────────────────────────────────────────
   const orden = S.categorias.filter(c => c.parentId === parentId).length;
   const ref = await addDoc(catsCol(), {
     nombre: nombre.trim(), icono: icono || '📁',
@@ -227,6 +238,21 @@ async function saveCategoria({ nombre, icono, color, parentId = null }) {
 }
 
 async function updateCategoria(id, cambios) {
+  // ── Validar nombre duplicado al renombrar ─────────
+  if (cambios.nombre) {
+    const nombreNorm = cambios.nombre.trim().toLowerCase();
+    const catActual  = getCatById(id);
+    const duplicada  = S.categorias.find(c =>
+      c._id !== id &&
+      c.parentId === catActual?.parentId &&
+      c.nombre.trim().toLowerCase() === nombreNorm
+    );
+    if (duplicada) {
+      toast(`⚠️ Ya existe "${duplicada.nombre}"`);
+      throw new Error('Categoría duplicada');
+    }
+  }
+  // ─────────────────────────────────────────────────
   await updateDoc(doc(db, `usuarios/${S.uid}/categorias/${id}`), {
     ...cambios, actualizadoEn: serverTimestamp(),
   });
