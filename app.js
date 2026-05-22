@@ -1488,10 +1488,9 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd, e
   listEl.querySelectorAll('.pg-item').forEach(el => {
     el.addEventListener('mouseenter', () => el.style.background = 'var(--surface2)');
     el.addEventListener('mouseleave', () => el.style.background = '');
-    el.addEventListener('click', () => {
-      if (onSelect) onSelect(el.dataset.id, el.dataset.name);
-      closeEdit();
-    });
+    const _doSelect = () => { if (onSelect) onSelect(el.dataset.id, el.dataset.name); closeEdit(); };
+    el.addEventListener('click', _doSelect);
+    el.addEventListener('touchend', e => { e.preventDefault(); _doSelect(); });
   });
   if (onAdd) {
     searchEl.addEventListener('keydown', e => {
