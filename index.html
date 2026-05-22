@@ -447,3 +447,246 @@
   </nav>
 
 </div><!-- /app -->
+
+<!-- ══════════════════════════════════
+     FAB
+══════════════════════════════════ -->
+<div id="fab-overlay"></div>
+<div id="fab-sheet">
+  <div class="fab-handle"><div class="fab-bar"></div></div>
+  <div class="fab-title">¿Qué querés agregar?</div>
+  <div class="fab-grid">
+    <button class="fab-btn rpl" data-sheet="fin"><div class="fab-btn-icon" style="background:var(--green-bg)"><span class="material-icons-round" style="color:var(--bosque)">account_balance_wallet</span></div><div class="fab-btn-name">Finanza</div><div class="fab-btn-sub">Ingreso o gasto</div></button>
+    <button class="fab-btn rpl" data-sheet="ped"><div class="fab-btn-icon" style="background:var(--teal-t)"><span class="material-icons-round" style="color:var(--teal)">receipt_long</span></div><div class="fab-btn-name">Pedido</div><div class="fab-btn-sub">Cliente y entrega</div></button>
+    <button class="fab-btn rpl" data-sheet="age"><div class="fab-btn-icon" style="background:var(--amber-t)"><span class="material-icons-round" style="color:var(--amber)">calendar_month</span></div><div class="fab-btn-name">Evento</div><div class="fab-btn-sub">Agenda y citas</div></button>
+    <button class="fab-btn rpl" data-sheet="task"><div class="fab-btn-icon" style="background:var(--purple-t)"><span class="material-icons-round" style="color:var(--purple)">check_circle</span></div><div class="fab-btn-name">Tarea</div><div class="fab-btn-sub">Recordatorio</div></button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     SHEETS — Formularios
+══════════════════════════════════ -->
+<div id="sheet-overlay"></div>
+
+<!-- Sheet: Finanza -->
+<div class="sheet" id="s-fin">
+  <div class="sheet-handle"><div class="sheet-bar"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title" id="s-fin-title">💸 Nuevo gasto</div>
+    <button class="sheet-close rpl" id="s-fin-close"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="sheet-body">
+    <div class="tipo-pills">
+      <button class="tipo-pill gas sel rpl" id="pill-gas"><span class="material-icons-round">trending_down</span>Gasto</button>
+      <button class="tipo-pill ing rpl" id="pill-ing"><span class="material-icons-round">trending_up</span>Ingreso</button>
+    </div>
+    <input class="monto-inp" id="s-fin-monto" type="number" min="0" placeholder="$0" inputmode="decimal">
+    <div class="quick-amts">
+      <button class="quick-amt rpl" data-val="500">$500</button>
+      <button class="quick-amt rpl" data-val="1000">$1.000</button>
+      <button class="quick-amt rpl" data-val="2000">$2.000</button>
+      <button class="quick-amt rpl" data-val="5000">$5.000</button>
+    </div>
+    <!-- Categoría -->
+    <span class="field-trigger-lbl" style="margin-top:4px;">Categoría</span>
+    <button class="field-trigger rpl" id="fin-cat-trigger">
+      <span id="fin-cat-trigger-lbl">Seleccionar categoría…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="s-fin-cat">
+    <div class="m3-field"><input class="m3-inp" id="s-fin-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+    <div class="m3-field"><input class="m3-inp" id="s-fin-desc" placeholder=" "><label class="m3-lbl">Nota</label></div>
+    <button class="btn-save rpl" id="s-fin-save">Guardar <span class="material-icons-round" style="font-size:18px">arrow_forward</span></button>
+  </div>
+</div>
+
+<!-- Sheet: Pedido -->
+<div class="sheet" id="s-ped">
+  <div class="sheet-handle"><div class="sheet-bar"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title">📋 Nuevo pedido</div>
+    <button class="sheet-close rpl" id="s-ped-close"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="sheet-body">
+    <!-- Picker cliente — alimentado por directorio -->
+    <span class="field-trigger-lbl">Cliente</span>
+    <button class="field-trigger rpl" id="ped-cli-trigger">
+      <span id="ped-cli-trigger-lbl">Seleccionar cliente…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="s-ped-cli-id">
+    <input type="hidden" id="s-ped-cli">
+    <!-- Picker empleado -->
+    <span class="field-trigger-lbl" style="margin-top:4px;">Empleado (opcional)</span>
+    <button class="field-trigger rpl" id="ped-emp-trigger">
+      <span id="ped-emp-trigger-lbl">Seleccionar empleado…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="s-ped-emp-id">
+    <!-- Productos -->
+    <span class="field-trigger-lbl" style="margin-top:4px;">Productos</span>
+    <button class="field-trigger rpl" id="ped-prod-trigger">
+      <span id="ped-prod-trigger-lbl">Agregar producto…</span>
+      <span class="material-icons-round">add</span>
+    </button>
+    <div id="s-ped-prods" style="margin-top:4px;"></div>
+    <div class="inp-row" style="margin-top:4px;">
+      <div class="m3-field"><input class="m3-inp" id="s-ped-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha entrega</label></div>
+      <div class="m3-field"><input class="m3-inp" id="s-ped-hora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
+    </div>
+    <div class="m3-field"><textarea class="m3-select" id="s-ped-notas" rows="2" placeholder="Notas del pedido…" style="resize:none;padding-top:10px;"></textarea></div>
+    <button class="btn-save rpl" id="s-ped-save">Guardar pedido <span class="material-icons-round" style="font-size:18px">arrow_forward</span></button>
+  </div>
+</div>
+
+<!-- Sheet: Evento -->
+<div class="sheet" id="s-age">
+  <div class="sheet-handle"><div class="sheet-bar"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title">📅 Nuevo evento</div>
+    <button class="sheet-close rpl" id="s-age-close"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="sheet-body">
+    <div class="m3-field"><input class="m3-inp" id="s-age-tit" placeholder=" "><label class="m3-lbl">¿Qué es?</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="s-age-fecha" type="date" placeholder=" "><label class="m3-lbl">Fecha</label></div>
+      <div class="m3-field"><input class="m3-inp" id="s-age-hora" type="time" placeholder=" "><label class="m3-lbl">Hora</label></div>
+    </div>
+    <!-- Picker cliente -->
+    <span class="field-trigger-lbl">Cliente (opcional)</span>
+    <button class="field-trigger rpl" id="age-cli-trigger">
+      <span id="age-cli-trigger-lbl">Seleccionar cliente…</span>
+      <span class="material-icons-round">expand_more</span>
+    </button>
+    <input type="hidden" id="s-age-cli-id">
+    <input type="hidden" id="s-age-cli">
+    <select class="m3-select" id="s-age-prio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
+    <textarea class="m3-select" id="s-age-desc" rows="2" placeholder="Detalles…" style="resize:none;padding-top:10px;"></textarea>
+    <button class="btn-save rpl" id="s-age-save">Agendar <span class="material-icons-round" style="font-size:18px">arrow_forward</span></button>
+  </div>
+</div>
+
+<!-- Sheet: Tarea -->
+<div class="sheet" id="s-task">
+  <div class="sheet-handle"><div class="sheet-bar"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title">✅ Nueva tarea</div>
+    <button class="sheet-close rpl" id="s-task-close"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="sheet-body">
+    <div class="m3-field"><input class="m3-inp" id="s-task-tit" placeholder=" "><label class="m3-lbl">¿Qué tenés que hacer?</label></div>
+    <div class="inp-row">
+      <div class="m3-field"><input class="m3-inp" id="s-task-fecha" type="date" placeholder=" "><label class="m3-lbl">Para cuándo</label></div>
+      <select class="m3-select" id="s-task-prio"><option value="normal">Normal</option><option value="urgente">🔴 Urgente</option></select>
+    </div>
+    <div class="m3-field"><input class="m3-inp" id="s-task-desc" placeholder=" "><label class="m3-lbl">Nota (opcional)</label></div>
+    <button class="btn-save rpl" id="s-task-save">Guardar tarea <span class="material-icons-round" style="font-size:18px">arrow_forward</span></button>
+  </div>
+</div>
+
+<!-- Edit Sheet (CRUD) -->
+<div id="edit-overlay"></div>
+<div id="edit-sheet">
+  <div class="sheet-handle"><div class="sheet-bar"></div></div>
+  <div class="sheet-header">
+    <div class="sheet-title" id="edit-title">Editar</div>
+    <button class="sheet-close rpl" id="edit-close"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="sheet-body" id="edit-body"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     MENÚ LATERAL
+══════════════════════════════════ -->
+<div id="menu-overlay"></div>
+<div id="menu-panel">
+  <div class="menu-user">
+    <div class="menu-av" id="menu-av">?</div>
+    <div><div class="menu-name" id="menu-name">—</div><div class="menu-neg" id="menu-neg">—</div></div>
+  </div>
+  <div class="menu-items">
+    <button class="menu-item rpl" data-nav="home"><span class="material-icons-round">home</span>Inicio</button>
+    <button class="menu-item rpl" data-nav="fin"><span class="material-icons-round">account_balance_wallet</span>Finanzas</button>
+    <button class="menu-item rpl" data-nav="ped"><span class="material-icons-round">receipt_long</span>Pedidos</button>
+    <button class="menu-item rpl" data-nav="age"><span class="material-icons-round">calendar_month</span>Agenda</button>
+    <button class="menu-item rpl" data-nav="task"><span class="material-icons-round">check_circle</span>Tareas</button>
+    <button class="menu-item rpl" data-nav="mn"><span class="material-icons-round">people_alt</span>Mi Negocio</button>
+    <button class="menu-item rpl" data-nav="otto"><span class="material-icons-round">smart_toy</span>OTTO</button>
+    <div class="menu-divider"></div>
+    <button class="menu-item rpl" data-nav="user"><span class="material-icons-round">account_circle</span>Mi usuario</button>
+    <div class="menu-divider"></div>
+    <button class="menu-item menu-logout rpl" id="menu-logout"><span class="material-icons-round">logout</span>Cerrar sesión</button>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     PICKER DIRECTORIO (dp-*)
+     Componente inyectado por app.js
+══════════════════════════════════ -->
+<div id="dp-overlay" class="dp-overlay"></div>
+<div id="dp-sheet" class="dp-sheet">
+  <div class="dp-handle"><div class="dp-handle-bar"></div></div>
+  <div class="dp-header">
+    <span class="dp-title" id="dp-title">Seleccionar</span>
+    <button class="dp-close" id="dp-close"><span class="material-icons-round">close</span></button>
+  </div>
+  <div class="dp-search-wrap">
+    <div class="dp-search">
+      <span class="dp-search-icon material-icons-round">search</span>
+      <input class="dp-search-inp" id="dp-search" placeholder="Buscar o escribir nuevo…" autocomplete="off">
+      <span class="dp-search-clear material-icons-round" id="dp-search-clear">close</span>
+    </div>
+  </div>
+  <div class="dp-list" id="dp-list"></div>
+  <!-- Sub-modal crear entidad desde picker -->
+  <div class="dp-create-modal" id="dp-create-modal">
+    <div class="dp-create-header">
+      <button class="dp-create-back" id="dp-create-back"><span class="material-icons-round">arrow_back</span></button>
+      <span class="dp-create-title" id="dp-create-title">Nueva entidad</span>
+    </div>
+    <div class="dp-create-body">
+      <div class="dp-field"><label class="dp-field-lbl">Nombre *</label><input class="dp-field-inp" id="dp-create-nombre" placeholder="Ej: María González" maxlength="60"></div>
+      <div class="dp-field"><label class="dp-field-lbl">Teléfono</label><input class="dp-field-inp" id="dp-create-tel" placeholder="+598 99 000 000" type="tel"></div>
+      <div class="dp-field"><label class="dp-field-lbl">Email</label><input class="dp-field-inp" id="dp-create-email" placeholder="correo@ejemplo.com" type="email"></div>
+      <div class="dp-field"><label class="dp-field-lbl">Ícono</label><div class="dp-icon-grid" id="dp-icon-grid"></div></div>
+      <div class="dp-field"><label class="dp-field-lbl">Color</label><div class="dp-color-grid" id="dp-color-grid"></div></div>
+      <button class="dp-create-save" id="dp-create-save"><span class="material-icons-round">check</span>Guardar y seleccionar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     MODALES
+══════════════════════════════════ -->
+<div id="ped-modal-overlay"></div>
+<div id="ped-modal"></div>
+
+<div id="prod-modal-overlay"></div>
+<div id="prod-modal">
+  <div class="prod-modal-handle"><div class="prod-modal-bar"></div></div>
+  <div class="prod-modal-header">
+    <span class="prod-modal-title">Producción</span>
+    <button class="prod-modal-close rpl" id="prod-modal-close"><span class="material-icons-round" style="font-size:18px;color:var(--t3)">close</span></button>
+  </div>
+  <div style="display:flex;align-items:center;justify-content:space-between;padding:0 16px 4px;">
+    <button class="age-nav-btn rpl" id="prod-sem-prev"><span class="material-icons-round" style="font-size:18px">chevron_left</span></button>
+    <div style="text-align:center;">
+      <div class="prod-modal-subtitle" id="prod-modal-subtitle" style="padding:0;margin:0;"></div>
+      <button id="prod-sem-today" style="background:transparent;border:none;font-family:var(--font);font-size:11px;font-weight:700;color:var(--bosque);cursor:pointer;padding:4px 0;">Esta semana</button>
+    </div>
+    <button class="age-nav-btn rpl" id="prod-sem-next"><span class="material-icons-round" style="font-size:18px">chevron_right</span></button>
+  </div>
+  <div class="prod-modal-body" id="prod-modal-body"></div>
+</div>
+
+<!-- Toast + Saving -->
+<div id="toast"></div>
+<div id="saving"><div class="typing"><span></span><span></span><span></span></div> Guardando…</div>
+
+<!-- ══════════════════════════════════
+     SCRIPT PRINCIPAL
+══════════════════════════════════ -->
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
