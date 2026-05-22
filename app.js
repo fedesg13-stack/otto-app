@@ -1101,9 +1101,7 @@ function navTo(panel) {
   const p   = g('p-'+panel);          if (p)   p.classList.add('on');
   const btn = document.querySelector(`.menu-item[data-nav="${panel}"]`);
   if (btn) btn.classList.add('on');
-  // Mostrar FAB de OTTO solo cuando NO estamos en el panel de OTTO
-  const ottofab = g('otto-global-fab');
-  if (ottofab) ottofab.style.display = panel === 'otto' ? 'none' : 'flex';
+
   if (panel === 'user')  renderUserPanel();
   if (panel === 'age')   renderAgeCalGoogle();
   if (panel === 'task')  renderCalMes('task','taskMesOffset','taskFecha',null,
@@ -1505,7 +1503,7 @@ function openPedProdPicker(targetBox) {
     title:    'Agregar producto',
     items,
     selected: '',
-    onSelect: (_, nombre) => { addPedProd(nombre, targetBox); closeEdit(); },
+    onSelect: (_, nombre) => { addPedProd(nombre, targetBox); },
     addLabel: 'Producto nuevo',
     onAdd: async nombre => {
       if (!nombre?.trim()) return;
@@ -2760,7 +2758,7 @@ async function sendMsg(){
   chatHistory.push({role:'user',content:msg, ts:new Date().toISOString()});
   const system=buildOttoContext()+'\n\nRespondé máximo 3 oraciones. Sin markdown. Sin asteriscos.';
   try{
-    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:500,system,messages:chatHistory.slice(-10)})});
+    const res=await fetch('/.netlify/functions/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-haiku-4-5-20251001',max_tokens:500,system,messages:chatHistory.slice(-10).map(({role,content})=>({role,content}))})});
     const data=await res.json();
     const reply=data.content?.[0]?.text||'No pude responder.';
     document.getElementById(tid)?.remove();
@@ -2983,7 +2981,6 @@ onAuthStateChanged(auth, async user => {
 
 // Auth
 g('btnGoogle')?.addEventListener('click', loginGoogle);
-g('otto-global-fab')?.addEventListener('click', () => navTo('otto'));
 g('menu-logout')?.addEventListener('click', logoutOtto);
 
 // Navegación
