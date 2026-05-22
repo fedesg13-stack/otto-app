@@ -1485,15 +1485,10 @@ function _openPickerLista({ title, items, selected, onSelect, addLabel, onAdd, e
       el.style.display = el.dataset.name.toLowerCase().includes(q) ? '' : 'none';
     });
   });
-  console.log('[picker] items encontrados:', listEl.querySelectorAll('.pg-item').length);
   listEl.querySelectorAll('.pg-item').forEach(el => {
     el.addEventListener('mouseenter', () => el.style.background = 'var(--surface2)');
     el.addEventListener('mouseleave', () => el.style.background = '');
-    el.addEventListener('click', () => {
-      console.log('[picker] click en:', el.dataset.name);
-      if (onSelect) onSelect(el.dataset.id, el.dataset.name);
-      closeEdit();
-    });
+    el.addEventListener('click', () => { if (onSelect) onSelect(el.dataset.id, el.dataset.name); closeEdit(); });
   });
   if (onAdd) {
     searchEl.addEventListener('keydown', e => {
@@ -3098,7 +3093,7 @@ _dpBindDinamico({
 // Categoría de finanza (dos niveles con categorías dinámicas)
 g('fin-cat-trigger')?.addEventListener('click', openFinCatPicker);
 // Productos en pedido
-g('ped-prod-trigger')?.addEventListener('click', openPedProdPicker);
+g('ped-prod-trigger')?.addEventListener('click', () => openPedProdPicker());
 
 // Picker directorio — eventos globales del DOM
 g('dp-close')?.addEventListener('click', dpClose);
