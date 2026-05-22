@@ -3370,24 +3370,33 @@ setTimeout(()=>{if(g('ob3')?.classList.contains('on'))finishOnboarding();},3000)
 
 // Teclado iOS: sheet sube con el teclado
 if('visualViewport' in window){
-  let _kbHeight = 0;
-  window.visualViewport.addEventListener('resize', () => {
-    const gap = window.innerHeight - window.visualViewport.height;
-    _kbHeight = gap > 100 ? gap : 0;
+  const _updateSheetsForKeyboard = () => {
+    const vv = window.visualViewport;
+    const offsetY = window.innerHeight - vv.height - vv.offsetTop;
+    const kbVisible = offsetY > 100;
     // Sheets de formulario
     document.querySelectorAll('.sheet.on').forEach(s => {
-      s.style.transform = _kbHeight ? `translateY(-${_kbHeight}px)` : '';
+      s.style.transform = kbVisible ? `translateY(-${offsetY}px)` : '';
     });
-    // Edit sheet: ajustar max-height para que no quede tapado por el teclado
+    // Edit sheet: posicionar usando offsetTop del visualViewport
     const editSheet = document.querySelector('#edit-sheet.on');
     if (editSheet) {
-      if (_kbHeight) {
-        editSheet.style.maxHeight = `${window.visualViewport.height * 0.95}px`;
-        editSheet.style.bottom = '0';
+      if (kbVisible) {
+        // En iOS con teclado, el viewport se achica desde arriba
+        // Posicionar el sheet justo encima del teclado
+        const sheetTop = vv.offsetTop + vv.height - editSheet.offsetHeight;
+        editSheet.style.position = 'fixed';
+        editSheet.style.top = `${Math.max(vv.offsetTop + 20, sheetTop)}px`;
+        editSheet.style.bottom = 'auto';
+        editSheet.style.maxHeight = `${vv.height * 0.9}px`;
       } else {
-        editSheet.style.maxHeight = '';
+        editSheet.style.position = '';
+        editSheet.style.top = '';
         editSheet.style.bottom = '';
+        editSheet.style.maxHeight = '';
       }
     }
-  });
+  };
+  window.visualViewport.addEventListener('resize', _updateSheetsForKeyboard);
+  window.visualViewport.addEventListener('scroll', _updateSheetsForKeyboard);
 }
