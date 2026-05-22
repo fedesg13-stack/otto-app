@@ -2896,13 +2896,15 @@ async function inicializarOTTO(user) {
     loadAllData(),
     _cargarPerfil(),
     _cargarNotas(),
-    _cargarChat(),
   ]);
 
   // ── Paso 4: Render completo ───────────────────────
   // En este punto: S.directorio ✓, S.categorias ✓, S.movs ✓, S.pedidos ✓,
   // S.eventos ✓, S.tareas ✓, S.perfil ✓, S.notas ✓
   _renderTodo();
+
+  // ── Paso 4b: Chat historial (después del render, DOM listo) ──
+  _cargarChat();
 
   // ── Paso 5: Onboarding si es nuevo usuario ────────
   if (!S.perfil?.onboardingDone)
