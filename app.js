@@ -1213,7 +1213,11 @@ function openEdit(titulo, bodyHtml) {
   g('edit-body').innerHTML    = '';
   g('edit-body').innerHTML    = bodyHtml;
   g('edit-overlay').classList.add('on');
-  g('edit-sheet').classList.add('on');
+  const es = g('edit-sheet');
+  es.classList.add('on');
+  es.scrollTop = 0; // siempre arrancar desde arriba
+  es.style.bottom = ''; // resetear posición del teclado
+  es.style.maxHeight = '';
 }
 const closeEdit = () => {
   g('edit-overlay').classList.remove('on');
