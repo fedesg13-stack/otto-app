@@ -146,6 +146,12 @@ const fmtARS = n => {
   const abs = Math.abs(n);
   return (n<0?'-':'')+'$'+abs.toLocaleString('es-AR',{minimumFractionDigits:0,maximumFractionDigits:0});
 };
+// Muestra solo el ítem sin el prefijo de categoría (ej: "Proveedores / Magus" → "Magus")
+const fmtCat = cat => {
+  if (!cat) return 'Sin categoría';
+  const slash = cat.indexOf(' / ');
+  return slash >= 0 ? cat.slice(slash + 3) : cat;
+};
 const fmt = ds => {
   try { return new Date(ds+'T00:00:00').toLocaleDateString('es-AR',{day:'numeric',month:'short'}); }
   catch(e) { return ds; }
@@ -1634,7 +1640,7 @@ function editMov(id) {
       <span class="field-trigger-lbl" style="margin-top:4px;">Categoría</span>
       <button class="field-trigger rpl${catActual?' filled':''}" id="ep-cat-trigger">
         <span id="ep-cat-lbl" style="color:${catActual?'var(--t1)':'var(--t4)'};">
-          ${catActual || 'Seleccionar categoría…'}
+          ${catActual ? fmtCat(catActual) : 'Seleccionar categoría…'}
         </span>
         <span class="material-icons-round">expand_more</span>
       </button>
@@ -2008,7 +2014,7 @@ function renderMovsFin() {
               </span>
             </div>
             <div class="mov-info">
-              <div class="mov-cat">${m.cat||'Sin categoría'}</div>
+              <div class="mov-cat">${fmtCat(m.cat)}</div>
               ${m.desc?`<div class="mov-desc">${m.desc}</div>`:''}
               ${m.proveedorNombre?`<div class="mov-desc">🏭 ${m.proveedorNombre}</div>`:''}
             </div>
@@ -3331,12 +3337,15 @@ setTimeout(()=>{if(g('ob3')?.classList.contains('on'))finishOnboarding();},3000)
 if('visualViewport' in window){
   window.visualViewport.addEventListener('resize', () => {
     const gap = window.innerHeight - window.visualViewport.height;
+    const offset = gap > 100 ? gap : 0;
+    // Sheets de formulario
     document.querySelectorAll('.sheet.on').forEach(s => {
-      s.style.transform = gap > 100 ? `translateY(-${gap}px)` : '';
+      s.style.transform = offset ? `translateY(-${offset}px)` : '';
     });
+    // Edit sheet (pickers, editar ítems)
     const editSheet = document.querySelector('#edit-sheet.on');
     if (editSheet) {
-      editSheet.style.transform = gap > 100 ? `translateY(-${gap}px)` : '';
+      editSheet.style.bottom = offset ? `${offset}px` : '0';
     }
   });
 }
