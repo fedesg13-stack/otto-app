@@ -1298,7 +1298,6 @@ function _openFinCatDosNiveles(items, onSelect) {
     searchEl.addEventListener('input', () => {
       const q = searchEl.value.toLowerCase();
       g('pg-list').querySelectorAll('.pg-item').forEach(el => {
-        // Buscar en nombre de categoría Y en nombres de sus ítems (nivel 2)
         const catId = el.dataset.catId;
         const matchNombre = el.dataset.name.toLowerCase().includes(q);
         const matchItems = catId
@@ -1317,8 +1316,16 @@ function _openFinCatDosNiveles(items, onSelect) {
       el.addEventListener('mouseleave', () => el.style.background='');
       el.addEventListener('click', () => {
         const nombre = el.dataset.catNombre || el.dataset.name.replace(/^[^\w\s]+ /,'').trim();
+        const q = searchEl.value.trim().toLowerCase();
         if (el.dataset.hasSubcats === 'true' && el.dataset.catId) {
-          // Navegar al nivel 2
+          // Si hay búsqueda activa y matchea exactamente UN ítem de nivel 2, seleccionarlo directo
+          if (q) {
+            const matches = dirGetByCat(el.dataset.catId).filter(e => e.nombre.toLowerCase().includes(q));
+            if (matches.length === 1) {
+              seleccionar(nombre + ' / ' + matches[0].nombre);
+              return;
+            }
+          }
           renderNivel2(el.dataset.catId, nombre, el.dataset.name.split(' ')[0]);
         } else {
           seleccionar(nombre);
@@ -3323,10 +3330,13 @@ setTimeout(()=>{if(g('ob3')?.classList.contains('on'))finishOnboarding();},3000)
 // Teclado iOS: sheet sube con el teclado
 if('visualViewport' in window){
   window.visualViewport.addEventListener('resize', () => {
-    const sheets=document.querySelectorAll('.sheet.on');
-    sheets.forEach(s=>{
-      const gap=window.innerHeight-window.visualViewport.height;
-      s.style.transform=gap>100?`translateY(-${gap}px)`:'';
+    const gap = window.innerHeight - window.visualViewport.height;
+    document.querySelectorAll('.sheet.on').forEach(s => {
+      s.style.transform = gap > 100 ? `translateY(-${gap}px)` : '';
     });
+    const editSheet = document.querySelector('#edit-sheet.on');
+    if (editSheet) {
+      editSheet.style.transform = gap > 100 ? `translateY(-${gap}px)` : '';
+    }
   });
 }
