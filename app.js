@@ -2901,26 +2901,19 @@ async function inicializarOTTO(user) {
   g('login').classList.remove('on');
   g('app').classList.add('on');
 
-  // ── Paso 2: Directorio — esperar primer snapshot ─
-  // fetchDirectorio() ahora devuelve una Promise que resuelve
-  // cuando llega el primer snapshot. S.directorio queda lleno.
+  console.log('[OTTO] paso 2: fetchDirectorio...');
   await fetchDirectorio();
-
-  // ── Paso 2b: Categorías dinámicas ────────────────
+  console.log('[OTTO] paso 2b: fetchCategorias...');
   await fetchCategorias();
-  // Si es usuario nuevo, crear las 4 categorías por defecto
+  console.log('[OTTO] paso 2c: initCategoriasDefault...');
   await initCategoriasDefault();
-
-  // ── Paso 3: Resto de datos en paralelo ───────────
+  console.log('[OTTO] paso 3: loadAllData...');
   await Promise.allSettled([
     loadAllData(),
     _cargarPerfil(),
     _cargarNotas(),
   ]);
-
-  // ── Paso 4: Render completo ───────────────────────
-  // En este punto: S.directorio ✓, S.categorias ✓, S.movs ✓, S.pedidos ✓,
-  // S.eventos ✓, S.tareas ✓, S.perfil ✓, S.notas ✓
+  console.log('[OTTO] paso 4: renderTodo...');
   _renderTodo();
 
   // ── Paso 4b: Chat historial (después del render, DOM listo) ──
