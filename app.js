@@ -900,7 +900,7 @@ function dpOpen({ categoria, titulo, selectedId, onSelect }) {
   _dpRenderList();
   g('dp-overlay').classList.add('on');
   g('dp-sheet').classList.add('on');
-  setTimeout(() => g('dp-search').focus(), 300);
+  // No auto-focus: teclado solo si el usuario toca el buscador
 }
 
 function dpClose() {
@@ -1373,7 +1373,7 @@ function _openFinCatDosNiveles(items, onSelect) {
         }
       });
     });
-    searchEl.focus();
+    // No auto-focus: el teclado solo aparece si el usuario toca el buscador
   };
 
   const renderNivel2 = (catId, catNombre, catIcono) => {
