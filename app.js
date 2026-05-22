@@ -1302,14 +1302,46 @@ function _openFinCatDosNiveles(items, onSelect) {
 
     const searchEl = g('pg-search');
     searchEl.addEventListener('input', () => {
-      const q = searchEl.value.toLowerCase();
-      g('pg-list').querySelectorAll('.pg-item').forEach(el => {
-        const catId = el.dataset.catId;
-        const matchNombre = el.dataset.name.toLowerCase().includes(q);
-        const matchItems = catId
-          ? dirGetByCat(catId).some(e => e.nombre.toLowerCase().includes(q))
-          : false;
-        el.style.display = (matchNombre || matchItems) ? '' : 'none';
+      const q = searchEl.value.trim().toLowerCase();
+      const list = g('pg-list');
+      if (!q) {
+        // Sin búsqueda: mostrar categorías normalmente
+        list.querySelectorAll('.pg-item').forEach(el => el.style.display = '');
+        list.querySelectorAll('.pg-items-inline').forEach(el => el.remove());
+        return;
+      }
+      // Con búsqueda: ocultar categorías y mostrar ítems que matchean inline
+      list.querySelectorAll('.pg-item').forEach(el => el.style.display = 'none');
+      list.querySelectorAll('.pg-items-inline').forEach(el => el.remove());
+      // Buscar en todos los ítems de todas las categorías
+      const resultados = [];
+      items.forEach(item => {
+        if (!item.catId) return;
+        const cat = getCatById(item.catId);
+        const catNombre = item.nombre || item.name.replace(/^[^\w\s]+ /,'').trim();
+        dirGetByCat(item.catId).forEach(e => {
+          if (e.nombre.toLowerCase().includes(q)) {
+            resultados.push({ nombre: e.nombre, catNombre, catId: item.catId });
+          }
+        });
+      });
+      if (resultados.length === 0) {
+        const empty = document.createElement('div');
+        empty.className = 'pg-items-inline';
+        empty.style.cssText = 'padding:12px;font-size:13px;color:var(--t4);text-align:center;';
+        empty.textContent = 'Sin resultados. Presioná Enter para categoría personalizada.';
+        list.appendChild(empty);
+        return;
+      }
+      resultados.forEach(r => {
+        const div = document.createElement('div');
+        div.className = 'rpl pg-items-inline';
+        div.style.cssText = 'padding:11px 12px;border-radius:var(--r10);cursor:pointer;font-size:14px;font-weight:500;color:var(--t1);display:flex;align-items:center;gap:8px;transition:background .1s;';
+        div.innerHTML = `<div style="flex:1;">${r.nombre}<div style="font-size:11px;color:var(--t4);margin-top:2px;">${r.catNombre}</div></div>`;
+        div.addEventListener('mouseenter', () => div.style.background = 'var(--surface2)');
+        div.addEventListener('mouseleave', () => div.style.background = '');
+        div.addEventListener('click', () => { seleccionar(r.catNombre + ' / ' + r.nombre); });
+        list.appendChild(div);
       });
     });
     searchEl.addEventListener('keydown', e => {
@@ -3338,35 +3370,24 @@ setTimeout(()=>{if(g('ob3')?.classList.contains('on'))finishOnboarding();},3000)
 
 // Teclado iOS: sheet sube con el teclado
 if('visualViewport' in window){
+  let _kbHeight = 0;
   window.visualViewport.addEventListener('resize', () => {
     const gap = window.innerHeight - window.visualViewport.height;
-    const offset = gap > 150 ? gap : 0;
+    _kbHeight = gap > 100 ? gap : 0;
     // Sheets de formulario
     document.querySelectorAll('.sheet.on').forEach(s => {
-      s.style.transform = offset ? `translateY(-${offset}px)` : '';
+      s.style.transform = _kbHeight ? `translateY(-${_kbHeight}px)` : '';
     });
-    // Edit sheet: mover bottom para que suba con el teclado
+    // Edit sheet: ajustar max-height para que no quede tapado por el teclado
     const editSheet = document.querySelector('#edit-sheet.on');
     if (editSheet) {
-      editSheet.style.bottom = offset ? `${offset}px` : '0px';
-      // Si hay un input activo dentro, hacer scroll para que sea visible
-      const activeEl = document.activeElement;
-      if (offset && activeEl && editSheet.contains(activeEl)) {
-        setTimeout(() => activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      if (_kbHeight) {
+        editSheet.style.maxHeight = `${window.visualViewport.height * 0.95}px`;
+        editSheet.style.bottom = '0';
+      } else {
+        editSheet.style.maxHeight = '';
+        editSheet.style.bottom = '';
       }
-    }
-  });
-  // También manejar el scroll cuando un input dentro del edit-sheet recibe foco
-  document.addEventListener('focusin', e => {
-    const editSheet = document.querySelector('#edit-sheet.on');
-    if (editSheet && editSheet.contains(e.target)) {
-      setTimeout(() => {
-        const gap = window.innerHeight - (window.visualViewport?.height || window.innerHeight);
-        if (gap > 150) {
-          editSheet.style.bottom = `${gap}px`;
-          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 300);
     }
   });
 }
