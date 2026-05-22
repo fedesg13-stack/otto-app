@@ -185,18 +185,29 @@ function fetchCategorias() {
   return new Promise((resolve) => {
     if (S.catsUnsub) S.catsUnsub();
     let primero = true;
+    let resuelto = false;
+    const _resolve = () => { if (!resuelto) { resuelto = true; resolve(); } };
+
+    // Timeout de seguridad: si onSnapshot no responde en 8s, continuar igual
+    const timeout = setTimeout(() => {
+      console.warn('[Cats] timeout — continuando sin datos');
+      _resolve();
+    }, 8000);
+
     const q = query(catsCol(), where('activo','==',true));
     S.catsUnsub = onSnapshot(q, snap => {
+      clearTimeout(timeout);
       S.categorias = snap.docs.map(d => ({ ...d.data(), _id: d.id }));
-      if (primero) { primero = false; resolve(); }
+      if (primero) { primero = false; _resolve(); }
       else { renderDirectorioGrid(); }
     }, async err => {
+      clearTimeout(timeout);
       console.warn('[Cats] onSnapshot:', err.message);
       try {
         const snap = await getDocs(catsCol());
         S.categorias = snap.docs.map(d => ({ ...d.data(), _id: d.id })).filter(c => c.activo !== false);
       } catch(e) {}
-      resolve();
+      _resolve();
     });
   });
 }
@@ -291,32 +302,41 @@ function fetchDirectorio() {
     if (S.dirUnsub) S.dirUnsub();
 
     let primerLlamada = true;
+    let resuelto = false;
+    const _resolve = () => { if (!resuelto) { resuelto = true; resolve(); } };
+
+    // Timeout de seguridad: si onSnapshot no responde en 8s, continuar igual
+    const timeout = setTimeout(() => {
+      console.warn('[Directorio] timeout — continuando sin datos');
+      _resolve();
+    }, 8000);
+
     const q = query(dirCol(), where('activo','==',true));
 
     S.dirUnsub = onSnapshot(q,
       snap => {
+        clearTimeout(timeout);
         S.directorio = snap.docs
           .map(d => ({ id: d.id, ...d.data() }))
           .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
 
         if (primerLlamada) {
           primerLlamada = false;
-          resolve(); // desbloquea el await en inicializarOTTO()
+          _resolve();
         } else {
-          // Snapshots posteriores: propagación neuronal completa
           _despuesDeActualizarDirectorio();
         }
       },
       err => {
+        clearTimeout(timeout);
         console.warn('[Directorio] onSnapshot error:', err.message);
-        // Fallback: getDocs si falla el listener
         getDocs(dirCol()).then(snap => {
           S.directorio = snap.docs
             .map(d => ({ id: d.id, ...d.data() }))
             .filter(e => e.activo !== false)
             .sort((a,b) => (a.nombre||'').localeCompare(b.nombre||'','es'));
-          resolve();
-        }).catch(() => resolve()); // resolver igual para no bloquear el arranque
+          _resolve();
+        }).catch(() => _resolve());
       }
     );
   });
