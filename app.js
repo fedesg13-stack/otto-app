@@ -1322,17 +1322,20 @@ function _openFinCatDosNiveles(items, onSelect) {
       el.addEventListener('mouseleave', () => el.style.background='');
       el.addEventListener('click', () => {
         const nombre = el.dataset.catNombre || el.dataset.name.replace(/^[^\w\s]+ /,'').trim();
-        const q = searchEl.value.trim().toLowerCase();
+        // Leer q del DOM directo para evitar problemas de closure en iOS
+        const q = (g('pg-search')?.value || '').trim().toLowerCase();
         if (el.dataset.hasSubcats === 'true' && el.dataset.catId) {
-          // Si hay búsqueda activa y matchea exactamente UN ítem de nivel 2, seleccionarlo directo
           if (q) {
             const matches = dirGetByCat(el.dataset.catId).filter(e => e.nombre.toLowerCase().includes(q));
             if (matches.length === 1) {
               seleccionar(nombre + ' / ' + matches[0].nombre);
               return;
             }
+            // Varios matches: ir al nivel 2 ya filtrado
+            renderNivel2(el.dataset.catId, nombre, el.dataset.name.split(' ')[0]);
+          } else {
+            renderNivel2(el.dataset.catId, nombre, el.dataset.name.split(' ')[0]);
           }
-          renderNivel2(el.dataset.catId, nombre, el.dataset.name.split(' ')[0]);
         } else {
           seleccionar(nombre);
         }
@@ -3337,15 +3340,33 @@ setTimeout(()=>{if(g('ob3')?.classList.contains('on'))finishOnboarding();},3000)
 if('visualViewport' in window){
   window.visualViewport.addEventListener('resize', () => {
     const gap = window.innerHeight - window.visualViewport.height;
-    const offset = gap > 100 ? gap : 0;
+    const offset = gap > 150 ? gap : 0;
     // Sheets de formulario
     document.querySelectorAll('.sheet.on').forEach(s => {
       s.style.transform = offset ? `translateY(-${offset}px)` : '';
     });
-    // Edit sheet (pickers, editar ítems)
+    // Edit sheet: mover bottom para que suba con el teclado
     const editSheet = document.querySelector('#edit-sheet.on');
     if (editSheet) {
-      editSheet.style.bottom = offset ? `${offset}px` : '0';
+      editSheet.style.bottom = offset ? `${offset}px` : '0px';
+      // Si hay un input activo dentro, hacer scroll para que sea visible
+      const activeEl = document.activeElement;
+      if (offset && activeEl && editSheet.contains(activeEl)) {
+        setTimeout(() => activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+      }
+    }
+  });
+  // También manejar el scroll cuando un input dentro del edit-sheet recibe foco
+  document.addEventListener('focusin', e => {
+    const editSheet = document.querySelector('#edit-sheet.on');
+    if (editSheet && editSheet.contains(e.target)) {
+      setTimeout(() => {
+        const gap = window.innerHeight - (window.visualViewport?.height || window.innerHeight);
+        if (gap > 150) {
+          editSheet.style.bottom = `${gap}px`;
+          e.target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 300);
     }
   });
 }
