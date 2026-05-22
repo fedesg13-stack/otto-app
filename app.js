@@ -1791,7 +1791,9 @@ function editPed(id) {
       <span class="prod-row-name">${i.p||''}</span>
       <div class="prod-row-qty">
         <button class="qty-btn rpl" data-a="dec">−</button>
-        <span class="qty-num">${i.q||1}</span>
+        <input class="qty-num" type="number" value="${i.q||1}" min="1" inputmode="numeric"
+          style="width:36px;text-align:center;border:none;background:transparent;
+                 font-family:var(--font);font-size:14px;font-weight:700;color:var(--t1);outline:none;">
         <button class="qty-btn rpl" data-a="inc">+</button>
       </div>
       <button class="prod-row-del rpl"><span class="material-icons-round" style="font-size:18px">close</span></button>
@@ -1815,12 +1817,11 @@ function editPed(id) {
   // Listeners qty en productos existentes
   g('ep-prods').querySelectorAll('.prod-row').forEach(row => {
     row.querySelector('[data-a="dec"]').addEventListener('click',()=>{
-      const n=row.querySelector('.qty-num'),v=parseInt(n.value||n.textContent)-1;
-      if(v<1) row.remove(); else { n.value ? n.value=v : n.textContent=v; }
+      const n=row.querySelector('.qty-num'), v=parseInt(n.value)-1;
+      if(v<1) row.remove(); else n.value=v;
     });
     row.querySelector('[data-a="inc"]').addEventListener('click',()=>{
-      const n=row.querySelector('.qty-num');
-      n.value ? n.value=parseInt(n.value)+1 : n.textContent=parseInt(n.textContent)+1;
+      const n=row.querySelector('.qty-num'); n.value=parseInt(n.value)+1;
     });
     row.querySelector('.prod-row-del').addEventListener('click',()=>row.remove());
   });
@@ -3382,10 +3383,10 @@ if('visualViewport' in window){
     document.querySelectorAll('.sheet.on').forEach(s => {
       s.style.transform = kbVisible ? `translateY(-${gap}px)` : '';
     });
-    // Edit sheet
-    const editSheet = document.querySelector('#edit-sheet.on');
-    if (editSheet) {
-      editSheet.style.bottom = kbVisible ? `${gap}px` : '';
-    }
+    // Edit sheet y dp-sheet
+    ['#edit-sheet', '#dp-sheet'].forEach(sel => {
+      const el = document.querySelector(sel + '.on');
+      if (el) el.style.bottom = kbVisible ? `${gap}px` : '';
+    });
   });
 }
